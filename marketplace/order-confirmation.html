@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed - Marketplace</title>
+    <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="css/checkout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .confirmation-container {
+            max-width: 600px;
+            margin: 4rem auto;
+            text-align: center;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .success-icon-large {
+            font-size: 5rem;
+            color: #4CAF50;
+            margin-bottom: 1.5rem;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .order-details-box {
+            background: rgba(var(--primary-color-rgb), 0.05);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            0% {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="logo">Marketplace</h1>
+        </div>
+    </header>
+
+    <main>
+        <div class="confirmation-container">
+            <div class="success-icon-large">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1>Order Placed Successfully!</h1>
+            <p>Thank you for shopping with us. Your order has been confirmed.</p>
+
+            <div class="order-details-box">
+                <div class="detail-row">
+                    <span>Order ID:</span>
+                    <strong id="display-order-id">Loading...</strong>
+                </div>
+                <div class="detail-row">
+                    <span>Payment ID:</span>
+                    <strong id="display-pay-id">Loading...</strong>
+                </div>
+                <div class="detail-row" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #eee;">
+                    <span>Amount Paid:</span>
+                    <strong id="display-amount" style="color: var(--primary-color); font-size: 1.2rem;">...</strong>
+                </div>
+            </div>
+
+            <p style="margin-bottom: 2rem; color: #666;">A confirmation email has been sent to your registered email
+                address.</p>
+
+            <button onclick="window.location.href='marketplace.html'" class="place-order-btn">
+                Continue Shopping
+            </button>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Theme Loader ---
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+
+            // Parse URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
+            const payId = urlParams.get('payId');
+
+            if (orderId) {
+                document.getElementById('display-order-id').textContent = '#' + orderId;
+                document.getElementById('display-pay-id').textContent = payId;
+
+                // Retrieve order details from localStorage to show amount
+                const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                const order = orders.find(o => o.id === orderId);
+
+                if (order) {
+                    document.getElementById('display-amount').textContent = order.total;
+                }
+            } else {
+                // Fallback if accessed directly
+                window.location.href = 'marketplace.html';
+            }
+        });
+    </script>
+</body>
+
+</html>

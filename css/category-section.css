@@ -1,0 +1,283 @@
+/* Category Section Styles - Placeholder */
+/* All styles are currently inline in index.html */
+/* This file exists to prevent 404 errors */
+/* ===================================
+   Featured Categories - Shop by Category
+   =================================== */
+.featured-categories {
+    padding: var(--spacing-xxl) 0;
+    background: var(--primary-dark);
+    overflow: hidden;
+}
+
+.section-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+}
+
+/* Marquee Wrapper */
+.category-marquee-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.category-marquee {
+    display: flex;
+    width: fit-content;
+    animation: scroll 40s linear infinite;
+}
+
+.category-marquee:hover {
+    animation-play-state: paused;
+}
+
+.category-scroll-track {
+    display: flex;
+    gap: var(--spacing-lg);
+    padding: 0 calc(var(--spacing-lg) / 2);
+}
+
+/* Category Cards */
+.category-card {
+    flex-shrink: 0;
+    width: 280px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+}
+
+.category-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--primary-red);
+    box-shadow: 0 12px 32px rgba(227, 30, 36, 0.3);
+}
+
+.category-image {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, #1a2332, #2a3342);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+/* Category Image Variants with Detailed SVG Icons for All 22 Categories */
+
+/* Motherboard */
+.category-card[data-category="motherboard"] .category-image {
+    background: url('../images/categories/motherboard.png') center/cover no-repeat,
+
+        linear-gradient(135deg, rgba(26, 35, 50, 0.7), rgba(42, 51, 66, 0.7));
+}
+
+/* CPU */
+.category-card[data-category="cpu"] .category-image {
+    background: url('../images/categories/cpu.png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(42, 26, 50, 0.7), rgba(58, 42, 66, 0.7));
+}
+
+/* Hard Disk (HDD) */
+.category-card[data-category="hdd"] .category-image {
+    background: url('../images/categories/Hard Disk.png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(50, 26, 42, 0.7), rgba(66, 58, 58, 0.7));
+}
+
+/* Power Supply (PSU) */
+.category-card[data-category="psu"] .category-image {
+    background: url('../images/categories/psu.png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2));
+}
+
+/* SSD */
+.category-card[data-category="ssd"] .category-image {
+    background: url('../images/categories/ssd.jpg') center/cover no-repeat,
+        linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
+}
+
+/* Monitor */
+.category-card[data-category="monitor"] .category-image {
+    background: url('../images/categories/monitor.png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2));
+}
+
+/* Mouse */
+.category-card[data-category="mouse"] .category-image {
+    background: url('../images/categories/mouse.png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2));
+}
+
+/* GPU */
+.category-card[data-category="gpu"] .category-image {
+    background: url('../images/categories/gpu.jpg') center/cover no-repeat,
+        linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
+}
+
+/* Printer */
+.category-card[data-category="printer"] .category-image {
+
+    background: url('../images/categories/printer.png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2));
+}
+
+/* RAM */
+.category-card[data-category="ram"] .category-image {
+    background: url('../images/categories/ram (2).png') center/cover no-repeat,
+
+        linear-gradient(135deg, rgba(42, 26, 50, 0.7), rgba(58, 42, 58, 0.7));
+}
+
+/* Input Devices */
+.category-card[data-category="input-devices"] .category-image {
+    background: url('../images/categories/input dives.png') center/cover no-repeat,
+
+        linear-gradient(135deg, rgba(26, 35, 50, 0.7), rgba(42, 51, 66, 0.7));
+}
+
+/* Microphone */
+.category-card[data-category="microphone"] .category-image {
+    background: url('../images/categories/microphone.png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2));
+}
+
+/* Output Devices */
+.category-card[data-category="output-devices"] .category-image {
+    background: url('../images/categories/output dives.png') center/cover no-repeat,
+
+        linear-gradient(135deg, rgba(50, 26, 42, 0.7), rgba(66, 58, 58, 0.7));
+}
+
+/* Peripherals */
+.category-card[data-category="peripherals"] .category-image {
+    background: url('../images/categories/peripherals.jpg') center/cover no-repeat,
+        linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
+}
+
+
+
+/* Computer */
+.category-card[data-category="computer"] .category-image {
+    background: url('../images/categories/computer.jpg') center/cover no-repeat,
+        linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
+}
+
+/* Computer Cases */
+.category-card[data-category="cases"] .category-image {
+    background: url('../images/categories/pc-case.jpg') center/cover no-repeat,
+        linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
+}
+
+/* Storage Devices */
+.category-card[data-category="storage-devices"] .category-image {
+    background: url('../images/categories/storage.jpg') center/cover no-repeat,
+        linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
+}
+
+/* Computer Keyboard */
+.category-card[data-category="keyboard"] .category-image {
+    background: url('../images/categories/keyboard.jpg') center/cover no-repeat,
+        linear-gradient(135deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
+}
+
+.badge-new {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    background: var(--primary-red);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.category-card h3 {
+    padding: var(--spacing-md);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    text-align: center;
+    color: var(--text-primary);
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Marquee Animation */
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .category-card {
+        width: 240px;
+    }
+}
+
+@media (max-width: 768px) {
+    .category-card {
+        width: 200px;
+    }
+
+    .category-image {
+        height: 160px;
+    }
+
+    .category-card h3 {
+        font-size: var(--font-size-base);
+        min-height: 70px;
+        padding: var(--spacing-sm);
+    }
+
+    .category-marquee {
+        animation: scroll 25s linear infinite;
+    }
+}
+
+@media (max-width: 480px) {
+    .category-card {
+        width: 160px;
+    }
+
+    .category-image {
+        height: 120px;
+    }
+
+    .category-card h3 {
+        font-size: var(--font-size-sm);
+        min-height: 60px;
+        padding: var(--spacing-xs);
+    }
+
+    .category-scroll-track {
+        gap: var(--spacing-sm);
+    }
+
+    .category-marquee {
+        animation: scroll 20s linear infinite;
+    }
+}

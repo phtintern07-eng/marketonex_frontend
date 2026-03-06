@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - VendorVerse</title>
+    <!-- Core Vendor Site CSS -->
+    <link rel="stylesheet" href="/vendor-site/css/gaming-theme.css">
+    <link rel="stylesheet" href="/vendor-site/css/main.css">
+    <link rel="stylesheet" href="/vendor-site/css/vendor-profile.css">
+
+    <!-- Cart System CSS (Replicated from Marketplace) -->
+    <link rel="stylesheet" href="/vendor-site/css/cart.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navigation Bar (Preserved from Vendor Site) -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="nav-brand">Vendor<span>Verse</span></a>
+            <div class="nav-links">
+                <a href="/vendor-site/index.html" class="nav-link">Home</a>
+                <a href="/vendor-site/products.html" class="nav-link">Shop</a>
+                <a href="/vendor-site/orders.html" class="nav-link">My Orders</a>
+                <a href="/vendor-site/cart.html" class="nav-link active"><i class="fas fa-shopping-cart"></i></a>
+
+                <!-- User Profile Icon & Dropdown -->
+                <div class="profile-container">
+                    <button id="profile-icon-btn" class="profile-icon" aria-label="User Profile">
+                        <img id="profile-avatar" src="" alt="Profile" class="profile-avatar hidden">
+                        <div id="profile-initials" class="profile-initials"></div>
+                    </button>
+
+                    <!-- Profile Dropdown Panel -->
+                    <div id="profile-dropdown" class="profile-dropdown hidden">
+                        <!-- User Info Header -->
+                        <div class="profile-header">
+                            <img id="dropdown-avatar" src="" alt="Profile" class="dropdown-avatar">
+                            <div class="profile-info">
+                                <p class="profile-greeting">Hello!</p>
+                                <h3 id="profile-name" class="profile-name">Vendor</h3>
+                            </div>
+                        </div>
+
+                        <!-- Profile Menu Sections -->
+                        <div class="profile-menu">
+                            <!-- Vendor Dashboard -->
+                            <div class="profile-menu-section">
+                                <a href="/vendor-site/products.html" class="profile-menu-item">
+                                    <i class="fas fa-box"></i>
+                                    <div class="menu-item-content">
+                                        <span class="menu-item-title">My Products</span>
+                                        <span class="menu-item-desc">Manage your inventory</span>
+                                    </div>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </div>
+
+                            <!-- Account Settings -->
+                            <div class="profile-menu-section">
+                                <h4 class="section-title">Account Settings</h4>
+                                <a href="/vendor-site/profile.html" class="profile-menu-item">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span class="menu-item-title">Profile Information</span>
+                                </a>
+                                <a href="/vendor-site/orders.html" class="profile-menu-item">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <span class="menu-item-title">Orders</span>
+                                </a>
+                            </div>
+
+                            <!-- Frequently Visited -->
+                            <div class="profile-menu-section">
+                                <h4 class="section-title">Frequently Visited</h4>
+                                <a href="/vendor-site/profile.html#password" class="profile-menu-item">
+                                    <i class="fas fa-key"></i>
+                                    <span class="menu-item-title">Change Password</span>
+                                </a>
+                                <a href="/vendor-site/help.html" class="profile-menu-item">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="menu-item-title">Help Center</span>
+                                </a>
+                            </div>
+
+                            <!-- Logout -->
+                            <div class="profile-menu-section">
+                                <button id="profile-logout-btn" class="profile-menu-item logout-btn">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span class="menu-item-title">Logout</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="theme-toggle" class="btn btn-secondary" style="padding: 0.5rem;">
+                <span id="theme-icon"><i class="fas fa-moon"></i></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Cart Layout (Replicated from Marketplace) -->
+    <main class="cart-container">
+        <div class="cart-content">
+            <!-- Product List Section -->
+            <div class="cart-products-section">
+                <div class="section-header">
+                    <h2>Product</h2>
+                    <h2 class="total-header">Total</h2>
+                </div>
+
+                <div id="cart-items-container" class="cart-items">
+                    <!-- Cart items will be dynamically inserted here -->
+                </div>
+
+                <div id="empty-cart-message" class="empty-cart hidden">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Your cart is empty</h3>
+                    <p>Add some products to get started!</p>
+                </div>
+
+                <div class="cart-footer">
+                    <p class="help-text">Need help? Check our <a href="/vendor-site/help.html">help and support</a></p>
+                    <button id="back-to-shopping" class="back-btn">
+                        <i class="fas fa-arrow-left"></i> Go back to shopping
+                    </button>
+                </div>
+            </div>
+
+            <!-- Order Summary Panel -->
+            <div class="order-summary-panel">
+                <div class="order-summary-sticky">
+                    <h2>Order Summary</h2>
+
+                    <div class="summary-details">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal-amount">₹0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>V.A.T</span>
+                            <span id="vat-amount">₹0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span id="shipping-amount">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="coupon-section">
+                        <button id="coupon-toggle" class="coupon-toggle">
+                            <span>Add a coupon</span>
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <div id="coupon-form" class="coupon-form hidden">
+                            <input type="text" id="coupon-input" placeholder="Enter your code">
+                            <button id="apply-coupon-btn" class="apply-coupon-btn">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div id="coupon-message" class="coupon-message hidden"></div>
+                        <div id="applied-discount" class="summary-row discount-row hidden">
+                            <span>Discount (<span id="discount-code"></span>)</span>
+                            <span id="discount-amount">-₹0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span id="total-amount">₹0.00</span>
+                    </div>
+
+                    <button id="checkout-btn" class="checkout-btn">
+                        Proceed to checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="toast-notification hidden">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message"></span>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/vendor-site/js/theme-switcher.js"></script>
+    <script src="/vendor-site/js/vendor-profile.js"></script>
+    <script src="/vendor-site/js/cart.js"></script>
+</body>
+
+</html>

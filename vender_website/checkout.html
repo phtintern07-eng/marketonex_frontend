@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - VendorVerse</title>
+    <!-- Core Vendor Site CSS -->
+    <link rel="stylesheet" href="/vendor-site/css/gaming-theme.css">
+    <link rel="stylesheet" href="/vendor-site/css/main.css">
+
+    <!-- Profile Dropdown CSS -->
+    <link rel="stylesheet" href="/vendor-site/css/vendor-profile.css">
+
+    <!-- Checkout CSS (Replicated from Marketplace) -->
+    <link rel="stylesheet" href="/vendor-site/css/checkout.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+</head>
+
+<body class="checkout-page">
+    <!-- 1. Navbar -->
+    <nav class="gaming-nav">
+        <div class="container-gaming" style="display: flex; justify-content: space-between; width: 100%;">
+            <!-- Left: Logo -->
+            <a href="/"
+                style="color: var(--text-main); font-weight: 800; font-size: 1.5rem; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; z-index: 10;">
+                <i class="fas fa-microchip" style="color: var(--accent);"></i> VENDORVERSE
+            </a>
+
+            <!-- Middle: Nav Links (Desktop Only) -->
+            <div class="nav-links" style="display: flex; align-items: center;">
+                <a href="/">Home</a>
+                <a href="/vendor-site/vendor_pc_builder.html">PC Builder</a>
+                <a href="/vendor-site/products.html">Shop</a>
+                <a href="/vendor-site/orders.html">Orders</a>
+                <a href="/" class="btn-gaming-outline"
+                    style="padding: 0.5rem 1rem; font-size: 0.8rem; margin-left: 0.5rem; text-decoration: none; color: var(--text-main); border: 1px solid var(--text-main);">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+
+            <!-- Right: Actions Group -->
+            <div class="nav-actions-group" style="display: flex; align-items: center; gap: 0.75rem;">
+                <!-- 🎨 Theme Switcher -->
+                <button id="customer-theme-toggle" class="nav-action-btn" aria-label="Toggle Theme">
+                    <i class="fas fa-palette"></i>
+                </button>
+
+                <!-- 🛒 Cart Button -->
+                <a href="/vendor-site/cart.html" class="nav-action-btn" aria-label="Cart">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 2rem; color: var(--text-primary);">
+        <a href="/vendor-site/cart.html" class="back-link"
+            style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--accent); text-decoration: none; margin-bottom: 1rem; font-weight: 500;"><i
+                class="fas fa-arrow-left"></i> Back to Cart</a>
+        <h1
+            style="margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; color: var(--text-primary);">
+            Checkout</h1>
+    </div>
+
+    <!-- Main Checkout Container -->
+    <main class="checkout-container" style="margin-top: 0;">
+        <form id="checkout-form" class="checkout-layout">
+            <!-- LEFT COLUMN: Forms -->
+            <div class="checkout-left">
+
+                <!-- Section 1: Contact Details -->
+                <section class="checkout-section fade-in">
+                    <h2 class="section-title"><i class="fas fa-user-circle"></i> Contact Details</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="fullname">Full Name</label>
+                            <input type="text" id="fullname" name="fullname" required placeholder="John Doe">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required placeholder="john@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="mobile">Mobile Number</label>
+                            <input type="tel" id="mobile" name="mobile" required placeholder="+91 98765 43210">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Delivery Address with Map -->
+                <section class="checkout-section fade-in delay-1">
+                    <h2 class="section-title"><i class="fas fa-map-marker-alt"></i> Delivery Address</h2>
+
+                    <div class="map-container-wrapper">
+                        <label>Pin your location to auto-fill address</label>
+                        <div id="map" style="height: 300px; width: 100%; border-radius: 8px; margin-bottom: 1rem;">
+                        </div>
+                        <button type="button" id="locate-me-btn" class="secondary-btn">
+                            <i class="fas fa-crosshairs"></i> Use My Current Location
+                        </button>
+                    </div>
+
+                    <div class="form-grid mt-2">
+                        <div class="form-group">
+                            <label for="house-no">House / Flat No.</label>
+                            <input type="text" id="house-no" name="house-no" required placeholder="e.g. 102">
+                        </div>
+                        <div class="form-group">
+                            <label for="building">Building / Apartment</label>
+                            <input type="text" id="building" name="building" required placeholder="e.g. Galaxy Heights">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="area">Street / Area / Colony</label>
+                            <input type="text" id="area" name="area" required placeholder="e.g. MG Road, Indiranagar">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="landmark">Landmark (Optional)</label>
+                            <input type="text" id="landmark" name="landmark" placeholder="e.g. Near Metro Station">
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City</label>
+                            <input type="text" id="city" name="city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <input type="text" id="state" name="state" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pincode">Pincode</label>
+                            <input type="text" id="pincode" name="pincode" required>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Payment Methods -->
+                <section class="checkout-section fade-in delay-2">
+                    <h2 class="section-title"><i class="fas fa-credit-card"></i> Payment Method</h2>
+
+                    <div class="payment-methods">
+                        <!-- UPI -->
+                        <div class="payment-option">
+                            <div class="payment-header">
+                                <input type="radio" name="payment" id="pay-upi" value="upi" checked>
+                                <label for="pay-upi" class="payment-label">
+                                    <span class="method-icon"><i class="fas fa-qrcode"></i></span>
+                                    <div class="method-details">
+                                        <span class="method-name">UPI / QR Code</span>
+                                        <span class="method-desc">Pay using GooglePay, PhonePe, Paytm</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="payment-content" id="upi-content">
+                                <p>Enter your UPI ID</p>
+                                <div class="input-group">
+                                    <input type="text" id="upi-id" placeholder="username@upi">
+                                    <button type="button" id="verify-upi-btn" class="verify-btn">Verify</button>
+                                </div>
+                                <p id="upi-msg" class="validation-msg hidden"></p>
+                            </div>
+                        </div>
+
+                        <!-- Card -->
+                        <div class="payment-option">
+                            <div class="payment-header">
+                                <input type="radio" name="payment" id="pay-card" value="card">
+                                <label for="pay-card" class="payment-label">
+                                    <span class="method-icon"><i class="fas fa-credit-card"></i></span>
+                                    <div class="method-details">
+                                        <span class="method-name">Credit / Debit Card</span>
+                                        <span class="method-desc">Visa, Mastercard, RuPay</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="payment-content hidden" id="card-content">
+                                <div class="card-form">
+                                    <input type="text" id="card-number" placeholder="Card Number (16 digits)"
+                                        maxlength="19">
+                                    <div class="card-row">
+                                        <input type="text" id="card-expiry" placeholder="MM/YY" maxlength="5">
+                                        <input type="password" id="card-cvv" placeholder="CVV" maxlength="3">
+                                    </div>
+                                    <input type="text" id="card-name" placeholder="Cardholder Name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COD -->
+                        <div class="payment-option">
+                            <div class="payment-header">
+                                <input type="radio" name="payment" id="pay-cod" value="cod">
+                                <label for="pay-cod" class="payment-label">
+                                    <span class="method-icon"><i class="fas fa-wallet"></i></span>
+                                    <div class="method-details">
+                                        <span class="method-name">Cash on Delivery</span>
+                                        <span class="method-desc">Pay when you receive the order</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- RIGHT COLUMN: Order Summary -->
+            <div class="checkout-right">
+                <div class="order-summary-card">
+                    <h3>Order Summary</h3>
+                    <div id="checkout-items" class="checkout-items-list">
+                        <!-- Items populated by JS -->
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div class="price-breakdown">
+                        <div class="row">
+                            <span>Subtotal</span>
+                            <span id="summary-subtotal">₹0.00</span>
+                        </div>
+                        <div class="row">
+                            <span>Tax (5%)</span>
+                            <span id="summary-tax">₹0.00</span>
+                        </div>
+                        <div class="row">
+                            <span>Shipping</span>
+                            <span id="summary-shipping">₹0.00</span>
+                        </div>
+                        <div class="row total-row">
+                            <span>Total Payable</span>
+                            <span id="summary-total">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="terms-conditions" style="margin: 1rem 0; font-size: 0.9rem; color: #555;">
+                        <input type="checkbox" id="terms-check" name="terms-check" required>
+                        <label for="terms-check">I agree to the <a href="#">Terms and Conditions</a> and <a
+                                href="#">Privacy Policy</a></label>
+                    </div>
+
+                    <button type="submit" id="place-order-btn" class="place-order-btn">
+                        Place Order <i class="fas fa-arrow-right"></i>
+                    </button>
+
+                    <div class="security-badges">
+                        <span><i class="fas fa-lock"></i> Secure Payment</span>
+                        <span><i class="fas fa-shield-alt"></i> PCI DSS Compliant</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="processing-overlay" class="overlay hidden">
+        <div class="loader">
+            <div class="spinner"></div>
+            <p>Processing Payment...</p>
+        </div>
+    </div>
+
+    <!-- Order Confirmation Modal/Screen -->
+    <div id="order-success-overlay" class="overlay hidden">
+        <div class="success-card fade-up">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2>Order Placed Successfully!</h2>
+            <p>Thank you for your purchase.</p>
+            <div class="order-details-mini"
+                style="margin: 1.5rem 0; background: var(--background-color); padding: 1rem; border-radius: 8px; text-align: left;">
+                <p style="margin: 0.5rem 0;">Order ID: <span id="success-order-id"
+                        style="font-weight: 700; color: var(--primary-color);">#ORD-12345</span></p>
+                <p style="margin: 0.5rem 0;">Payment ID: <span id="success-pay-id"
+                        style="font-weight: 700;">PAY-98765</span></p>
+            </div>
+            <button id="finish-btn" class="primary-btn">Continue Shopping</button>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Scripts -->
+    <script src="/vendor-site/js/theme-switcher.js"></script>
+    <script src="/vendor-site/js/vendor-profile.js"></script>
+    <script src="/vendor-site/js/checkout.js"></script>
+</body>
+
+</html>

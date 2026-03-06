@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build Your PC - VendorVerse</title>
+    <!-- Use Vendor Theme -->
+    <link rel="stylesheet" href="/vendor-site/css/gaming-theme.css">
+    <link rel="stylesheet" href="css/vendor_pc_builder.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-content"
+            style="padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-card); border-bottom: 1px solid var(--border); color: var(--text-primary);">
+            <div class="logo">
+                <a href="/vendor-site/index.html"
+                    style="text-decoration: none; color: var(--text-main); font-weight: 800; font-size: 1.5rem;">
+                    <i class="fas fa-microchip" style="color: var(--accent);"></i> VENDORVERSE
+                </a>
+            </div>
+
+            <div class="actions" style="display: flex; gap: 20px; align-items: center;">
+                <a href="/vendor-site/products.html" class="back-btn"
+                    style="text-decoration: none; color: var(--text-main); font-weight: 600;">
+                    <i class="fas fa-arrow-left"></i> Back to Shop
+                </a>
+
+                <a href="/vendor-site/cart.html" class="cart-icon-link"
+                    style="position: relative; color: var(--text-main);">
+                    <div class="cart-icon">
+                        <i class="fas fa-shopping-cart fa-lg"></i>
+                        <!-- Cart count could be updated dynamically but simple link is fine for now -->
+                    </div>
+                </a>
+
+                <button id="theme-toggle"
+                    style="background: none; border: 1px solid var(--border); color: var(--text-main); width: 36px; height: 36px; border-radius: 50%; cursor: pointer;">
+                    <i class="fas fa-adjust"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="builder-container">
+
+        <div class="builder-header">
+            <h1 class="builder-title">Build Your Dream Machine</h1>
+            <p class="builder-subtitle">Select compatible components from our vendor inventory.</p>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar-container">
+            <div class="status-pill success" id="compatibility-pill">
+                <i class="fas fa-check-circle"></i>
+                <span id="compatibility-text">Compatibility Check: Pass</span>
+            </div>
+            <div class="status-pill warning">
+                <i class="fas fa-bolt"></i>
+                <span>Estimated Power: <span id="total-wattage">0</span>W</span>
+            </div>
+        </div>
+
+        <!-- System Build Grid -->
+        <div id="builder-grid" class="component-grid">
+            <!-- Cards will be injected by JS -->
+            <div style="grid-column: 1/-1; text-align: center; padding: 4rem;">
+                <i class="fas fa-spinner fa-spin fa-3x" style="color: var(--accent);"></i>
+                <p style="margin-top: 1rem; color: var(--text-secondary);">Loading builder components...</p>
+            </div>
+        </div>
+
+        <!-- Footer Summary -->
+        <div class="builder-footer">
+            <div class="total-price-display">
+                <span class="total-label">Total Estimate</span>
+                <span id="total-price" class="total-amount">₹0.00</span>
+            </div>
+            <button id="buy-all-btn" class="buy-now-btn">
+                <i class="fas fa-shopping-cart"></i> Buy All Components
+            </button>
+        </div>
+    </main>
+
+    <!-- Part Selection Overlay -->
+    <div id="part-selection-overlay">
+        <div class="selection-modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="selection-category-title">Select Component</h2>
+                <button class="modal-close" id="close-selection-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="selection-grid">
+                <!-- Selection Items injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/vendor-site/js/theme-switcher.js"></script>
+    <script src="js/vendor_pc_builder.js"></script>
+</body>
+
+</html>

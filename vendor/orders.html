@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendorVerse - Orders</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-layer-group"></i>
+            <span>VendorVerse</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="vender_profile.html" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>My Profile</span>
+            </a>
+            <a href="vender_profile.html" class="nav-item">
+                <i class="fas fa-box"></i>
+                <span>My Products</span>
+            </a>
+            <a href="orders.html" class="nav-item active">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Orders</span>
+            </a>
+            <a href="insights.html" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Insights</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="verification.html" class="nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Verification</span>
+            </a>
+            <a href="reviews.html" class="nav-item">
+                <i class="fas fa-star"></i>
+                <span>Reviews</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <!-- Theme Switcher -->
+            <div class="theme-controls">
+                <button class="theme-btn" id="themeBtn">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <div class="theme-menu" id="themeMenu">
+                    <div class="theme-option active" data-value="light">
+                        <span>Light</span>
+                    </div>
+                    <div class="theme-option" data-value="dark">
+                        <span>Dark</span>
+                    </div>
+                    <div class="theme-option" data-value="brown">
+                        <span>Brown</span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="user-info.html" class="user-avatar">
+                <img src="https://i.pravatar.cc/150?img=12" alt="User">
+            </a>
+        </div>
+
+        <!-- Orders Page Content -->
+        <div class="orders-container">
+            <!-- Header & Actions -->
+            <div class="orders-header-row">
+                <div class="header-left">
+                    <h1>Orders</h1>
+                    <div class="date-filter-dropdown">
+                        <i class="far fa-calendar"></i>
+                        <span>Jan 1 - Jan 30, 2024</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="action-btn secondary">
+                        <i class="fas fa-file-export"></i> Export
+                    </button>
+                    <button class="action-btn secondary">
+                        More actions <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <button class="action-btn primary">
+                        Create order
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="orders-stats-grid">
+                <!-- Card 1 -->
+                <div class="order-stat-card">
+                    <div class="stat-content">
+                        <span class="stat-label">Total Orders</span>
+                        <div class="stat-value-row">
+                            <span class="stat-num" id="stat-total-orders">21</span>
+                            <span class="stat-dash">-</span>
+                        </div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-caret-up"></i> 25.2% <span class="trend-label">last week</span>
+                        </div>
+                    </div>
+                    <div class="stat-chart">
+                        <!-- Simple SVG Sparkline -->
+                        <svg viewBox="0 0 100 40" class="sparkline-svg">
+                            <path d="M0 35 Q 20 35, 40 20 T 100 5" fill="none" stroke="#fbbf24" stroke-width="2" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="order-stat-card">
+                    <div class="stat-content">
+                        <span class="stat-label">Order items over time</span>
+                        <div class="stat-value-row">
+                            <span class="stat-num" id="stat-order-items">15</span>
+                            <span class="stat-dash">-</span>
+                        </div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-caret-up"></i> 18.2% <span class="trend-label">last week</span>
+                        </div>
+                    </div>
+                    <div class="stat-chart">
+                        <svg viewBox="0 0 100 40" class="sparkline-svg">
+                            <path d="M0 35 Q 30 30, 50 25 T 100 10" fill="none" stroke="#2dd4bf" stroke-width="2" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="order-stat-card">
+                    <div class="stat-content">
+                        <span class="stat-label">Returns Orders</span>
+                        <div class="stat-value-row">
+                            <span class="stat-num" id="stat-returns">0</span>
+                            <span class="stat-dash">-</span>
+                        </div>
+                        <div class="stat-trend negative">
+                            <i class="fas fa-caret-down"></i> -1.2% <span class="trend-label">last week</span>
+                        </div>
+                    </div>
+                    <div class="stat-chart">
+                        <svg viewBox="0 0 100 40" class="sparkline-svg">
+                            <path d="M0 20 H 100" fill="none" stroke="#f87171" stroke-width="2" stroke-dasharray="4" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="order-stat-card">
+                    <div class="stat-content">
+                        <span class="stat-label">Fulfilled orders over time</span>
+                        <div class="stat-value-row">
+                            <span class="stat-num" id="stat-fulfilled">12</span>
+                            <span class="stat-dash">-</span>
+                        </div>
+                        <div class="stat-trend positive">
+                            <i class="fas fa-caret-up"></i> 12.2% <span class="trend-label">last week</span>
+                        </div>
+                    </div>
+                    <div class="stat-chart">
+                        <svg viewBox="0 0 100 40" class="sparkline-svg">
+                            <path d="M0 35 L 20 35 L 40 25 L 60 25 L 80 15 L 100 15" fill="none" stroke="#34d399"
+                                stroke-width="2" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Tabs & Search -->
+            <div class="orders-controls-bar">
+                <div class="orders-tabs">
+                    <button class="tab-pill active" data-filter="all">All</button>
+                    <button class="tab-pill" data-filter="unfulfilled">Unfulfilled</button>
+                    <button class="tab-pill" data-filter="unpaid">Unpaid</button>
+                    <button class="tab-pill" data-filter="open">Open</button>
+                    <button class="tab-pill" data-filter="closed">Closed</button>
+                    <button class="tab-pill add-view"><i class="fas fa-plus"></i> Add</button>
+                </div>
+                <div class="table-actions">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search" id="ordersSearch">
+                    </div>
+                    <button class="icon-btn"><i class="fas fa-filter"></i></button>
+                    <button class="icon-btn"><i class="fas fa-sort-amount-down"></i></button>
+                </div>
+            </div>
+
+            <!-- Enhanced Orders Table -->
+            <div class="orders-table-container">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px;"><input type="checkbox"></th>
+                            <th>Order</th>
+                            <th>Date <i class="fas fa-sort"></i></th>
+                            <th>Customer</th>
+                            <th>Payment</th>
+                            <th>Total</th>
+                            <th>Delivery</th>
+                            <th>Items</th>
+                            <th>Fulfilment</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <!-- Rows will be populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination -->
+            <div id="ordersPaginationContainer"></div>
+        </div>
+    </div>
+    <!-- Graph Detailed View Modal -->
+    <div id="graphModal" class="graph-modal">
+        <div class="graph-modal-content">
+            <span class="close-graph-modal">&times;</span>
+            <div class="graph-modal-header">
+                <h2 id="graphModalTitle">Detailed Statistics</h2>
+                <div class="graph-period-selector">
+                    <button class="period-btn active" data-period="7d">7 Days</button>
+                    <button class="period-btn" data-period="30d">30 Days</button>
+                    <button class="period-btn" data-period="90d">3 Months</button>
+                </div>
+            </div>
+            <div class="graph-modal-body">
+                <canvas id="detailedChartCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/orders.js"></script>
+</body>
+
+</html>

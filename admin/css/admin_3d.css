@@ -1,0 +1,404 @@
+/* ============================================================================
+   ADMIN DASHBOARD 3D ENHANCEMENTS
+   Professional, Futuristic, and Elevated Aesthetics
+   ============================================================================ */
+
+:root {
+    --primary-3d: #6366f1;
+    --secondary-3d: #a855f7;
+    --bg-3d: #f8fafc;
+    --card-shadow-3d:
+        0 1px 1px rgba(0, 0, 0, 0.05),
+        0 2px 2px rgba(0, 0, 0, 0.05),
+        0 4px 4px rgba(0, 0, 0, 0.05),
+        0 8px 8px rgba(0, 0, 0, 0.05),
+        0 16px 16px rgba(0, 0, 0, 0.05);
+    --glow-primary: rgba(99, 102, 241, 0.3);
+}
+
+/* Base Body Update for 3D Feel */
+.main-content {
+    background-color: var(--bg-3d);
+    perspective: 1500px;
+}
+
+/* 3D Stat Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--card-shadow-3d);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    cursor: default;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-12px) rotateX(4deg) scale(1.02);
+    box-shadow:
+        0 20px 30px -10px rgba(0, 0, 0, 0.1),
+        0 15px 15px -10px rgba(0, 0, 0, 0.05),
+        0 0 20px var(--glow-primary);
+    border-color: var(--primary-3d);
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-3d), var(--secondary-3d));
+    opacity: 0.6;
+}
+
+.stat-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    font-size: 1.8rem;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover .stat-icon {
+    transform: translateZ(20px) scale(1.1);
+}
+
+/* Animated Counters */
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #1e293b, #475569);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+/* Recent Sections Grid */
+.recent-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.glass-panel h3 {
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.glass-panel h3 i {
+    color: var(--primary-3d);
+}
+
+/* 3D Tables */
+.data-table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.data-table tr {
+    transition: all 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: scale(1.01);
+    z-index: 10;
+}
+
+/* Notifications Badge 3D */
+.badge-3d {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+    margin-left: auto;
+}
+
+/* Smooth Transitions */
+.view-section {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.view-section:not(.active) {
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.view-section.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (max-width: 1024px) {
+    .recent-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 3D Document Cards on Vendor Details */
+.doc-item-3d {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.doc-item-3d:hover {
+    transform: translateY(-5px) translateZ(10px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-3d);
+}
+
+.doc-status-badge-3d {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: #f1f5f9;
+    margin-bottom: 0.75rem;
+}
+
+.status-pending {
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.1);
+}
+
+.status-approved {
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.status-rejected {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.status-reuploaded {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.status-not-uploaded {
+    color: #94a3b8;
+    background: rgba(148, 163, 184, 0.1);
+}
+
+.card-reuploaded-glow {
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
+}
+
+.doc-rejection-note-3d {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #475569;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.doc-rejection-note-3d i {
+    color: #ef4444;
+    margin-top: 2px;
+}
+
+.doc-item--disabled {
+    opacity: 0.7;
+    background: #f8fafc;
+    border-style: dashed;
+}
+
+/* Glow Borders for Step 2 Statuses */
+.doc-status--pending {
+    border-color: rgba(245, 158, 11, 0.5) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 0 10px rgba(245, 158, 11, 0.2) !important;
+}
+
+.doc-status--pending:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 0 20px rgba(245, 158, 11, 0.4) !important;
+}
+
+.doc-status--approved {
+    border-color: rgba(16, 185, 129, 0.5) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 0 10px rgba(16, 185, 129, 0.2) !important;
+}
+
+.doc-status--approved:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 0 20px rgba(16, 185, 129, 0.4) !important;
+}
+
+.doc-status--rejected {
+    border-color: rgba(239, 68, 68, 0.5) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 0 10px rgba(239, 68, 68, 0.2) !important;
+}
+
+.doc-status--rejected:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 0 20px rgba(239, 68, 68, 0.4) !important;
+}
+
+.card-reuploaded-glow {
+    border-color: rgba(59, 130, 246, 0.5) !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 0 15px rgba(59, 130, 246, 0.3) !important;
+}
+
+.card-reuploaded-glow:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 0 25px rgba(59, 130, 246, 0.5) !important;
+}
+
+.doc-status--not-uploaded {
+    border-color: rgba(148, 163, 184, 0.2) !important;
+    border-style: dashed !important;
+    background: #f8fafc !important;
+    opacity: 0.8 !important;
+}
+
+.doc-status--not-uploaded:hover {
+    border-color: rgba(148, 163, 184, 0.4) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Ensure icons in disabled cards look right */
+.doc-status--not-uploaded .document-icon {
+    background: #94a3b8;
+    filter: grayscale(1);
+    opacity: 0.5;
+}
+
+/* 3D Title Highlight for Step 2 Cards */
+#biz-verification-card {
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.15);
+}
+
+/* Logs Section 3D Enhancements */
+.log-row {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.log-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+    transform: translateY(-2px) scale(1.002);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+}
+
+.user-info-small {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-email {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.user-role-badge {
+    font-size: 0.7rem;
+    padding: 1px 6px;
+    border-radius: 4px;
+    width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.role-admin {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.role-vendor {
+    background: rgba(78, 205, 196, 0.2);
+    color: #4ecdc4;
+    border: 1px solid rgba(78, 205, 196, 0.3);
+}
+
+.role-user {
+    background: rgba(69, 183, 233, 0.2);
+    color: #45b7e9;
+    border: 1px solid rgba(69, 183, 233, 0.3);
+}
+
+.role-system {
+    background: rgba(155, 155, 155, 0.2);
+    color: #9b9b9b;
+    border: 1px solid rgba(155, 155, 155, 0.3);
+}
+
+.log-time {
+    color: var(--text-muted, #888);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.log-action strong {
+    color: var(--primary, #3498db);
+    text-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+}
+
+.log-desc {
+    font-size: 0.9rem;
+    color: var(--text, #eee);
+}
+
+.status-badge.status-approved {
+    background: linear-gradient(135deg, rgba(46, 213, 115, 0.2), rgba(46, 213, 115, 0.1));
+    color: #2ed573;
+    border: 1px solid rgba(46, 213, 115, 0.3);
+    box-shadow: 0 4px 6px rgba(46, 213, 115, 0.1);
+}
+
+.status-badge.status-rejected {
+    background: linear-gradient(135deg, rgba(255, 71, 87, 0.2), rgba(255, 71, 87, 0.1));
+    color: #ff4757;
+    border: 1px solid rgba(255, 71, 87, 0.3);
+    box-shadow: 0 4px 6px rgba(255, 71, 87, 0.1);
+}

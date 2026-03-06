@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - VendorVerse</title>
+    <link rel="stylesheet" href="/vendor-site/css/gaming-theme.css">
+    <link rel="stylesheet" href="/vendor-site/css/main.css">
+    <link rel="stylesheet" href="/vendor-site/css/vendor-profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: var(--accent);
+            --text-color: var(--text-primary);
+            --bg-color: var(--bg-main);
+            --card-bg: var(--bg-card);
+            --border-color: var(--border);
+            --shadow-light: rgba(0, 0, 0, 0.1);
+            --shadow-medium: rgba(0, 0, 0, 0.2);
+            --tag-bg: var(--bg-card);
+            --primary-gradient: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-main) 100%);
+        }
+
+        /* Re-alias local variables for light theme so var() references resolve correctly */
+        body.theme-chrome {
+            --primary-color: #2563EB;
+            --text-color: #111827;
+            --bg-color: #E5E7EB;
+            --card-bg: #FFFFFF;
+            --border-color: #D1D5DB;
+            --shadow-light: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --tag-bg: #F3F4F6;
+            --primary-gradient: linear-gradient(135deg, #2563EB 0%, #1d4ed8 100%);
+        }
+
+
+        .orders-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 1rem;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 1.1em;
+        }
+
+        .orders-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--border-color);
+            background: #22222200;
+            color: var(--text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .order-card {
+            background: #22222200;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 8px 24px var(--shadow-medium);
+            transform: translateY(-2px);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .order-id {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .order-date {
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+
+        .order-status {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #f59e0b;
+        }
+
+        .status-confirmed {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .status-shipped {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+        }
+
+        .status-delivered {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .order-items {
+            margin-bottom: 20px;
+        }
+
+        .order-item {
+            display: flex;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: var(--tag-bg);
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .item-quantity {
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+
+        .item-price {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+        }
+
+        .order-total {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #b6c11e;
+            color: var(--text-color);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-light);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4em;
+            color: var(--primary-color);
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .empty-state p {
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-bottom: 30px;
+        }
+
+        /* ================================================
+           RESPONSIVE - 3-tier: Mobile / Tablet / Desktop
+           ================================================ */
+
+        /* Prevent horizontal overflow globally */
+        html,
+        body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        /* Make nav container flex-wrap safe */
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        /* Filter bar: scrollable on mobile */
+        .orders-filter {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            flex-wrap: nowrap;
+            padding-bottom: 4px;
+        }
+
+        .orders-filter::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Ensure filter buttons never shrink */
+        .filter-btn {
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-height: 40px;
+        }
+
+        /* ── MOBILE (≤ 768px) ── */
+        @media (max-width: 768px) {
+            .orders-container {
+                padding: 0 12px;
+                margin: 20px auto;
+            }
+
+            .page-header h1 {
+                font-size: 1.6em;
+            }
+
+            .page-header p {
+                font-size: 0.95em;
+            }
+
+            /* Filter: horizontal scroll row */
+            .orders-filter {
+                gap: 8px;
+                margin-bottom: 20px;
+            }
+
+            .filter-btn {
+                padding: 9px 16px;
+                font-size: 0.875rem;
+                min-height: 44px;
+                /* touch-friendly */
+                border-radius: 8px;
+            }
+
+            /* Order card */
+            .order-card {
+                padding: 16px;
+                border-radius: 12px;
+                margin-bottom: 14px;
+            }
+
+            /* Header: stack id+date above status badge */
+            .order-header {
+                flex-direction: column;
+                gap: 8px;
+                align-items: flex-start;
+            }
+
+            .order-id {
+                font-size: 1em;
+            }
+
+            .order-status {
+                align-self: flex-start;
+            }
+
+            /* Item row: image stays 50px, name wraps */
+            .order-item {
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .item-image {
+                width: 50px;
+                height: 50px;
+                flex-shrink: 0;
+            }
+
+            .item-details {
+                min-width: 0;
+                flex: 1;
+            }
+
+            .item-name {
+                white-space: normal;
+                word-break: break-word;
+                font-size: 0.9em;
+            }
+
+            .item-price {
+                width: 100%;
+                text-align: left;
+                font-size: 0.95em;
+                padding-left: 60px;
+                /* align under the item name */
+            }
+
+            /* Footer: stack total + actions */
+            .order-footer {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+
+            .order-total {
+                font-size: 1.1em;
+            }
+
+            .order-actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .action-btn {
+                width: 100%;
+                min-height: 44px;
+                text-align: center;
+                font-size: 0.9rem;
+            }
+
+            /* Nav: hide desktop links, they're handled by vendor-profile.js or inline */
+            .nav-links {
+                display: none !important;
+            }
+        }
+
+        /* ── TABLET (769px – 1024px) ── */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .orders-container {
+                padding: 0 20px;
+                margin: 28px auto;
+            }
+
+            /* 2-column order grid on tablet */
+            #orders-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            /* Reset card margin since grid gap handles spacing */
+            .order-card {
+                margin-bottom: 0;
+                padding: 18px;
+            }
+
+            .order-footer {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+
+            .order-actions {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+                min-height: 42px;
+            }
+
+            /* Filter tabs: wrap nicely */
+            .orders-filter {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .filter-btn {
+                flex: 1 1 auto;
+                text-align: center;
+            }
+        }
+
+        /* ── DESKTOP (≥ 1025px) ── */
+        @media (min-width: 1025px) {
+            .orders-container {
+                max-width: 1200px;
+                padding: 0 1.5rem;
+            }
+
+            #orders-list {
+                display: block;
+                /* single-column, full-width cards */
+            }
+
+            .orders-filter {
+                flex-wrap: wrap;
+                overflow-x: visible;
+            }
+        }
+
+        /* Light Mode Override for Manage Products Button */
+        [data-theme="light"] .empty-state .btn-primary,
+        body.theme-chrome .empty-state .btn-primary {
+            color: #000000 !important;
+            background: #f8f9fa !important;
+            border: 1px solid #ced4da;
+        }
+
+        [data-theme="light"] .empty-state .btn-primary:hover,
+        body.theme-chrome .empty-state .btn-primary:hover {
+            color: #0d6efd !important;
+            background: #e2e6ea !important;
+        }
+
+        /* ================================================================
+           LIGHT THEME [data-theme="light"] — VISIBILITY FIXES
+           theme-switcher.js sets html[data-theme="light"] on theme toggle
+           ================================================================ */
+
+        /* Re-alias CSS variables for light theme */
+        [data-theme="light"] body,
+        [data-theme="light"] {
+            --primary-color: #2563EB;
+            --text-color: #111827;
+            --bg-color: #E5E7EB;
+            --card-bg: #FFFFFF;
+            --border-color: #D1D5DB;
+            --tag-bg: #F3F4F6;
+        }
+
+        /* 1. Order card */
+        [data-theme="light"] .order-card {
+            background: #ffffff !important;
+            border: 1px solid #d1d5db !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        [data-theme="light"] .order-card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        [data-theme="light"] .order-header {
+            border-bottom-color: #e5e7eb !important;
+        }
+
+        [data-theme="light"] .order-item {
+            border-bottom-color: #e5e7eb !important;
+        }
+
+        /* 2. Text inside order card */
+        [data-theme="light"] .order-id {
+            color: #1d4ed8 !important;
+        }
+
+        [data-theme="light"] .order-date {
+            color: #6b7280 !important;
+            opacity: 1 !important;
+        }
+
+        [data-theme="light"] .item-name {
+            color: #111827 !important;
+        }
+
+        [data-theme="light"] .item-quantity {
+            color: #6b7280 !important;
+            opacity: 1 !important;
+        }
+
+        [data-theme="light"] .item-price {
+            color: #1d4ed8 !important;
+        }
+
+        [data-theme="light"] .order-total {
+            color: #111827 !important;
+        }
+
+        /* 3. Status badges */
+        [data-theme="light"] .status-pending {
+            background: rgba(245, 158, 11, 0.15) !important;
+            color: #b45309 !important;
+        }
+
+        [data-theme="light"] .status-confirmed {
+            background: rgba(37, 99, 235, 0.12) !important;
+            color: #1d4ed8 !important;
+        }
+
+        [data-theme="light"] .status-shipped {
+            background: rgba(124, 58, 237, 0.12) !important;
+            color: #6d28d9 !important;
+        }
+
+        [data-theme="light"] .status-delivered {
+            background: rgba(5, 150, 105, 0.12) !important;
+            color: #047857 !important;
+        }
+
+        /* 4. Filter tabs */
+        [data-theme="light"] .filter-btn {
+            background: #ffffff !important;
+            border: 2px solid #d1d5db !important;
+            color: #1d1b1b !important;
+        }
+
+        [data-theme="light"] .filter-btn:hover,
+        [data-theme="light"] .filter-btn.active {
+            background: #2563eb !important;
+            border-color: #2563eb !important;
+            color: #ffffff !important;
+        }
+
+        /* 5. Action buttons */
+        [data-theme="light"] .action-btn.btn-secondary {
+            background: #f3f4f6 !important;
+            color: #111827 !important;
+            border: 1px solid #d1d5db !important;
+        }
+
+        [data-theme="light"] .action-btn.btn-secondary:hover {
+            background: #e5e7eb !important;
+        }
+
+        [data-theme="light"] .action-btn.btn-primary {
+            background: #2563eb !important;
+            color: #ffffff !important;
+        }
+
+        /* 6. Theme toggle button */
+        [data-theme="light"] #theme-toggle {
+            background: #ffffff !important;
+            border: 2px solid #d1d5db !important;
+            color: #374151 !important;
+        }
+
+        [data-theme="light"] #theme-toggle:hover {
+            background: #f3f4f6 !important;
+            border-color: #9ca3af !important;
+        }
+
+        [data-theme="light"] #theme-toggle i {
+            color: #374151 !important;
+        }
+
+        /* 7. Page header */
+        [data-theme="light"] .page-header p {
+            color: #6b7280 !important;
+            opacity: 1 !important;
+        }
+
+        /* 8. Navbar in light mode */
+        [data-theme="light"] .navbar {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+
+        /* ── Hamburger Button ── */
+        .nav-hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 8px;
+            transition: border-color 0.2s;
+            flex-shrink: 0;
+            margin-left: 0.5rem;
+        }
+
+        .nav-hamburger span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: var(--text-color);
+            border-radius: 2px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            transform-origin: center;
+        }
+
+        .nav-hamburger:hover {
+            border-color: var(--primary-color);
+        }
+
+        .nav-hamburger.is-open span:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .nav-hamburger.is-open span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .nav-hamburger.is-open span:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* ── Mobile Nav Drawer ── */
+        .mobile-nav-drawer {
+            display: none;
+            flex-direction: column;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0;
+            gap: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .mobile-nav-drawer.is-open {
+            display: flex;
+            max-height: 260px;
+            padding: 0.75rem 1rem;
+        }
+
+        .mobile-nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s ease;
+            opacity: 0.85;
+        }
+
+        .mobile-nav-link:hover,
+        .mobile-nav-link.active {
+            color: var(--primary-color);
+            background: rgba(250, 204, 21, 0.08);
+            opacity: 1;
+        }
+
+        body.theme-chrome .mobile-nav-link:hover,
+        body.theme-chrome .mobile-nav-link.active {
+            background: rgba(37, 99, 235, 0.08);
+        }
+
+        [data-theme="light"] .mobile-nav-drawer {
+            background: #ffffff;
+            border-color: #e5e7eb;
+        }
+
+        [data-theme="light"] .mobile-nav-link {
+            color: #111827;
+        }
+
+        [data-theme="light"] .mobile-nav-link:hover,
+        [data-theme="light"] .mobile-nav-link.active {
+            background: rgba(37, 99, 235, 0.07);
+            color: #2563eb;
+        }
+
+        @media (max-width: 1024px) {
+            .nav-hamburger {
+                display: flex;
+            }
+
+            .mobile-nav-drawer {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="nav-brand">Vendor<span>Verse</span></a>
+            <div class="nav-links">
+                <a href="/vendor-site/index.html" class="nav-link">Home</a>
+                <a href="/vendor-site/products.html" class="nav-link">Shop</a>
+                <a href="/vendor-site/orders.html" class="nav-link active">My Orders</a>
+                <a href="/vendor-site/cart.html" class="nav-link"><i class="fas fa-shopping-cart"></i></a>
+
+                <!-- User Profile Icon & Dropdown -->
+                <div class="profile-container">
+                    <button id="profile-icon-btn" class="profile-icon" aria-label="User Profile">
+                        <img id="profile-avatar" src="" alt="Profile" class="profile-avatar hidden">
+                        <div id="profile-initials" class="profile-initials"></div>
+                    </button>
+
+                    <!-- Profile Dropdown Panel -->
+                    <div id="profile-dropdown" class="profile-dropdown hidden">
+                        <!-- User Info Header -->
+                        <div class="profile-header">
+                            <img id="dropdown-avatar" src="" alt="Profile" class="dropdown-avatar">
+                            <div class="profile-info">
+                                <p class="profile-greeting">Hello!</p>
+                                <h3 id="profile-name" class="profile-name">Vendor</h3>
+                            </div>
+                        </div>
+
+                        <!-- Profile Menu Sections -->
+                        <div class="profile-menu">
+                            <!-- Vendor Dashboard -->
+                            <div class="profile-menu-section">
+                                <a href="/vendor-site/products.html" class="profile-menu-item">
+                                    <i class="fas fa-box"></i>
+                                    <div class="menu-item-content">
+                                        <span class="menu-item-title">My Products</span>
+                                        <span class="menu-item-desc">Manage your inventory</span>
+                                    </div>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </div>
+
+                            <!-- Account Settings -->
+                            <div class="profile-menu-section">
+                                <h4 class="section-title">Account Settings</h4>
+                                <a href="/vendor-site/profile.html" class="profile-menu-item">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span class="menu-item-title">Profile Information</span>
+                                </a>
+                                <a href="/vendor-site/orders.html" class="profile-menu-item">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <span class="menu-item-title">Orders</span>
+                                </a>
+                            </div>
+
+                            <!-- Frequently Visited -->
+                            <div class="profile-menu-section">
+                                <h4 class="section-title">Frequently Visited</h4>
+                                <a href="/vendor-site/profile.html#password" class="profile-menu-item">
+                                    <i class="fas fa-key"></i>
+                                    <span class="menu-item-title">Change Password</span>
+                                </a>
+                                <a href="/vendor-site/help.html" class="profile-menu-item">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="menu-item-title">Help Center</span>
+                                </a>
+                            </div>
+
+                            <!-- Logout -->
+                            <div class="profile-menu-section">
+                                <button id="profile-logout-btn" class="profile-menu-item logout-btn">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span class="menu-item-title">Logout</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button id="theme-toggle" class="btn btn-secondary" style="padding: 0.5rem;">
+                <span id="theme-icon"><i class="fas fa-moon"></i></span>
+            </button>
+
+            <!-- Hamburger (mobile only) -->
+            <button id="nav-hamburger" class="nav-hamburger" aria-label="Open menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobile-nav-drawer" class="mobile-nav-drawer" aria-hidden="true">
+        <a href="/vendor-site/index.html" class="mobile-nav-link">
+            <i class="fas fa-home"></i> Home
+        </a>
+        <a href="/vendor-site/products.html" class="mobile-nav-link">
+            <i class="fas fa-store"></i> Shop
+        </a>
+        <a href="/vendor-site/orders.html" class="mobile-nav-link active">
+            <i class="fas fa-receipt"></i> My Orders
+        </a>
+        <a href="/vendor-site/cart.html" class="mobile-nav-link">
+            <i class="fas fa-shopping-cart"></i> Cart
+        </a>
+    </div>
+
+    <div class="orders-container">
+        <div class="page-header">
+            <h1>My Orders</h1>
+            <p>Track, manage, and review your order history</p>
+        </div>
+
+        <div class="orders-filter">
+            <button class="filter-btn active" data-filter="all">All Orders</button>
+            <button class="filter-btn" data-filter="pending">Pending</button>
+            <button class="filter-btn" data-filter="confirmed">Confirmed</button>
+            <button class="filter-btn" data-filter="shipped">Shipped</button>
+            <button class="filter-btn" data-filter="delivered">Delivered</button>
+        </div>
+
+        <div id="orders-list">
+            <!-- Orders will be dynamically loaded here -->
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <h2>Loading your orders...</h2>
+                <p>Please wait while we fetch your order history</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/vendor-site/js/theme-switcher.js"></script>
+    <script src="/vendor-site/js/vendor-profile.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Load orders
+            await loadOrders();
+
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    filterOrders(btn.dataset.filter);
+                });
+            });
+        });
+
+        // Helper to get vendor slug from URL
+        function getVendorSlug() {
+            const path = window.location.pathname;
+            const parts = path.split('/');
+            if (parts.length >= 3 && parts[1] === 'vendor') {
+                return parts[2];
+            }
+            return null;
+        }
+
+        async function loadVendorProfile(slug) {
+            try {
+                const res = await fetch(`/api/vendors/info/${slug}`);
+                if (!res.ok) return;
+                const vendor = await res.json();
+
+                if (window.applyVendorTheme) {
+                    window.applyVendorTheme(vendor);
+                }
+
+                // Update navigation brand and page title
+                const brands = document.querySelectorAll('.nav-brand');
+                brands.forEach(b => {
+                    if (!b.querySelector('img')) {
+                        b.innerHTML = `<i class="fas fa-microchip"></i> ${vendor.business_name || vendor.fullname}`;
+                    }
+                });
+                document.title = `Orders - ${vendor.business_name || vendor.fullname}`;
+            } catch (err) {
+                console.error('Failed to load vendor profile:', err);
+            }
+        }
+
+        let allOrders = [];
+
+        async function loadOrders() {
+            const ordersList = document.getElementById('orders-list');
+            const vendorSlug = getVendorSlug();
+            if (vendorSlug) loadVendorProfile(vendorSlug);
+
+            ordersList.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h2>Loading your orders...</h2>
+                </div>
+            `;
+
+            try {
+                let apiUrl = '/api/orders?source=vendor_site';
+                if (vendorSlug) {
+                    apiUrl += `&vendor_slug=${vendorSlug}`;
+                }
+
+                const res = await fetch(apiUrl, {
+                    credentials: 'include',
+                    headers: { 'Cache-Control': 'no-cache, no-store' }
+                });
+
+                // Not logged in → redirect to login
+                if (res.status === 401) {
+                    window.location.href = '/vendor-site/login.html?redirect=' +
+                        encodeURIComponent(window.location.pathname);
+                    return;
+                }
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    throw new Error(err.error || `Server error ${res.status}`);
+                }
+
+                const data = await res.json();
+                allOrders = data.orders || [];
+
+                if (allOrders.length === 0) {
+                    ordersList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-box-open"></i>
+                            <h2>No orders received yet</h2>
+                            <p>Orders from customers will appear here</p>
+                            <a href="/vendor-site/products.html" class="action-btn btn-primary" style="display: inline-block; text-decoration: none;">
+                                Manage Products
+                            </a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                renderOrders(allOrders);
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                ordersList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h2>Failed to load orders</h2>
+                        <p>${error.message}</p>
+                        <button class="action-btn btn-primary" onclick="loadOrders()">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+
+        function renderOrders(orders) {
+            const ordersList = document.getElementById('orders-list');
+
+            if (orders.length === 0) {
+                ordersList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-filter"></i>
+                        <h2>No orders found</h2>
+                        <p>Try adjusting your filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            ordersList.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <div class="order-id">#${order.order_id}</div>
+                            <div class="order-date">${new Date(order.created_at).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })}</div>
+                        </div>
+                        <span class="order-status status-${order.status}">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span>
+                    </div>
+
+                    <div class="order-items">
+                        ${(order.items || []).map(item => `
+                            <div class="order-item">
+                                <img src="${item.image || 'https://picsum.photos/60'}" class="item-image" alt="${item.product_name}">
+                                <div class="item-details">
+                                    <div class="item-name">${item.product_name}</div>
+                                    <div class="item-quantity">Quantity: ${item.quantity}</div>
+                                </div>
+                                <div class="item-price">₹${parseFloat(item.price).toFixed(2)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="order-footer">
+                        <div class="order-total">Total: ₹${parseFloat(order.total).toFixed(2)}</div>
+                        <div class="order-actions">
+                            <button class="action-btn btn-secondary" onclick="viewOrderDetails('${order.order_id}')">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterOrders(status) {
+            if (status === 'all') {
+                renderOrders(allOrders);
+            } else {
+                const filtered = allOrders.filter(order => order.status === status);
+                renderOrders(filtered);
+            }
+        }
+
+        function viewOrderDetails(orderId) {
+            // Navigate to order details page or show modal
+            alert(`View details for order ${orderId}`);
+            // TODO: Implement order details page
+        }
+
+        // Hamburger menu toggle
+        (function () {
+            const hamburger = document.getElementById('nav-hamburger');
+            const drawer = document.getElementById('mobile-nav-drawer');
+            if (!hamburger || !drawer) return;
+
+            hamburger.addEventListener('click', () => {
+                const isOpen = hamburger.classList.toggle('is-open');
+                drawer.classList.toggle('is-open');
+                hamburger.setAttribute('aria-expanded', isOpen);
+                drawer.setAttribute('aria-hidden', !isOpen);
+            });
+
+            // Close on outside click
+            document.addEventListener('click', (e) => {
+                if (drawer.classList.contains('is-open') &&
+                    !drawer.contains(e.target) &&
+                    !hamburger.contains(e.target)) {
+                    hamburger.classList.remove('is-open');
+                    drawer.classList.remove('is-open');
+                    hamburger.setAttribute('aria-expanded', 'false');
+                    drawer.setAttribute('aria-hidden', 'true');
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

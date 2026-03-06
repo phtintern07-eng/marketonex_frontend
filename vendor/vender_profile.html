@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendorVerse - My Profile</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-layer-group"></i>
+            <span>VendorVerse</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="vender_profile.html" class="nav-item active">
+                <i class="fas fa-user"></i>
+                <span>My Profile</span>
+            </a>
+            <a href="products.html" class="nav-item">
+                <i class="fas fa-box"></i>
+                <span>My Products</span>
+            </a>
+            <a href="orders.html" class="nav-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Orders</span>
+            </a>
+            <a href="insights.html" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Insights</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="verification.html" class="nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Verification</span>
+            </a>
+            <a href="reviews.html" class="nav-item">
+                <i class="fas fa-star"></i>
+                <span>Reviews</span>
+            </a>
+            <a href="website_editor.html" class="nav-item">
+                <i class="fas fa-laptop-code"></i>
+                <span>Website Editor</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <!-- Theme Switcher -->
+            <div class="theme-controls">
+                <button class="theme-btn" id="themeBtn">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <div class="theme-menu" id="themeMenu">
+                    <div class="theme-option active" data-value="light">
+                        <span>Light</span>
+                    </div>
+                    <div class="theme-option" data-value="dark">
+                        <span>Dark</span>
+                    </div>
+                    <div class="theme-option" data-value="brown">
+                        <span>Brown</span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="user-info.html" class="user-avatar">
+                <img src="https://i.pravatar.cc/150?img=12" alt="User">
+            </a>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-container">
+            <!-- Back Button -->
+            <a href="../index.html" class="back-button" id="backToLandingPage">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to Landing Page</span>
+            </a>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon sales">
+                        <i class="fas fa-rupee-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Sales</h3>
+                        <p class="stat-value" id="dashboardTotalSales">₹0.00</p>
+                        <span class="stat-change positive" id="dashboardSalesChange">+0.0% this month</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orders">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Orders</h3>
+                        <p class="stat-value" id="dashboardTotalOrders">0</p>
+                        <span class="stat-change positive" id="dashboardOrdersChange">+0.0% this month</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon products">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Products</h3>
+                        <p class="stat-value" id="dashboardTotalProducts">0</p>
+                        <span class="stat-change positive" id="dashboardProductsChange">+0.0% this month</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon rating">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Overall Rating</h3>
+                        <p class="stat-value" id="dashboardOverallRating">0.0</p>
+                        <span class="stat-change negative" id="dashboardRatingChange">-0.0% this month</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Sales Performance Chart -->
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div>
+                            <h3>Sales Performance</h3>
+                            <p class="card-subtitle">Your sales summary for the last 7 days.</p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Profile Card -->
+                <div class="profile-sidebar">
+                    <div class="profile-card">
+                        <div class="profile-header">
+                            <a href="user-info.html">
+                                <img src="https://i.pravatar.cc/150?img=12" alt="Profile" class="profile-img"
+                                    id="profileCardImg">
+                            </a>
+                            <div class="profile-info">
+                                <h2 id="profileName">—</h2>
+                                <p id="profileEmail">—</p>
+                            </div>
+                            <a href="user-info.html" class="menu-btn" title="Edit Profile">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                        </div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <i class="fas fa-phone"></i>
+                                <span id="profilePhone">—</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-calendar"></i>
+                                <span id="profileDob">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="business-card" style="margin-top: 20px;">
+                        <div class="business-header">
+                            <h3>My Store URL</h3>
+                            <i class="fas fa-link" style="color: var(--primary-color);"></i>
+                        </div>
+                        <div class="biz-field" style="margin-top: 10px; padding-bottom: 8px;">
+                            <p id="displayStoreURL"
+                                style="font-weight: 500; font-size: 0.85rem; color: var(--primary-color); word-break: break-all; margin-bottom: 12px;">
+                                Loading...</p>
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="openStore()" class="btn-action btn-view"
+                                    style="flex: 1; margin: 0; padding: 8px; font-size: 12px;">
+                                    <i class="fas fa-external-link-alt"></i> Open Store
+                                </button>
+                                <button onclick="copyStoreLink()" class="btn-action btn-approve"
+                                    style="flex: 1; margin: 0; padding: 8px; font-size: 12px; background-color: #f1f5f9; color: #475569;">
+                                    <i class="fas fa-copy"></i> Copy Link
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="business-card" style="margin-top: 20px;">
+                        <div class="business-header">
+                            <h3>Bank Details <span id="bankStatusBadge" class="status-badge"
+                                    style="font-size: 10px; padding: 2px 8px; vertical-align: middle; margin-left: 8px; display: none;"></span>
+                            </h3>
+                            <i class="fas fa-university" style="color: var(--accent-blue);"></i>
+                        </div>
+                        <div class="biz-field"
+                            style="margin-top: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                            <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Bank
+                                Name</span>
+                            <p id="displayBankName" style="font-weight: 600; color: var(--text-primary);">Not Linked</p>
+                        </div>
+                        <div class="biz-field"
+                            style="margin-top: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                            <span style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">IFSC
+                                Code</span>
+                            <p id="displayIFSC" style="font-weight: 600; color: var(--text-primary);">Not Linked</p>
+                        </div>
+                        <div class="biz-field" style="margin-top: 8px;">
+                            <span
+                                style="font-size: 11px; color: var(--text-secondary); text-transform: uppercase;">Account
+                                Number</span>
+                            <p id="displayAccountNumber" style="font-weight: 600; color: var(--text-primary);">Not
+                                Linked</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3D Reviews Section -->
+            <div class="reviews-section">
+                <div class="review-stats-card">
+                    <div class="rating-display">
+                        <h4 id="avgRatingDisplay">0.0</h4>
+                        <div class="stars" id="avgStarsDisplay">
+                            <!-- JS Filled -->
+                        </div>
+                    </div>
+                    <div class="rating-info">
+                        <h3>Customer Reviews</h3>
+                        <p id="reviewCountDisplay">Based on 0 reviews from your products.</p>
+                    </div>
+                </div>
+
+                <div class="review-grid-3d" id="vendorReviewGrid">
+                    <!-- Dynamic Review Cards -->
+                    <div class="loading-reviews"
+                        style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 12px;"></i>
+                        <p>Loading your reviews...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="activity-card" style="margin-top: 32px;">
+                <div class="card-header">
+                    <h3>Recent Activity</h3>
+                    <p class="card-subtitle">Latest updates on your store.</p>
+                </div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon package">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p><strong>New order #OR0006</strong> received from <strong>Alex Ray.</strong></p>
+                            <span class="activity-time">2 minutes ago</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon star">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p>You received a <strong>5-star review</strong> for <strong>"Blue Denim Jeans".</strong>
+                            </p>
+                            <span class="activity-time">1 hour ago</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon user">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p>A new customer, <strong>Maria Garcia,</strong> just signed up.</p>
+                            <span class="activity-time">3 hours ago</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon message">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p><strong>New inquiry</strong> on <strong>"Leather Jacket"</strong> from a visitor.</p>
+                            <span class="activity-time">5 hours ago</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/common.js"></script>
+</body>
+
+</html>

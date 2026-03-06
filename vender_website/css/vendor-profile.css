@@ -1,0 +1,568 @@
+/* ============================================================================
+   VENDOR PROFILE DROPDOWN SYSTEM
+   Replicated from Marketplace profile dropdown
+   ============================================================================ */
+
+/* User Profile Icon & Dropdown Panel */
+.profile-container {
+    position: relative;
+}
+
+.profile-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color, #e0e4f0);
+    background: var(--card-bg, #ffffff);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.profile-icon:hover {
+    transform: scale(1.05);
+    border-color: var(--primary-color, #6366f1);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
+}
+
+.profile-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-initials {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary-color, #6366f1);
+    text-transform: uppercase;
+}
+
+/* Profile Dropdown Panel */
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 360px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e0e4f0);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: none;
+}
+
+.profile-dropdown:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+/* Custom Scrollbar for Profile Dropdown */
+.profile-dropdown::-webkit-scrollbar {
+    width: 6px;
+}
+
+.profile-dropdown::-webkit-scrollbar-track {
+    background: var(--tag-bg, #f1f5f9);
+    border-radius: 10px;
+}
+
+.profile-dropdown::-webkit-scrollbar-thumb {
+    background: var(--primary-color, #6366f1);
+    border-radius: 10px;
+}
+
+.profile-dropdown::-webkit-scrollbar-thumb:hover {
+    background: var(--hover-color, #4f46e5);
+}
+
+/* Profile Header Section */
+.profile-header {
+    padding: 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-radius: 16px 16px 0 0;
+}
+
+.dropdown-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-greeting {
+    font-size: 14px;
+    opacity: 0.9;
+    margin: 0 0 4px 0;
+    font-weight: 500;
+}
+
+.profile-name {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Profile Menu */
+.profile-menu {
+    padding: 12px 0;
+}
+
+.profile-menu-section {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color, #e0e4f0);
+}
+
+.profile-menu-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-color, #1a1a2e);
+    opacity: 0.6;
+    padding: 8px 20px 4px;
+    margin: 0;
+}
+
+.profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    color: var(--text-color, #1a1a2e);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-size: 15px;
+}
+
+.profile-menu-item:hover {
+    background: var(--tag-bg, #f1f5f9);
+    color: var(--primary-color, #6366f1);
+}
+
+.profile-menu-item i {
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+    color: var(--primary-color, #6366f1);
+    opacity: 0.8;
+}
+
+.profile-menu-item:hover i {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.menu-item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.menu-item-title {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.menu-item-desc {
+    font-size: 12px;
+    opacity: 0.7;
+    color: var(--text-color, #1a1a2e);
+}
+
+.profile-menu-item .fa-chevron-right {
+    font-size: 14px;
+    opacity: 0.4;
+    margin-left: auto;
+}
+
+.profile-menu-item:hover .fa-chevron-right {
+    opacity: 0.8;
+    transform: translateX(3px);
+}
+
+/* Logout Button Special Styling */
+.logout-btn {
+    color: #ef4444;
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.logout-btn i {
+    color: #ef4444;
+}
+
+.logout-btn:hover i {
+    color: #dc2626;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Dark Theme Support */
+[data-theme="dark"] .profile-icon {
+    background: #1e1e2e;
+    border-color: #2a2a3e;
+}
+
+[data-theme="dark"] .profile-dropdown {
+    background: #1e1e2e;
+    border-color: #2a2a3e;
+    box-shadow: 0 8px 32px rgba(129, 140, 248, 0.25);
+}
+
+[data-theme="dark"] .profile-header {
+    background: linear-gradient(135deg, #818cf8 0%, #a78bfa 100%);
+}
+
+[data-theme="dark"] .profile-menu-section {
+    border-bottom-color: #2a2a3e;
+}
+
+[data-theme="dark"] .section-title {
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .profile-menu-item {
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .profile-menu-item:hover {
+    background: #2a2a3e;
+    color: #818cf8;
+}
+
+[data-theme="dark"] .profile-dropdown::-webkit-scrollbar-track {
+    background: #2a2a3e;
+}
+
+[data-theme="dark"] .profile-dropdown::-webkit-scrollbar-thumb {
+    background: #818cf8;
+}
+
+[data-theme="dark"] .profile-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #a78bfa;
+}
+
+/* Brown Theme Support */
+[data-theme="brown"] .profile-icon {
+    border-color: rgba(245, 245, 220, 0.1);
+}
+
+[data-theme="brown"] .profile-dropdown {
+    background: #4E342E;
+    border-color: rgba(245, 245, 220, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="brown"] .profile-header {
+    background: linear-gradient(135deg, #4E342E 0%, #3E2723 100%);
+}
+
+[data-theme="brown"] .profile-menu-section {
+    border-bottom-color: rgba(245, 245, 220, 0.1);
+}
+
+[data-theme="brown"] .section-title {
+    color: #D7CCC8;
+}
+
+[data-theme="brown"] .profile-menu-item {
+    color: #F5F5DC;
+}
+
+[data-theme="brown"] .profile-menu-item:hover {
+    background: rgba(245, 245, 220, 0.05);
+    color: #D7CCC8;
+}
+
+[data-theme="brown"] .profile-menu-item i {
+    color: #D7CCC8;
+}
+
+[data-theme="brown"] .profile-dropdown::-webkit-scrollbar-track {
+    background: #3E2723;
+}
+
+[data-theme="brown"] .profile-dropdown::-webkit-scrollbar-thumb {
+    background: #8D6E63;
+}
+
+[data-theme="brown"] .profile-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #6D4C41;
+}
+
+/* ===================================
+   ENHANCED BASE STYLES — ANIMATION & DEPTH
+   =================================== */
+
+/* Dropdown — enhanced shadow + transition for all sizes */
+.profile-dropdown {
+    /* Layered 3D shadow depth */
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.05),
+        0 10px 20px rgba(99, 102, 241, 0.1),
+        0 20px 40px rgba(99, 102, 241, 0.08),
+        0 1px 0 rgba(255, 255, 255, 0.6) inset;
+    /* Use a more natural open/close animation */
+    transition:
+        opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        visibility 0.28s;
+}
+
+/* Enhanced hover effect on menu items */
+.profile-menu-item {
+    position: relative;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+    border-radius: 8px;
+    margin: 1px 8px;
+    width: calc(100% - 16px);
+}
+
+.profile-menu-item:hover {
+    background: var(--tag-bg, #f1f5f9);
+    color: var(--primary-color, #6366f1);
+    /* Subtle 3D lift */
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+}
+
+/* Touch / tap active state */
+.profile-menu-item:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: none;
+    background: rgba(99, 102, 241, 0.12);
+}
+
+/* Icon transition */
+.profile-menu-item i {
+    transition: transform 0.2s ease, opacity 0.2s ease, color 0.2s ease;
+}
+
+/* ===================================
+   TABLET (≤ 768px)
+   =================================== */
+@media (max-width: 768px) {
+    .profile-dropdown {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        left: auto;
+        /* Constrained width — won't exceed screen */
+        width: min(340px, calc(100vw - 1rem));
+        max-width: calc(100vw - 1rem);
+        max-height: 75vh;
+        border-radius: 14px;
+        /* Keep it within the viewport */
+        transform-origin: top right;
+        /* Ensure no overflow on narrow tablets */
+        overflow-x: hidden;
+    }
+
+    /* Adjust header padding */
+    .profile-header {
+        padding: 18px 20px;
+        gap: 12px;
+    }
+
+    /* Slightly smaller avatar */
+    .dropdown-avatar {
+        width: 52px;
+        height: 52px;
+    }
+
+    .profile-name {
+        font-size: 17px;
+    }
+
+    /* Bigger touch targets */
+    .profile-menu-item {
+        min-height: 48px;
+        padding: 12px 18px;
+        font-size: 14px;
+        margin: 1px 6px;
+        width: calc(100% - 12px);
+    }
+
+    .profile-menu-item i {
+        font-size: 17px;
+    }
+
+    .menu-item-title {
+        font-size: 14px;
+    }
+
+    .menu-item-desc {
+        font-size: 11px;
+    }
+}
+
+/* ===================================
+   MOBILE (≤ 480px) — Bottom Sheet
+   =================================== */
+@media (max-width: 480px) {
+
+    /* Switch to fixed bottom-sheet layout on mobile */
+    .profile-dropdown {
+        position: fixed !important;
+        top: auto !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 85vh;
+        border-radius: 20px 20px 0 0 !important;
+        border-bottom: none;
+        /* Override transform for bottom-sheet slide-up */
+        transform: translateY(20px) !important;
+        transform-origin: bottom center;
+        z-index: 9999 !important;
+    }
+
+    /* Bottom-sheet open state */
+    .profile-dropdown:not(.hidden) {
+        transform: translateY(0) !important;
+    }
+
+    /* Pull indicator bar at the top of the sheet */
+    .profile-dropdown::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: 4px;
+        margin: 10px auto 0;
+        flex-shrink: 0;
+    }
+
+    /* Header full width */
+    .profile-header {
+        padding: 20px;
+        border-radius: 0;
+        gap: 14px;
+    }
+
+    .dropdown-avatar {
+        width: 56px;
+        height: 56px;
+    }
+
+    .profile-name {
+        font-size: 18px;
+    }
+
+    .profile-greeting {
+        font-size: 13px;
+    }
+
+    /* Large touch targets for fingers */
+    .profile-menu-item {
+        min-height: 52px;
+        padding: 14px 20px;
+        font-size: 15px;
+        margin: 2px 8px;
+        width: calc(100% - 16px);
+        border-radius: 10px;
+    }
+
+    .profile-menu-item i {
+        font-size: 18px;
+        width: 22px;
+    }
+
+    .menu-item-title {
+        font-size: 15px;
+    }
+
+    .menu-item-desc {
+        font-size: 12px;
+    }
+
+    /* Section spacing */
+    .profile-menu-section {
+        padding: 6px 0;
+    }
+
+    /* Scrollable menu area */
+    .profile-menu {
+        padding: 8px 0 env(safe-area-inset-bottom, 0px);
+        overflow-y: auto;
+        max-height: calc(85vh - 100px);
+    }
+
+    /* Larger tap area for logout */
+    .logout-btn {
+        min-height: 52px;
+    }
+}
+
+/* ===================================
+   MOBILE OVERLAY — dimmed background
+   when profile dropdown is open
+   =================================== */
+@media (max-width: 480px) {
+
+    /* When dropdown is open on mobile, show a backdrop via JS-added class */
+    body.profile-open::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 9998;
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+}

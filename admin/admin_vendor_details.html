@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Verification Details - Admin Panel</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin_vendor_details.css">
+    <link rel="stylesheet" href="css/admin_3d.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <span>Admin Panel</span>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="dashboard.html#pending" class="nav-item">
+                    <i class="fas fa-user-clock"></i>
+                    <span>Pending Approvals</span>
+                </a>
+                <a href="dashboard.html#vendors" class="nav-item">
+                    <i class="fas fa-store"></i>
+                    <span>All Vendors</span>
+                </a>
+                <a href="../index.html" class="nav-item">
+                    <i class="fas fa-home"></i>
+                    <span>Back to Landing Page</span>
+                </a>
+            </nav>
+
+            <div class="user-profile">
+                <div class="user-info">
+                    <p class="user-name">Admin User</p>
+                    <p class="user-role">Administrator</p>
+                </div>
+                <button id="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="breadcrumb">
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Vendor Verification Details</span>
+                </div>
+                <div class="date-display" id="current-date"></div>
+            </header>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="loading-container">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Loading vendor details...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-state" class="error-container" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <p id="error-message">Failed to load vendor details</p>
+                <button class="btn-primary" onclick="location.href='dashboard.html'">Back to Dashboard</button>
+            </div>
+
+            <!-- Vendor Details Content -->
+            <div id="vendor-details-content" style="display: none;">
+                <!-- Header Card -->
+                <div class="vendor-header-card">
+                    <div class="vendor-header-info">
+                        <div class="vendor-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="vendor-basic-info">
+                            <h1 id="vendor-name">Loading...</h1>
+                            <p id="vendor-email">email@example.com</p>
+                            <p class="vendor-id">Vendor ID: <span id="vendor-id-display"></span></p>
+                        </div>
+                    </div>
+                    <div class="verification-status-container">
+                        <div class="status-badge" id="main-status-badge">
+                            <i class="fas fa-clock"></i>
+                            <span>Pending</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verification Information Grid -->
+                <div class="details-grid">
+                    <!-- Business Information Card -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <i class="fas fa-building"></i>
+                            <h2>Business Information</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-row">
+                                <span class="info-label">Business Name:</span>
+                                <span class="info-value" id="business-name">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Full Name (As per ID):</span>
+                                <span class="info-value" id="full-name">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">PAN Number:</span>
+                                <span class="info-value pan-number" id="pan-number">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">GST Number:</span>
+                                <span class="info-value" id="gst-number">Not Provided</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Government ID Type:</span>
+                                <span class="info-value" id="gov-id-type">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Government ID Number:</span>
+                                <span class="info-value" id="gov-id-number">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Business Registration Type:</span>
+                                <span class="info-value" id="business-reg-type">-</span>
+                            </div>
+                            <div class="info-row full-width">
+                                <span class="info-label">Business Address:</span>
+                                <span class="info-value" id="business-address">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bank Details Card -->
+                    <div class="detail-card">
+                        <div class="card-header">
+                            <i class="fas fa-university"></i>
+                            <h2>Bank Account Details</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-row">
+                                <span class="info-label">Account Holder Name:</span>
+                                <span class="info-value" id="account-holder">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Bank Name:</span>
+                                <span class="info-value" id="bank-name">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Account Number:</span>
+                                <span class="info-value masked-account" id="account-number">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">IFSC Code:</span>
+                                <span class="info-value" id="ifsc-code">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Uploaded Documents Card -->
+                    <div class="detail-card full-width">
+                        <div class="card-header">
+                            <i class="fas fa-file-alt"></i>
+                            <h2>Uploaded Documents</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="documents-grid">
+                                <!-- PAN Card -->
+                                <div class="document-item">
+                                    <div class="document-icon">
+                                        <i class="fas fa-credit-card"></i>
+                                    </div>
+                                    <div class="document-info">
+                                        <h4>PAN Card</h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-doc="pan_card_image">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn-download" data-doc="pan_card_image">
+                                                <i class="fas fa-download"></i> Download
+                                            </button>
+                                            <button class="btn-doc-reject" data-doc="pan_card_image"
+                                                data-doc-label="PAN Card">
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Government ID -->
+                                <div class="document-item">
+                                    <div class="document-icon">
+                                        <i class="fas fa-id-card"></i>
+                                    </div>
+                                    <div class="document-info">
+                                        <h4>Government ID Proof</h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-doc="government_id_proof">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn-download" data-doc="government_id_proof">
+                                                <i class="fas fa-download"></i> Download
+                                            </button>
+                                            <button class="btn-doc-reject" data-doc="government_id_proof"
+                                                data-doc-label="Government ID Proof">
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Business Certificate -->
+                                <div class="document-item">
+                                    <div class="document-icon">
+                                        <i class="fas fa-certificate"></i>
+                                    </div>
+                                    <div class="document-info">
+                                        <h4>Business Registration Certificate</h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-doc="business_certificate">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn-download" data-doc="business_certificate">
+                                                <i class="fas fa-download"></i> Download
+                                            </button>
+                                            <button class="btn-doc-reject" data-doc="business_certificate"
+                                                data-doc-label="Business Registration Certificate">
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Address Proof -->
+                                <div class="document-item">
+                                    <div class="document-icon">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    <div class="document-info">
+                                        <h4>Business Address Proof</h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-doc="business_address_proof">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn-download" data-doc="business_address_proof">
+                                                <i class="fas fa-download"></i> Download
+                                            </button>
+                                            <button class="btn-doc-reject" data-doc="business_address_proof"
+                                                data-doc-label="Business Address Proof">
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Cancelled Cheque -->
+                                <div class="document-item">
+                                    <div class="document-icon">
+                                        <i class="fas fa-money-check"></i>
+                                    </div>
+                                    <div class="document-info">
+                                        <h4>Cancelled Cheque / Bank Statement</h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-doc="cancelled_cheque">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn-download" data-doc="cancelled_cheque">
+                                                <i class="fas fa-download"></i> Download
+                                            </button>
+                                            <button class="btn-doc-reject" data-doc="cancelled_cheque"
+                                                data-doc-label="Cancelled Cheque / Bank Statement">
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Selfie with ID (Optional) -->
+                                <div class="document-item" id="selfie-doc" style="display: none;">
+                                    <div class="document-icon">
+                                        <i class="fas fa-camera"></i>
+                                    </div>
+                                    <div class="document-info">
+                                        <h4>Selfie with ID <span class="optional-tag">Optional</span></h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-doc="selfie_with_id">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn-download" data-doc="selfie_with_id">
+                                                <i class="fas fa-download"></i> Download
+                                            </button>
+                                            <button class="btn-doc-reject" data-doc="selfie_with_id"
+                                                data-doc-label="Selfie with ID">
+                                                <i class="fas fa-times"></i> Reject
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Business Verification Card -->
+                    <div class="detail-card full-width" id="biz-verification-card" style="display: none;">
+                        <div class="card-header" style="background: rgba(99, 102, 241, 0.05);">
+                            <i class="fas fa-store" style="color: #6366f1;"></i>
+                            <h2>Step 2: Business (Physical Shop) Verification</h2>
+                            <div class="status-badge" id="biz-status-badge">Pending</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-row full-width">
+                                <span class="info-label">Google Maps Link:</span>
+                                <span class="info-value"><a href="#" id="biz-maps-link" target="_blank"
+                                        class="vendor-link">View on Maps <i
+                                            class="fas fa-external-link-alt"></i></a></span>
+                            </div>
+
+                            <div class="documents-grid" style="margin-top: 1.5rem;">
+                                <!-- Shop Front -->
+                                <div class="document-item biz-doc" data-field="shop_front_photo">
+                                    <div class="document-icon"><i class="fas fa-image"></i></div>
+                                    <div class="document-info">
+                                        <h4>Shop Front Photo</h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-biz-doc="shop_front_photo"><i
+                                                    class="fas fa-eye"></i> View</button>
+                                            <button class="btn-download" data-biz-doc="shop_front_photo"><i
+                                                    class="fas fa-download"></i> Download</button>
+                                            <button class="btn-biz-doc-reject" data-biz-doc="shop_front_photo"
+                                                data-label="Shop Front Photo"><i class="fas fa-times"></i>
+                                                Reject</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Shop Board -->
+                                <div class="document-item biz-doc" data-field="shop_board_photo">
+                                    <div class="document-icon"><i class="fas fa-id-badge"></i></div>
+                                    <div class="document-info">
+                                        <h4>Shop Board Photo</h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-biz-doc="shop_board_photo"><i
+                                                    class="fas fa-eye"></i> View</button>
+                                            <button class="btn-download" data-biz-doc="shop_board_photo"><i
+                                                    class="fas fa-download"></i> Download</button>
+                                            <button class="btn-biz-doc-reject" data-biz-doc="shop_board_photo"
+                                                data-label="Shop Board Photo"><i class="fas fa-times"></i>
+                                                Reject</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Shop Video -->
+                                <div class="document-item biz-doc" data-field="shop_video">
+                                    <div class="document-icon"><i class="fas fa-video"></i></div>
+                                    <div class="document-info">
+                                        <h4>Shop Video</h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-biz-doc="shop_video"><i
+                                                    class="fas fa-eye"></i> View</button>
+                                            <button class="btn-download" data-biz-doc="shop_video"><i
+                                                    class="fas fa-download"></i> Download</button>
+                                            <button class="btn-biz-doc-reject" data-biz-doc="shop_video"
+                                                data-label="Shop Video"><i class="fas fa-times"></i> Reject</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Vendor Photo -->
+                                <div class="document-item biz-doc" data-field="vendor_photo">
+                                    <div class="document-icon"><i class="fas fa-user-circle"></i></div>
+                                    <div class="document-info">
+                                        <h4>Vendor Photo (at Shop)</h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-biz-doc="vendor_photo"><i
+                                                    class="fas fa-eye"></i> View</button>
+                                            <button class="btn-download" data-biz-doc="vendor_photo"><i
+                                                    class="fas fa-download"></i> Download</button>
+                                            <button class="btn-biz-doc-reject" data-biz-doc="vendor_photo"
+                                                data-label="Vendor Photo"><i class="fas fa-times"></i> Reject</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Brand Auth -->
+                                <div class="document-item biz-doc" data-field="brand_auth_certificate">
+                                    <div class="document-icon"><i class="fas fa-certificate"></i></div>
+                                    <div class="document-info">
+                                        <h4>Brand Authorization</h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-biz-doc="brand_auth_certificate"><i
+                                                    class="fas fa-eye"></i> View</button>
+                                            <button class="btn-download" data-biz-doc="brand_auth_certificate"><i
+                                                    class="fas fa-download"></i> Download</button>
+                                            <button class="btn-biz-doc-reject" data-biz-doc="brand_auth_certificate"
+                                                data-label="Brand Authorization"><i class="fas fa-times"></i>
+                                                Reject</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Service Cert -->
+                                <div class="document-item biz-doc" data-field="service_certification">
+                                    <div class="document-icon"><i class="fas fa-award"></i></div>
+                                    <div class="document-info">
+                                        <h4>Service Certification</h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-biz-doc="service_certification"><i
+                                                    class="fas fa-eye"></i> View</button>
+                                            <button class="btn-download" data-biz-doc="service_certification"><i
+                                                    class="fas fa-download"></i> Download</button>
+                                            <button class="btn-biz-doc-reject" data-biz-doc="service_certification"
+                                                data-label="Service Certification"><i class="fas fa-times"></i>
+                                                Reject</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Biz Proof (Optional) -->
+                                <div class="document-item biz-doc" data-field="business_proof">
+                                    <div class="document-icon"><i class="fas fa-history"></i></div>
+                                    <div class="document-info">
+                                        <h4>2+ Years Proof <span class="optional-tag">Optional</span></h4>
+                                        <div class="document-actions">
+                                            <button class="btn-view" data-biz-doc="business_proof"><i
+                                                    class="fas fa-eye"></i> View</button>
+                                            <button class="btn-download" data-biz-doc="business_proof"><i
+                                                    class="fas fa-download"></i> Download</button>
+                                            <button class="btn-biz-doc-reject" data-biz-doc="business_proof"
+                                                data-label="Business Proof"><i class="fas fa-times"></i> Reject</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="action-buttons" id="biz-action-buttons" style="margin-top: 2rem;">
+                                <button class="btn-approve" id="approve-biz-btn"
+                                    style="background: #6366f1; color: white;">
+                                    <i class="fas fa-check-double"></i> Approve Level 2
+                                </button>
+                                <button class="btn-reject" id="reject-biz-btn">
+                                    <i class="fas fa-times-circle"></i> Reject Level 2
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submission Details Card -->
+                    <div class="detail-card full-width">
+                        <div class="card-header">
+                            <i class="fas fa-info-circle"></i>
+                            <h2>Submission Details</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-row">
+                                <span class="info-label">Submitted At:</span>
+                                <span class="info-value" id="submitted-at">-</span>
+                            </div>
+                            <div class="info-row" id="verified-row" style="display: none;">
+                                <span class="info-label">Verified At:</span>
+                                <span class="info-value" id="verified-at">-</span>
+                            </div>
+                            <div class="info-row" id="rejection-row" style="display: none;">
+                                <span class="info-label">Rejection Reason:</span>
+                                <span class="info-value rejection-reason" id="rejection-reason">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons" id="action-buttons">
+                    <button class="btn-approve" id="approve-btn">
+                        <i class="fas fa-check-circle"></i> Approve Vendor
+                    </button>
+                    <button class="btn-reject" id="reject-btn">
+                        <i class="fas fa-times-circle"></i> Reject Vendor
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Reject Vendor Modal -->
+    <div id="reject-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeRejectModal()">&times;</span>
+            <h2>Reject Vendor Verification</h2>
+            <p>Please provide a detailed reason for rejection:</p>
+            <textarea id="rejection-reason-input" rows="5" placeholder="Enter rejection reason..." required></textarea>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeRejectModal()">Cancel</button>
+                <button class="btn-danger" id="confirm-reject-btn">Confirm Rejection</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Document Modal -->
+    <div id="reject-doc-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeRejectDocModal()">&times;</span>
+            <h2>Reject Document</h2>
+            <p>Document: <strong id="reject-doc-label"></strong></p>
+            <p>The vendor will be asked to re-upload only this document. Provide a reason:</p>
+            <textarea id="reject-doc-reason-input" rows="4" placeholder="Enter reason for rejecting this document..."
+                required></textarea>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeRejectDocModal()">Cancel</button>
+                <button class="btn-danger" id="confirm-reject-doc-btn">Reject Document</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Preview Modal -->
+    <div id="document-modal" class="modal">
+        <div class="modal-content document-preview-modal">
+            <span class="close-modal" onclick="closeDocumentModal()">&times;</span>
+            <h2 id="document-title">Document Preview</h2>
+            <div class="document-preview-container">
+                <iframe id="document-iframe" src=""></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin_vendor_details.js"></script>
+</body>
+
+</html>

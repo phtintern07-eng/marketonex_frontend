@@ -1,0 +1,945 @@
+/* ============================================================================
+   ADMIN VENDOR VERIFICATION DETAILS PAGE STYLES
+   Professional Card-Based Design Consistent with Admin Theme
+   ============================================================================ */
+
+/* Loading & Error States */
+.loading-container,
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 1rem;
+}
+
+.loading-container i,
+.error-container i {
+    font-size: 3rem;
+    color: #3b82f6;
+}
+
+.error-container i {
+    color: #ef4444;
+}
+
+.loading-container p,
+.error-container p {
+    font-size: 1.1rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.breadcrumb a {
+    color: #3b82f6;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+    color: #2563eb;
+}
+
+.breadcrumb i.fa-chevron-right {
+    font-size: 0.7rem;
+    color: #9ca3af;
+}
+
+.breadcrumb span {
+    color: var(--text-primary, #1f2937);
+    font-weight: 500;
+}
+
+/* Vendor Header Card */
+.vendor-header-card {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+    animation: fadeInUp 0.5s ease;
+}
+
+.vendor-header-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.vendor-avatar {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+}
+
+.vendor-basic-info h1 {
+    margin: 0 0 0.5rem 0;
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.vendor-basic-info p {
+    margin: 0.25rem 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+}
+
+.vendor-id {
+    font-size: 0.85rem !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+.verification-status-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.status-badge.status-pending {
+    background: #fbbf24;
+    color: white;
+}
+
+.status-badge.status-approved {
+    background: #10b981;
+    color: white;
+}
+
+.status-badge.status-rejected {
+    background: #ef4444;
+    color: white;
+}
+
+/* Details Grid */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.detail-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease;
+}
+
+.detail-card.full-width {
+    grid-column: 1 / -1;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.card-header i {
+    font-size: 1.3rem;
+    color: #3b82f6;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary, #1f2937);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Info Rows */
+.info-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row.full-width {
+    grid-template-columns: 200px 1fr;
+}
+
+.info-label {
+    font-weight: 600;
+    color: var(--text-secondary, #6b7280);
+    font-size: 0.9rem;
+}
+
+.info-value {
+    color: var(--text-primary, #1f2937);
+    font-size: 0.95rem;
+    word-break: break-word;
+}
+
+.info-value.pan-number,
+.info-value.masked-account {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.info-value.rejection-reason {
+    color: #ef4444;
+    font-weight: 500;
+}
+
+/* Documents Grid */
+.documents-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.document-item {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(147, 51, 234, 0.05));
+    border: 2px solid rgba(59, 130, 246, 0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    gap: 1rem;
+    transition: all 0.3s ease;
+}
+
+.document-item:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    transform: translateY(-2px);
+}
+
+.document-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.document-info {
+    flex: 1;
+}
+
+.document-info h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.95rem;
+    color: var(--text-primary, #1f2937);
+}
+
+.optional-tag {
+    font-size: 0.7rem;
+    background: #fbbf24;
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+.document-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-view,
+.btn-download,
+.btn-doc-reject {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-doc-reject {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-doc-reject:hover {
+    background: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.3);
+}
+
+.btn-doc-reject:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-view {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-view:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.btn-download {
+    background: #10b981;
+    color: white;
+}
+
+.btn-download:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+    animation: fadeInUp 0.7s ease;
+}
+
+.btn-approve,
+.btn-reject {
+    padding: 1rem 2.5rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-approve {
+    background: linear-gradient(135deg, #10b981, #16a34a);
+    color: white;
+}
+
+.btn-approve:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.btn-reject {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.btn-reject:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+.btn-approve:disabled,
+.btn-reject:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease;
+}
+
+.document-preview-modal {
+    max-width: 900px;
+    max-height: 90vh;
+}
+
+.close-modal {
+    float: right;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-modal:hover {
+    color: #1f2937;
+}
+
+.modal-content h2 {
+    margin: 0 0 1rem 0;
+    color: var(--text-primary, #1f2937);
+    font-size: 1.5rem;
+}
+
+.modal-content p {
+    margin: 0 0 1rem 0;
+    color: var(--text-secondary, #6b7280);
+}
+
+.modal-content textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+.modal-content textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.btn-cancel,
+.btn-danger,
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel {
+    background: #e5e7eb;
+    color: var(--text-primary, #1f2937);
+}
+
+.btn-cancel:hover {
+    background: #d1d5db;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Document Preview */
+.document-preview-container {
+    width: 100%;
+    height: 70vh;
+    margin-top: 1rem;
+}
+
+.document-preview-container iframe {
+    width: 100%;
+    height: 100%;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .documents-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .vendor-header-card {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .verification-status-container {
+        align-items: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .info-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .btn-approve,
+    .btn-reject {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .document-actions {
+        flex-direction: column;
+    }
+
+    .btn-view,
+    .btn-download,
+    .btn-doc-reject {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Dark Theme Support (if needed) */
+[data-theme="dark"] .detail-card {
+    background: #1f2937;
+}
+
+[data-theme="dark"] .card-header {
+    background: linear-gradient(135deg, #374151, #4b5563);
+}
+
+[data-theme="dark"] .modal-content {
+    background: #1f2937;
+}
+
+[data-theme="dark"] .modal-content textarea {
+    background: #374151;
+    border-color: #4b5563;
+    color: white;
+}
+
+/* ============================================================================
+   DOCUMENT STATUS ENHANCEMENT — 3D Cards, Badges, Summary Pills
+   ============================================================================ */
+
+/* ── Section header summary pills ─────────────────────────────────────────── */
+.card-header {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.doc-summary-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-left: auto;
+    align-items: center;
+}
+
+.doc-summary-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 0.22rem 0.65rem;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.pill--pending {
+    background: rgba(234, 179, 8, .15);
+    color: #92400e;
+    border: 1px solid rgba(234, 179, 8, .4);
+}
+
+.pill--approved {
+    background: rgba(16, 185, 129, .12);
+    color: #065f46;
+    border: 1px solid rgba(16, 185, 129, .4);
+}
+
+.pill--rejected {
+    background: rgba(239, 68, 68, .12);
+    color: #7f1d1d;
+    border: 1px solid rgba(239, 68, 68, .4);
+}
+
+.pill--reupload {
+    background: rgba(59, 130, 246, .12);
+    color: #1e3a8a;
+    border: 1px solid rgba(59, 130, 246, .4);
+}
+
+.pill--not-uploaded {
+    background: rgba(107, 114, 128, .1);
+    color: #374151;
+    border: 1px solid rgba(107, 114, 128, .3);
+}
+
+/* ── Enhanced document card base ──────────────────────────────────────────── */
+.doc-item--enhanced {
+    border-radius: 12px;
+    background: #fff;
+    border: 1.5px solid rgba(0, 0, 0, .07);
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, .05),
+        0 4px 12px rgba(0, 0, 0, .07),
+        0 12px 24px rgba(0, 0, 0, .04);
+    transform: translateY(0) scale(1);
+    transition:
+        transform .2s cubic-bezier(.34, 1.56, .64, 1),
+        box-shadow .2s ease,
+        border-color .2s ease;
+    will-change: transform;
+    overflow: hidden;
+    position: relative;
+}
+
+.doc-item--enhanced:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, .07),
+        0 8px 22px rgba(0, 0, 0, .1),
+        0 20px 40px rgba(0, 0, 0, .06);
+}
+
+/* ── Status-specific accents ──────────────────────────────────────────────── */
+
+/* Pending — yellow left border */
+.doc-status--pending {
+    border-left: 4px solid #f59e0b;
+}
+
+.doc-status--pending:hover {
+    box-shadow:
+        0 2px 6px rgba(245, 158, 11, .1),
+        0 8px 22px rgba(245, 158, 11, .12),
+        0 20px 40px rgba(0, 0, 0, .06);
+}
+
+/* Approved — green left border */
+.doc-status--approved {
+    border-left: 4px solid #10b981;
+}
+
+.doc-status--approved:hover {
+    box-shadow:
+        0 2px 6px rgba(16, 185, 129, .1),
+        0 8px 22px rgba(16, 185, 129, .12),
+        0 20px 40px rgba(0, 0, 0, .06);
+}
+
+/* Rejected — red left border */
+.doc-status--rejected {
+    border-left: 4px solid #ef4444;
+    background: #fffafa;
+}
+
+.doc-status--rejected:hover {
+    box-shadow:
+        0 2px 6px rgba(239, 68, 68, .1),
+        0 8px 22px rgba(239, 68, 68, .13),
+        0 20px 40px rgba(0, 0, 0, .06);
+}
+
+/* Re-uploaded — blue left border + pulsing highlight ring */
+.doc-status--reupload {
+    border-left: 4px solid #3b82f6;
+    background: #f0f7ff;
+    animation: reuploadRing 2.5s ease infinite;
+}
+
+@keyframes reuploadRing {
+
+    0%,
+    100% {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .05), 0 4px 12px rgba(0, 0, 0, .07), 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+
+    50% {
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .05), 0 4px 12px rgba(0, 0, 0, .07), 0 0 0 5px rgba(59, 130, 246, .12);
+    }
+}
+
+.doc-status--reupload:hover {
+    animation: none;
+}
+
+/* Not uploaded — grey left border + muted look */
+.doc-status--not-uploaded {
+    border-left: 4px solid #9ca3af;
+    background: #f9fafb;
+    opacity: 0.82;
+}
+
+/* ── Status badge ─────────────────────────────────────────────────────────── */
+.doc-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 0.22rem 0.65rem;
+    border-radius: 20px;
+    margin-bottom: 0.45rem;
+    width: fit-content;
+}
+
+/* Map badge color to parent card status */
+.doc-status--pending .doc-status-badge {
+    background: rgba(245, 158, 11, .15);
+    color: #92400e;
+    border: 1px solid rgba(245, 158, 11, .5);
+}
+
+.doc-status--approved .doc-status-badge {
+    background: rgba(16, 185, 129, .12);
+    color: #065f46;
+    border: 1px solid rgba(16, 185, 129, .5);
+}
+
+.doc-status--rejected .doc-status-badge {
+    background: rgba(239, 68, 68, .12);
+    color: #7f1d1d;
+    border: 1px solid rgba(239, 68, 68, .5);
+}
+
+.doc-status--reupload .doc-status-badge {
+    background: rgba(59, 130, 246, .12);
+    color: #1e3a8a;
+    border: 1px solid rgba(59, 130, 246, .5);
+    box-shadow: 0 0 6px rgba(59, 130, 246, .2);
+}
+
+.doc-status--not-uploaded .doc-status-badge {
+    background: rgba(107, 114, 128, .1);
+    color: #4b5563;
+    border: 1px solid rgba(107, 114, 128, .4);
+}
+
+/* ── Rejection reason note ────────────────────────────────────────────────── */
+.doc-rejection-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    margin-top: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    background: linear-gradient(135deg, rgba(254, 202, 202, .4), rgba(255, 241, 241, .5));
+    border-left: 3px solid #ef4444;
+    border-radius: 7px;
+    font-size: 0.8rem;
+    color: #7f1d1d;
+    line-height: 1.45;
+}
+
+.doc-status--reupload .doc-rejection-note {
+    background: linear-gradient(135deg, rgba(219, 234, 254, .5), rgba(239, 246, 255, .6));
+    border-left-color: #3b82f6;
+    color: #1e40af;
+}
+
+.doc-rejection-note i {
+    flex-shrink: 0;
+    margin-top: 0.15rem;
+    font-size: 0.78rem;
+}
+
+/* ── Disabled buttons ─────────────────────────────────────────────────────── */
+.btn--disabled,
+.btn--disabled:hover {
+    opacity: 0.4;
+    cursor: not-allowed !important;
+    filter: grayscale(0.6);
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* ── Dark theme adjustments ───────────────────────────────────────────────── */
+[data-theme="dark"] .doc-item--enhanced {
+    background: #1f2937;
+    border-color: rgba(255, 255, 255, .08);
+}
+
+[data-theme="dark"] .doc-status--rejected {
+    background: rgba(127, 29, 29, .15);
+}
+
+[data-theme="dark"] .doc-status--reupload {
+    background: rgba(30, 58, 138, .15);
+}
+
+[data-theme="dark"] .doc-status--not-uploaded {
+    background: #111827;
+}
+
+[data-theme="dark"] .doc-rejection-note {
+    background: linear-gradient(135deg, rgba(127, 29, 29, .25), rgba(153, 27, 27, .12));
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .doc-status--reupload .doc-rejection-note {
+    background: linear-gradient(135deg, rgba(30, 58, 138, .25), rgba(29, 78, 216, .12));
+    color: #93c5fd;
+}
+
+[data-theme="dark"] .pill--pending {
+    background: rgba(234, 179, 8, .12);
+    color: #fbbf24;
+}
+
+[data-theme="dark"] .pill--approved {
+    background: rgba(16, 185, 129, .1);
+    color: #34d399;
+}
+
+[data-theme="dark"] .pill--rejected {
+    background: rgba(239, 68, 68, .1);
+    color: #f87171;
+}
+
+[data-theme="dark"] .pill--reupload {
+    background: rgba(59, 130, 246, .1);
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .pill--not-uploaded {
+    background: rgba(107, 114, 128, .1);
+    color: #9ca3af;
+}
+
+[data-theme="dark"] .doc-status--pending .doc-status-badge {
+    background: rgba(245, 158, 11, .15);
+    color: #fbbf24;
+}
+
+[data-theme="dark"] .doc-status--approved .doc-status-badge {
+    background: rgba(16, 185, 129, .12);
+    color: #34d399;
+}
+
+[data-theme="dark"] .doc-status--rejected .doc-status-badge {
+    background: rgba(239, 68, 68, .12);
+    color: #f87171;
+}
+
+[data-theme="dark"] .doc-status--reupload .doc-status-badge {
+    background: rgba(59, 130, 246, .12);
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .doc-status--not-uploaded .doc-status-badge {
+    background: rgba(107, 114, 128, .12);
+    color: #9ca3af;
+}

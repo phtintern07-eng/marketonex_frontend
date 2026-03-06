@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Builder - Marketplace</title>
+    <link rel="stylesheet" href="css/marketplace.css">
+    <link rel="stylesheet" href="css/builder.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="logo">Marketplace</h1>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search products...">
+            </div>
+            <div class="actions">
+                <a href="marketplace.html" class="back-btn"
+                    style="text-decoration: none; color: inherit; margin-right: 1rem;">
+                    <i class="fas fa-arrow-left"></i> Back to Marketplace
+                </a>
+                <a href="builder.html" class="nav-link-btn active">
+                    <i class="fas fa-tools"></i> Build PC
+                </a>
+                <a href="cart.html" class="cart-icon-link">
+                    <div class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-badge" class="cart-badge">0</span>
+                    </div>
+                </a>
+                <div class="theme-toggle">
+                    <button id="theme-toggle-btn" aria-label="Toggle theme">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="builder-container">
+
+        <div class="builder-header">
+            <h1 class="builder-title">Build Your Dream Machine</h1>
+            <p class="builder-subtitle">Select your components below to craft a PC that perfectly matches your needs.
+                Premium performance starts here.</p>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar-container">
+            <div class="status-pill success" id="compatibility-pill">
+                <i class="fas fa-check-circle"></i>
+                <span id="compatibility-text">Compatibility Check: Pass</span>
+            </div>
+            <div class="status-pill warning">
+                <i class="fas fa-bolt"></i>
+                <span>Estimated Power: <span id="total-wattage">0</span>W</span>
+            </div>
+        </div>
+
+        <!-- System Build Grid -->
+        <div id="builder-grid" class="component-grid">
+            <!-- Cards will be injected by JS -->
+        </div>
+
+        <!-- Footer Summary -->
+        <div class="builder-footer">
+            <div class="total-price-display">
+                <span class="total-label">Total Estimate</span>
+                <span id="total-price" class="total-amount">₹0.00</span>
+            </div>
+            <button id="buy-all-btn" class="buy-now-btn">
+                <i class="fas fa-shopping-cart"></i> Buy All Components
+            </button>
+        </div>
+    </main>
+
+    <!-- Part Selection Overlay -->
+    <div id="part-selection-overlay">
+        <div class="selection-modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="selection-category-title">Select Component</h2>
+                <button class="modal-close" id="close-selection-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="selection-grid">
+                <!-- Selection Items injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/common.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/builder.js"></script>
+</body>
+
+</html>

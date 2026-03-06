@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KYC Management - Admin Panel</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        /* Layout */
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 20px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar .logo {
+            padding: 16px 24px 24px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #7c3aed;
+            border-bottom: 1px solid #2d2d4e;
+        }
+
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: #ccc;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            background: #2d2d4e;
+            color: #fff;
+        }
+
+        .sidebar nav a i {
+            width: 18px;
+            text-align: center;
+        }
+
+        .main {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px solid #e0e0e0;
+            background: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            color: #555;
+        }
+
+        .filter-tab.active {
+            border-color: #7c3aed;
+            background: #7c3aed;
+            color: #fff;
+        }
+
+        .filter-tab:hover:not(.active) {
+            border-color: #7c3aed;
+            color: #7c3aed;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+
+        .stat-card .stat-num {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .stat-card.pending .stat-num {
+            color: #f59e0b;
+        }
+
+        .stat-card.approved .stat-num {
+            color: #10b981;
+        }
+
+        .stat-card.rejected .stat-num {
+            color: #ef4444;
+        }
+
+        .stat-card.total .stat-num {
+            color: #7c3aed;
+        }
+
+        /* Table */
+        .table-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .table-card table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table-card th {
+            background: #f8f9fa;
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table-card td {
+            padding: 14px 16px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .table-card tr:hover td {
+            background: #fafafa;
+        }
+
+        /* Status Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge.approved {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .badge.rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .badge.not_submitted {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        /* Action Buttons */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 7px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .btn-approve {
+            background: #10b981;
+            color: #fff;
+        }
+
+        .btn-approve:hover {
+            background: #059669;
+        }
+
+        .btn-reject {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .btn-reject:hover {
+            background: #dc2626;
+        }
+
+        .btn-view {
+            background: #7c3aed;
+            color: #fff;
+        }
+
+        .btn-view:hover {
+            background: #6d28d9;
+        }
+
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #ddd;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px;
+            width: 90%;
+            max-width: 480px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .modal textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        .modal textarea:focus {
+            outline: none;
+            border-color: #7c3aed;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            justify-content: flex-end;
+        }
+
+        .btn-cancel {
+            background: #f3f4f6;
+            color: #555;
+        }
+
+        .btn-cancel:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-confirm-reject {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .btn-confirm-reject:hover {
+            background: #dc2626;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            max-width: 360px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: #10b981;
+        }
+
+        .toast.error {
+            background: #ef4444;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 16px;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo"><i class="fas fa-shield-alt"></i> Admin Panel</div>
+            <nav>
+                <a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="kyc_management.html" class="active"><i class="fas fa-id-card"></i> KYC Management</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="page-header">
+                <div>
+                    <h1><i class="fas fa-id-card" style="color:#7c3aed;margin-right:10px;"></i>KYC Management</h1>
+                    <p>Review and approve vendor KYC verification requests</p>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card total">
+                    <div class="stat-num" id="statTotal">—</div>
+                    <div class="stat-label">Total Submissions</div>
+                </div>
+                <div class="stat-card pending">
+                    <div class="stat-num" id="statPending">—</div>
+                    <div class="stat-label">Pending Review</div>
+                </div>
+                <div class="stat-card approved">
+                    <div class="stat-num" id="statApproved">—</div>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-card rejected">
+                    <div class="stat-num" id="statRejected">—</div>
+                    <div class="stat-label">Rejected</div>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-status="all">All</button>
+                <button class="filter-tab" data-status="pending">Pending</button>
+                <button class="filter-tab" data-status="approved">Approved</button>
+                <button class="filter-tab" data-status="rejected">Rejected</button>
+            </div>
+
+            <!-- Table -->
+            <div class="table-card">
+                <div id="tableContent" class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal-overlay" id="rejectModal">
+        <div class="modal">
+            <h3><i class="fas fa-times-circle" style="color:#ef4444;margin-right:8px;"></i>Reject KYC Verification</h3>
+            <p style="color:#666;font-size:14px;margin-bottom:12px;">Please provide a reason for rejection. This will be
+                shown to the vendor.</p>
+            <textarea id="rejectReason"
+                placeholder="Enter rejection reason (e.g., PAN card image is blurry, GST number mismatch)..."></textarea>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeRejectModal()">Cancel</button>
+                <button class="btn btn-confirm-reject" onclick="confirmReject()"><i class="fas fa-times"></i> Confirm
+                    Reject</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let allVerifications = [];
+        let currentFilter = 'all';
+        let pendingRejectId = null;
+
+        // Check admin auth
+        async function checkAuth() {
+            const res = await fetch('/api/admin/auth/status', { credentials: 'include' });
+            const data = await res.json();
+            if (!data.isAuthenticated) {
+                window.location.href = '/admin/login.html';
+            }
+        }
+
+        async function loadVerifications(status = 'all') {
+            document.getElementById('tableContent').innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+            try {
+                const url = status === 'all' ? '/api/admin/kyc/verifications' : `/api/admin/kyc/verifications?status=${status}`;
+                const res = await fetch(url, { credentials: 'include' });
+                if (!res.ok) throw new Error('Failed to fetch');
+                allVerifications = await res.json();
+                renderTable(allVerifications);
+                updateStats();
+            } catch (e) {
+                document.getElementById('tableContent').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Failed to load data. Please refresh.</p></div>`;
+            }
+        }
+
+        async function loadAllForStats() {
+            try {
+                const res = await fetch('/api/admin/kyc/verifications', { credentials: 'include' });
+                if (!res.ok) return;
+                const all = await res.json();
+                document.getElementById('statTotal').textContent = all.length;
+                document.getElementById('statPending').textContent = all.filter(v => v.status === 'pending').length;
+                document.getElementById('statApproved').textContent = all.filter(v => v.status === 'approved').length;
+                document.getElementById('statRejected').textContent = all.filter(v => v.status === 'rejected').length;
+            } catch (e) { }
+        }
+
+        function updateStats() {
+            loadAllForStats();
+        }
+
+        function renderTable(data) {
+            if (!data.length) {
+                document.getElementById('tableContent').innerHTML = `<div class="empty-state"><i class="fas fa-folder-open"></i><p>No KYC submissions found.</p></div>`;
+                return;
+            }
+
+            const rows = data.map(v => `
+            <tr>
+                <td>
+                    <strong>${escHtml(v.vendor_name || '—')}</strong><br>
+                    <small style="color:#888;">${escHtml(v.vendor_email || '—')}</small>
+                </td>
+                <td>${escHtml(v.business_name || '—')}</td>
+                <td>${escHtml(v.pan_number || '—')}</td>
+                <td>${formatDate(v.submitted_at)}</td>
+                <td><span class="badge ${v.status}">${statusLabel(v.status)}</span></td>
+                <td>
+                    <div class="action-btns">
+                        ${v.status !== 'approved' ? `<button class="btn btn-approve btn-sm" onclick="approveKyc(${v.id})"><i class="fas fa-check"></i> Approve</button>` : ''}
+                        ${v.status !== 'rejected' ? `<button class="btn btn-reject btn-sm" onclick="openRejectModal(${v.id})"><i class="fas fa-times"></i> Reject</button>` : ''}
+                        ${v.rejection_reason ? `<span title="${escHtml(v.rejection_reason)}" style="color:#ef4444;font-size:12px;cursor:help;"><i class="fas fa-info-circle"></i> Reason</span>` : ''}
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+
+            document.getElementById('tableContent').innerHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vendor</th>
+                        <th>Business Name</th>
+                        <th>PAN</th>
+                        <th>Submitted</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        `;
+        }
+
+        async function approveKyc(id) {
+            if (!confirm('Approve this KYC submission? The vendor will get full dashboard access.')) return;
+            try {
+                const res = await fetch(`/api/admin/kyc/${id}/approve`, {
+                    method: 'POST', credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast('✅ KYC approved! Vendor now has full access.', 'success');
+                    loadVerifications(currentFilter);
+                } else {
+                    showToast('❌ ' + (data.error || 'Failed to approve'), 'error');
+                }
+            } catch (e) {
+                showToast('❌ Network error', 'error');
+            }
+        }
+
+        function openRejectModal(id) {
+            pendingRejectId = id;
+            document.getElementById('rejectReason').value = '';
+            document.getElementById('rejectModal').classList.add('active');
+        }
+
+        function closeRejectModal() {
+            pendingRejectId = null;
+            document.getElementById('rejectModal').classList.remove('active');
+        }
+
+        async function confirmReject() {
+            const reason = document.getElementById('rejectReason').value.trim();
+            if (!reason) { alert('Please provide a rejection reason.'); return; }
+            try {
+                const res = await fetch(`/api/admin/kyc/${pendingRejectId}/reject`, {
+                    method: 'POST', credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ reason })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showToast('KYC rejected. Vendor has been notified.', 'success');
+                    closeRejectModal();
+                    loadVerifications(currentFilter);
+                } else {
+                    showToast('❌ ' + (data.error || 'Failed to reject'), 'error');
+                }
+            } catch (e) {
+                showToast('❌ Network error', 'error');
+            }
+        }
+
+        // Filter tabs
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentFilter = tab.dataset.status;
+                loadVerifications(currentFilter);
+            });
+        });
+
+        // Helpers
+        function statusLabel(s) {
+            return { pending: '🟡 Pending', approved: '✅ Approved', rejected: '❌ Rejected', not_submitted: '⚪ Not Submitted' }[s] || s;
+        }
+        function formatDate(d) {
+            if (!d) return '—';
+            return new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+        function escHtml(str) {
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = `toast ${type} show`;
+            setTimeout(() => t.classList.remove('show'), 4000);
+        }
+
+        // Close modal on overlay click
+        document.getElementById('rejectModal').addEventListener('click', function (e) {
+            if (e.target === this) closeRejectModal();
+        });
+
+        // Init
+        checkAuth().then(() => {
+            loadVerifications('all');
+        });
+    </script>
+</body>
+
+</html>

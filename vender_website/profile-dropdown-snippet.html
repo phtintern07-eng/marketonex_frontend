@@ -1,0 +1,71 @@
+<!-- PROFILE DROPDOWN HTML SNIPPET -->
+<!-- Add this to replace the simple profile icon link in navigation -->
+
+<!-- User Profile Icon & Dropdown -->
+<div class="profile-container">
+    <button id="profile-icon-btn" class="profile-icon" aria-label="User Profile">
+        <img id="profile-avatar" src="" alt="Profile" class="profile-avatar hidden">
+        <div id="profile-initials" class="profile-initials"></div>
+    </button>
+
+    <!-- Profile Dropdown Panel -->
+    <div id="profile-dropdown" class="profile-dropdown hidden">
+        <!-- User Info Header -->
+        <div class="profile-header">
+            <img id="dropdown-avatar" src="" alt="Profile" class="dropdown-avatar">
+            <div class="profile-info">
+                <p class="profile-greeting">Hello!</p>
+                <h3 id="profile-name" class="profile-name">Vendor</h3>
+            </div>
+        </div>
+
+        <!-- Profile Menu Sections -->
+        <div class="profile-menu">
+            <!-- Vendor Dashboard -->
+            <div class="profile-menu-section">
+                <a href="/vendor-site/products.html" class="profile-menu-item">
+                    <i class="fas fa-box"></i>
+                    <div class="menu-item-content">
+                        <span class="menu-item-title">My Products</span>
+                        <span class="menu-item-desc">Manage your inventory</span>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+
+            <!-- Account Settings -->
+            <div class="profile-menu-section">
+                <h4 class="section-title">Account Settings</h4>
+                <a href="/vendor-site/profile.html" class="profile-menu-item">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="menu-item-title">Profile Information</span>
+                </a>
+                <a href="/vendor-site/orders.html" class="profile-menu-item">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="menu-item-title">Orders</span>
+                </a>
+            </div>
+
+            <!-- Frequently Visited -->
+            <div class="profile-menu-section">
+                <h4 class="section-title">Frequently Visited</h4>
+                <a href="/vendor-site/profile.html#password" class="profile-menu-item">
+                    <i class="fas fa-key"></i>
+                    <span class="menu-item-title">Change Password</span>
+                </a>
+                <a href="/vendor-site/help.html" class="profile-menu-item">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="menu-item-title">Help Center</span>
+                </a>
+            </div>
+
+            <!-- Logout -->
+            <div class="profile-menu-section">
+                <button id="profile-logout-btn" class="profile-menu-item logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="menu-item-title">Logout</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

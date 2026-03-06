@@ -1,0 +1,1646 @@
+/* Gaming Theme Design System - Multi-Theme Support */
+
+:root {
+    /* DEFAULT: DARK THEME */
+    --bg-main: #0F172A;
+    --bg-card: #1E293B;
+    --text-primary: #F9FAFB;
+    --text-secondary: #9CA3AF;
+    --accent: #FACC15;
+    /* Yellow/Gold */
+    --border: rgba(255, 255, 255, 0.1);
+
+    /* Legacy Mapping (for compatibility) */
+    --gaming-red: var(--accent);
+    --text-white: var(--text-primary);
+    --text-gray: var(--text-secondary);
+    --gaming-card: var(--bg-card);
+    --text-main: var(--text-primary);
+    --text-dark: var(--bg-main);
+    --bg-body: var(--bg-main);
+
+    /* Spacing & Typography */
+    --container-width: 1400px;
+    --header-height: 80px;
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+/* THEME: BROWN */
+body.theme-brown {
+    --bg-main: #3E2723;
+    --bg-card: #86746f;
+    --text-primary: #e1b221;
+    --text-secondary: rgba(44, 44, 39, 0.849);
+    --accent: #D7CCC8;
+    /* Soft Brown/Cream Accent */
+    --border: rgba(245, 245, 220, 0.1);
+}
+
+/* THEME: CHROME (LIGHT) */
+body.theme-chrome {
+    --bg-main: #E5E7EB;
+    --bg-card:#b8a2a20f;
+    --text-primary: #111827;
+    --text-secondary: #4B5563;
+    --accent: #2563EB;
+    /* Blue */
+    --border: rgba(0, 0, 0, 0.1);
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+    min-height: 100vh;
+}
+
+/* Typography Overrides */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Button Components */
+.btn-gaming-primary {
+    background-color: #FACC15;
+    /* Luxury Gold */
+    color: #111827;
+    /* Dark Text */
+    padding: 1rem 2rem;
+    font-weight: 600;
+    /* Requested 600 */
+    text-transform: uppercase;
+    border: none;
+    border-radius: 10px;
+    /* Requested 10px */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-gaming-primary:hover {
+    background-color: #F59E0B;
+    /* Darker Gold on Hover */
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(250, 204, 21, 0.5);
+    /* Slight Glow Effect */
+    color: #111827;
+}
+
+.btn-gaming-outline {
+    background: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 1rem 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.btn-gaming-outline:hover {
+    background: white;
+    color: black;
+}
+
+/* Layout Utils */
+.container-gaming {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* Navigation */
+.gaming-nav {
+    background-color: rgba(26, 11, 32, 0.8);
+    /* Semi-transparent version of Main Background */
+    backdrop-filter: blur(10px);
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.shop-layout {
+    padding: 4rem 0;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+.products-grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.gaming-nav .nav-links a {
+    color: var(--text-main);
+    /* Dynamic Text */
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.875rem;
+    margin: 0 1rem;
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.gaming-nav .nav-links a:hover {
+    opacity: 1;
+    color: var(--gaming-red);
+}
+
+/* Navbar Actions Group */
+.nav-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* 3D Action Buttons (Cart, Theme, Profile) */
+.nav-action-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 1.1rem;
+    position: relative;
+    /* Soft 3D Depth */
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-action-btn:hover {
+    /* Lift up & Glow */
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--gaming-red);
+    color: var(--gaming-red);
+    box-shadow:
+        0 6px 12px rgba(0, 0, 0, 0.15),
+        0 0 15px rgba(250, 204, 21, 0.3),
+        /* gold glow */
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.nav-action-btn:active {
+    /* Press down effect */
+    transform: translateY(1px) scale(0.95);
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Special fix for profile icon to fit perfectly inside the new 3D button */
+.nav-action-btn.profile-icon-nav {
+    padding: 0;
+    overflow: hidden;
+}
+
+.nav-action-btn.profile-icon-nav .profile-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    /* match inner curve */
+}
+
+.nav-action-btn.profile-icon-nav .profile-initials {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Section Components based on Screenshots */
+
+/* 1. Hero */
+.gaming-hero {
+    background-color: var(--bg-body);
+    /* Dynamic Background */
+    /* Very dark blue/black */
+    padding: 6rem 0;
+    display: flex;
+    align-items: center;
+    min-height: 700px;
+    position: relative;
+    overflow: hidden;
+}
+
+.gaming-hero-content {
+    max-width: 600px;
+    z-index: 2;
+    color: var(--text-main);
+}
+
+.hero-container-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.hero-btns {
+    display: flex;
+    gap: 1rem;
+}
+
+.hero-dots {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+}
+
+.hero-dots .dot {
+    width: 30px;
+    height: 3px;
+    background: #333;
+    transition: background 0.3s ease;
+}
+
+.hero-dots .dot.active {
+    background: var(--gaming-red);
+}
+
+.gaming-hero h1 {
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    color: var(--text-main);
+    /* Ensure title adapts */
+}
+
+.gaming-hero p {
+    color: var(--text-gray);
+    font-size: 1.125rem;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+}
+
+.gaming-hero-image {
+    position: absolute;
+    right: -5%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60%;
+    z-index: 1;
+}
+
+/* 2. Shop By Category */
+.gaming-categories {
+    padding: 6rem 0;
+    background-color: var(--bg-main);
+    text-align: center;
+}
+
+.gaming-section-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 3rem;
+    margin-top: 0;
+}
+
+.gaming-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.gaming-cat-card {
+    background-color: var(--gaming-dark);
+    border-radius: 8px;
+    padding: 2rem;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    text-align: center;
+}
+
+.gaming-cat-card:hover {
+    transform: translateY(-10px);
+    background-color: #1f1f1f;
+}
+
+.gaming-cat-image {
+    width: 100%;
+    height: 150px;
+    object-fit: contain;
+    margin-bottom: 1.5rem;
+}
+
+.gaming-cat-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* 3. Feature/Review Section (Split Black/White) */
+.gaming-split-section {
+    display: flex;
+    flex-wrap: wrap;
+    min-height: 600px;
+}
+
+.split-left {
+    flex: 1;
+    background-color: var(--bg-main);
+    padding: 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 400px;
+}
+
+.split-right {
+    flex: 1;
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    padding: 5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 400px;
+}
+
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+}
+
+.feature-list li {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+    color: var(--text-gray);
+}
+
+.feature-list li::before {
+    content: '✓';
+    color: var(--text-white);
+    margin-right: 1rem;
+    font-weight: bold;
+}
+
+.testimonial-text {
+    font-size: 1.25rem;
+    font-style: italic;
+    line-height: 1.6;
+    color: #444;
+    margin-bottom: 2rem;
+}
+
+/* 4. Promo Section (Play Now Pay Later) */
+.gaming-promo {
+    background: linear-gradient(90deg, #1a0b1f 0%, #2d1b36 100%);
+    padding: 6rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pc-builder-promo {
+    padding: 5rem 0;
+    background-color: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+}
+
+.pc-builder-promo h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+}
+
+.pc-builder-promo p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.promo-btn {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    text-decoration: none;
+}
+
+/* 5. Info Cards Section (NEW - White Cards) */
+.gaming-info-section {
+    background-color: var(--bg-main);
+    /* Light background for contrast */
+    padding: 6rem 0;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+}
+
+.info-card-white {
+    background: var(--bg-card);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+    text-align: left;
+    transition: transform 0.3s ease;
+}
+
+.info-card-white:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+}
+
+.info-icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.info-icon-red {
+    background-color: #ef4444;
+}
+
+.info-icon-blue {
+    background-color: #3b82f6;
+}
+
+.info-icon-purple {
+    background-color: #8b5cf6;
+}
+
+.info-card-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.info-card-subtitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+}
+
+.info-card-list {
+    list-style: none;
+    padding: 0;
+}
+
+.info-card-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.info-card-list li::before {
+    content: 'ds';
+    /* Diamond symbol replacement or icon */
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    width: 8px;
+    height: 8px;
+    background-color: #ef4444;
+    transform: rotate(45deg);
+}
+
+/* 6. Red CTA Banner (NEW) */
+.gaming-cta-banner {
+    background-color: var(--gaming-red);
+    padding: 2.5rem 0;
+    text-align: center;
+    color: white;
+}
+
+.gaming-cta-banner h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+}
+
+/* Footer (Updated) */
+.gaming-footer {
+    background-color: var(--bg-main);
+    padding: 5rem 0 2rem;
+    border-top: none;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2rem;
+    margin-bottom: 4rem;
+}
+
+.footer-col h4 {
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+    letter-spacing: 1px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 1rem;
+}
+
+.footer-links a {
+    color: #9ca3af;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: white;
+}
+
+.social-icons {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.social-btn:hover {
+    background: var(--gaming-red);
+}
+
+/* Animations */
+.fade-in-up {
+    animation: fadeInUp 0.8s ease forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===================================
+   RESPONSIVE MEDIA QUERIES
+   =================================== */
+
+/* Global overflow fix */
+html {
+    overflow-x: hidden;
+}
+
+/* ---- Large Desktop (1200px+) ---- */
+@media (min-width: 1200px) {
+    .container-gaming {
+        padding: 0 2rem;
+    }
+}
+
+/* ---- Laptop / Tablet Landscape (max 1024px) ---- */
+@media (max-width: 1024px) {
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .gaming-hero h1 {
+        font-size: 3rem;
+    }
+
+    .gaming-nav .nav-links a {
+        margin: 0 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    /* Hide desktop nav-links on tablet/mobile — drawer replaces them */
+    .nav-links {
+        display: none !important;
+    }
+
+    /* Ensure .container-gaming doesn't overflow on small screens */
+    .container-gaming {
+        max-width: 100%;
+    }
+
+    .shop-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        padding: 2rem 0;
+    }
+
+    .products-grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .filters {
+        width: 100%;
+    }
+}
+
+/* ---- Tablet (max 768px) ---- */
+@media (max-width: 768px) {
+
+    /* Body — prevent horizontal scroll */
+    body {
+        overflow-x: hidden;
+    }
+
+    /* Container — tighter padding */
+    .container-gaming {
+        padding: 0 1rem;
+    }
+
+    /* Navbar container — wrap to two rows */
+    .gaming-nav {
+        height: auto;
+        min-height: var(--header-height);
+        padding: 0.5rem 0;
+    }
+
+    /* Navbar inner wrapper — allow wrap */
+    .gaming-nav>div[style] {
+        flex-wrap: wrap !important;
+        gap: 0.5rem;
+    }
+
+    /* Nav links — hidden on mobile/tablet (drawer replaces them) */
+    .nav-links {
+        display: none !important;
+    }
+
+    /* Hero Section */
+    .gaming-hero {
+        padding: 4rem 0 3rem;
+        min-height: auto;
+    }
+
+    .gaming-hero>.container-gaming {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    .gaming-hero-content {
+        max-width: 100%;
+        width: 100%;
+        position: relative;
+        z-index: 2;
+    }
+
+    .gaming-hero h1 {
+        font-size: 2.2rem;
+    }
+
+    .gaming-hero p {
+        font-size: 1rem;
+    }
+
+    /* Hero image: pull it from absolute to relative/hidden on mobile */
+    .hero-img-container {
+        position: relative !important;
+        right: auto !important;
+        top: auto !important;
+        transform: none !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 260px;
+        margin-top: 2rem;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .hero-img-container img {
+        width: 100%;
+        height: auto;
+        -webkit-mask-image: none !important;
+        mask-image: none !important;
+    }
+
+    /* Hero buttons — stack if needed */
+    .gaming-hero-content>div[style*="display: flex"] {
+        flex-wrap: wrap;
+        gap: 0.75rem !important;
+    }
+
+    .btn-gaming-primary,
+    .btn-gaming-outline {
+        min-height: 44px;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.85rem;
+        flex: 1 1 auto;
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* PC Builder Section */
+    .featured-categories {
+        padding: 4rem 0;
+    }
+
+    /* Section below gaming-hero (PC Builder) */
+    section[style*="padding: 5rem 0"] {
+        padding: 3rem 0 !important;
+    }
+
+    section[style*="padding: 5rem 0"] h2 {
+        font-size: 1.75rem !important;
+    }
+
+    section[style*="padding: 5rem 0"] p {
+        font-size: 1rem !important;
+        padding: 0 1rem;
+    }
+
+    /* Section Title */
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Split Section — stack vertically */
+    .gaming-split-section {
+        flex-direction: column;
+    }
+
+    .split-left,
+    .split-right {
+        flex: none;
+        width: 100%;
+        min-width: unset;
+        padding: 3rem 1.5rem;
+    }
+
+    .split-left h2 {
+        font-size: 2rem !important;
+    }
+
+    .split-left>div[style*="display: flex"] {
+        flex-wrap: wrap;
+        gap: 0.75rem !important;
+    }
+
+    /* Info Grid — single column */
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .info-card-white {
+        padding: 2rem 1.5rem;
+    }
+
+    /* CTA Banner */
+    .gaming-cta-banner {
+        padding: 2rem 1rem;
+    }
+
+    .gaming-cta-banner h2 {
+        font-size: 1.4rem;
+    }
+
+    /* Footer */
+    .gaming-footer {
+        padding: 3rem 0 2rem;
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    /* Social icons — wrap nicely */
+    .social-icons {
+        flex-wrap: wrap;
+    }
+}
+
+/* ---- Mobile (max 480px) ---- */
+@media (max-width: 480px) {
+    .container-gaming {
+        padding: 0 0.75rem;
+    }
+
+    .gaming-hero h1 {
+        font-size: 1.8rem;
+    }
+
+    .gaming-hero p {
+        font-size: 0.95rem;
+    }
+
+    /* Ensure buttons are finger-friendly */
+    .btn-gaming-primary,
+    .btn-gaming-outline {
+        min-height: 48px;
+        width: 100%;
+        padding: 0.875rem 1rem;
+    }
+
+    /* Footer — single column */
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .split-left,
+    .split-right {
+        padding: 2.5rem 1rem;
+    }
+
+    .split-left h2 {
+        font-size: 1.75rem !important;
+    }
+
+    .info-card-white {
+        padding: 1.5rem 1rem;
+    }
+
+    .gaming-cta-banner h2 {
+        font-size: 1.2rem;
+    }
+
+    .section-title {
+        font-size: 1.3rem;
+    }
+}
+
+/* ---- Small Mobile (max 320px) ---- */
+@media (max-width: 320px) {
+    .gaming-hero h1 {
+        font-size: 1.5rem;
+    }
+
+    .btn-gaming-primary,
+    .btn-gaming-outline {
+        font-size: 0.8rem;
+        padding: 0.75rem;
+    }
+
+    .split-left h2 {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* ===================================
+   Featured Categories - Shop by Category (Marquee)
+   =================================== */
+.featured-categories {
+    padding: 6rem 0;
+    background: var(--gaming-black);
+    /* Replaced --primary-dark */
+    overflow: hidden;
+}
+
+.section-title {
+    font-size: 2rem;
+    /* Replaced --font-size-2xl */
+    font-weight: 800;
+    /* Replaced 700 to match gaming theme */
+    text-align: center;
+    margin-bottom: 3rem;
+    /* Replaced --spacing-xl */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-white);
+    /* Replaced --text-primary */
+    font-family: var(--font-heading);
+}
+
+/* Marquee Wrapper */
+.category-marquee-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.category-marquee {
+    display: flex;
+    width: fit-content;
+    animation: scroll 40s linear infinite;
+}
+
+.category-marquee:hover {
+    animation-play-state: paused;
+}
+
+.category-scroll-track {
+    display: flex;
+    gap: 1.5rem;
+    /* Replaced --spacing-lg */
+    padding: 0 0.75rem;
+}
+
+/* Category Cards */
+.category-card {
+    flex-shrink: 0;
+    width: 280px;
+    background: var(--gaming-card);
+    /* Replaced --bg-card */
+    border-radius: 8px;
+    /* Slightly sharper for gaming look */
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /* Replaced --transition */
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+}
+
+.category-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--gaming-red);
+    /* Replaced --primary-red */
+    box-shadow: 0 12px 32px rgba(227, 30, 36, 0.3);
+}
+
+.category-image {
+    width: 100%;
+    height: 200px;
+    background: linear-gradient(135deg, #1a2332, #2a3342);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    /* Changed to cover for better fill */
+    background-position: center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+
+/* Category Image Variants - Keeping User's paths but adding fallbacks/gradients */
+
+/* Motherboard */
+.category-card[data-category="motherboard"] .category-image {
+    background: url('/static/images/categories/motherboard.png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(26, 35, 50, 0.7), rgba(42, 51, 66, 0.7));
+}
+
+/* CPU */
+.category-card[data-category="cpu"] .category-image {
+    background: url('/static/images/categories/cpu.png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(42, 26, 50, 0.7), rgba(58, 42, 66, 0.7));
+}
+
+/* Hard Disk (HDD) */
+.category-card[data-category="hdd"] .category-image {
+    background: url('/static/images/categories/Hard Disk.png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(50, 26, 42, 0.7), rgba(66, 58, 58, 0.7));
+}
+
+/* Power Supply (PSU) */
+.category-card[data-category="psu"] .category-image {
+    background: url('/static/images/categories/psu.png') center/cover no-repeat,
+        linear-gradient(135deg, #222, #333);
+}
+
+/* SSD */
+.category-card[data-category="ssd"] .category-image {
+    background: url('/static/images/categories/ssd.jpg') center/cover no-repeat,
+        linear-gradient(135deg, #222, #333);
+}
+
+/* Monitor */
+.category-card[data-category="monitor"] .category-image {
+    background: url('/static/images/categories/monitor.png') center/cover no-repeat,
+        linear-gradient(135deg, #222, #333);
+}
+
+/* Mouse */
+.category-card[data-category="mouse"] .category-image {
+    background: url('/static/images/categories/mouse.png') center/cover no-repeat,
+        linear-gradient(135deg, #222, #333);
+}
+
+/* GPU */
+.category-card[data-category="gpu"] .category-image {
+    background: url('/static/images/categories/gpu.jpg') center/cover no-repeat,
+        linear-gradient(135deg, #222, #333);
+}
+
+/* Printer */
+.category-card[data-category="printer"] .category-image {
+    background: url('/static/images/categories/printer.png') center/cover no-repeat,
+        linear-gradient(135deg, #222, #333);
+}
+
+/* RAM */
+.category-card[data-category="ram"] .category-image {
+    background: url('/static/images/categories/ram (2).png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(42, 26, 50, 0.7), rgba(58, 42, 58, 0.7));
+}
+
+/* Input Devices */
+.category-card[data-category="input-devices"] .category-image {
+    background: url('/static/images/categories/input dives.png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(26, 35, 50, 0.7), rgba(42, 51, 66, 0.7));
+}
+
+/* Microphone */
+.category-card[data-category="microphone"] .category-image {
+    background: url('/static/images/categories/microphone.png') center/cover no-repeat,
+        linear-gradient(135deg, #222, #333);
+}
+
+/* Output Devices */
+.category-card[data-category="output-devices"] .category-image {
+    background: url('/static/images/categories/output dives.png') center/cover no-repeat,
+        linear-gradient(135deg, rgba(50, 26, 42, 0.7), rgba(66, 58, 58, 0.7));
+}
+
+/* Peripherals */
+.category-card[data-category="peripherals"] .category-image {
+    background: url('/static/images/categories/peripherals.jpg') center/cover no-repeat,
+        linear-gradient(135deg, #222, #333);
+}
+
+/* Computer */
+.category-card[data-category="computer"] .category-image {
+    background: url('/static/images/categories/computer.jpg') center/cover no-repeat,
+        linear-gradient(135deg, #222, #333);
+}
+
+/* Computer Cases */
+.category-card[data-category="cases"] .category-image {
+    background: url('/static/images/categories/pc-case.jpg') center/cover no-repeat,
+        linear-gradient(135deg, #222, #333);
+}
+
+/* Storage Devices */
+.category-card[data-category="storage-devices"] .category-image {
+    background: url('/static/images/categories/storage.jpg') center/cover no-repeat,
+        linear-gradient(135deg, #222, #333);
+}
+
+/* Computer Keyboard */
+.category-card[data-category="keyboard"] .category-image {
+    background: url('/static/images/categories/keyboard.jpg') center/cover no-repeat,
+        linear-gradient(135deg, #222, #333);
+}
+
+.badge-new {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--gaming-red);
+    /* Replaced --primary-red */
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    /* Replaced --font-size-xs */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.category-card h3 {
+    padding: 1.5rem;
+    /* Replaced --spacing-md */
+    font-size: 1.125rem;
+    /* Replaced --font-size-lg */
+    font-weight: 600;
+    text-align: center;
+    color: var(--text-white);
+    /* Replaced --text-primary */
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    font-family: var(--font-heading);
+}
+
+/* Marquee Animation */
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .category-card {
+        width: 220px;
+    }
+
+    .category-image {
+        height: 160px;
+    }
+
+    .category-card h3 {
+        font-size: 1rem;
+        min-height: 70px;
+    }
+
+    .category-marquee {
+        animation: scroll 30s linear infinite;
+    }
+}
+
+@media (max-width: 480px) {
+    .category-card {
+        width: 180px;
+    }
+
+    .category-image {
+        height: 140px;
+    }
+
+    .category-card h3 {
+        font-size: 0.875rem;
+        min-height: 60px;
+        padding: 1rem;
+    }
+
+    .category-scroll-track {
+        gap: 1.5rem;
+    }
+}
+
+/* =======================================================
+   HAMBURGER BUTTON (Always Visible)
+   ======================================================= */
+.hamburger-btn {
+    display: flex;
+    background: none;
+    border: none;
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    /* adjusted gap for smaller size */
+    transition: background 0.2s ease;
+    z-index: 1100;
+}
+
+.hamburger-btn:hover {
+    background: rgba(250, 204, 21, 0.12);
+}
+
+/* The three bars */
+.hamburger-btn span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--text-primary, #F9FAFB);
+    border-radius: 2px;
+    transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1),
+        opacity 0.25s ease,
+        width 0.25s ease;
+    transform-origin: center;
+}
+
+/* Animate bars → X when aria-expanded="true" */
+.hamburger-btn[aria-expanded="true"] span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.hamburger-btn[aria-expanded="true"] span:nth-child(2) {
+    opacity: 0;
+    width: 0;
+}
+
+.hamburger-btn[aria-expanded="true"] span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Show hamburger on mobile / tablet */
+@media (max-width: 1024px) {
+    .hamburger-btn {
+        display: flex;
+    }
+}
+
+/* =======================================================
+   OVERLAY BACKDROP
+   ======================================================= */
+.mob-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 1199;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+}
+
+.mob-overlay--visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Prevent body scroll when drawer open */
+body.mob-drawer-lock {
+    overflow: hidden;
+}
+
+/* =======================================================
+   SLIDE-OUT DRAWER PANEL
+   ======================================================= */
+.mob-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 300px;
+    max-width: 85vw;
+    background: linear-gradient(160deg, #0d1117 0%, #161b22 50%, #0f172a 100%);
+    border-right: 1px solid rgba(250, 204, 21, 0.15);
+    box-shadow: 6px 0 40px rgba(0, 0, 0, 0.6),
+        2px 0 0 rgba(250, 204, 21, 0.08);
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* subtle 3D perspective */
+    perspective: 1000px;
+}
+
+.mob-drawer--open {
+    transform: translateX(0);
+}
+
+/* ---- Drawer Header ---- */
+.mob-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.25rem 1rem;
+    border-bottom: 1px solid rgba(250, 204, 21, 0.12);
+    background: linear-gradient(135deg, rgba(250, 204, 21, 0.08) 0%, transparent 60%);
+    flex-shrink: 0;
+}
+
+.mob-drawer-logo {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #F9FAFB;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mob-drawer-logo i {
+    color: #FACC15;
+    font-size: 1.2rem;
+}
+
+.mob-drawer-close {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #9CA3AF;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.mob-drawer-close:hover {
+    background: rgba(250, 204, 21, 0.15);
+    color: #FACC15;
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* ---- Drawer Nav ---- */
+.mob-drawer-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.75rem 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(250, 204, 21, 0.3) transparent;
+}
+
+.mob-drawer-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.mob-drawer-nav::-webkit-scrollbar-thumb {
+    background: rgba(250, 204, 21, 0.3);
+    border-radius: 4px;
+}
+
+/* ---- Individual Nav Item ---- */
+.mob-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem 1.25rem;
+    color: #9CA3AF;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    /* Start hidden for stagger animation */
+    opacity: 0;
+    transform: translateX(-18px);
+    transition: opacity 0.3s ease,
+        transform 0.3s ease,
+        color 0.25s ease,
+        background 0.25s ease,
+        box-shadow 0.25s ease;
+    border-radius: 0 10px 10px 0;
+    margin-right: 0.75rem;
+    cursor: pointer;
+}
+
+/* Stagger-in when drawer opens (JS adds this class) */
+.mob-nav-item--visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ──────── 3D Hover Effect ──────── */
+.mob-nav-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #FACC15;
+    border-radius: 0 3px 3px 0;
+    transform: scaleY(0);
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mob-nav-item:hover {
+    color: #F9FAFB;
+    background: rgba(250, 204, 21, 0.07);
+    box-shadow: 0 4px 20px rgba(250, 204, 21, 0.08),
+        inset 0 0 0 1px rgba(250, 204, 21, 0.08);
+    /* Subtle 3D lift */
+    transform: translateX(4px) translateY(-1px);
+}
+
+.mob-nav-item:hover::before {
+    transform: scaleY(1);
+}
+
+/* Pressed / click effect */
+.mob-nav-item:active {
+    transform: translateX(2px) translateY(1px) scale(0.98);
+    box-shadow: 0 2px 8px rgba(250, 204, 21, 0.05);
+}
+
+/* Icon */
+.mob-nav-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 0.85rem;
+    color: #6B7280;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+    flex-shrink: 0;
+}
+
+.mob-nav-item:hover .mob-nav-icon {
+    background: rgba(250, 204, 21, 0.15);
+    color: #FACC15;
+    transform: scale(1.12) rotate(-3deg);
+}
+
+/* Label */
+.mob-nav-label {
+    flex: 1;
+    position: relative;
+}
+
+/* Animated underline on hover */
+.mob-nav-label::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: #FACC15;
+    transition: width 0.3s ease;
+}
+
+.mob-nav-item:hover .mob-nav-label::after {
+    width: 100%;
+}
+
+/* Arrow */
+.mob-nav-arrow {
+    font-size: 0.7rem;
+    color: #374151;
+    transition: transform 0.25s ease, color 0.25s ease;
+    flex-shrink: 0;
+}
+
+.mob-nav-item:hover .mob-nav-arrow {
+    transform: translateX(4px);
+    color: #FACC15;
+}
+
+/* Active Page Highlight */
+.mob-nav-item--active {
+    color: #FACC15;
+    background: rgba(250, 204, 21, 0.1);
+    box-shadow: 0 0 20px rgba(250, 204, 21, 0.12),
+        inset 0 0 0 1px rgba(250, 204, 21, 0.15);
+}
+
+.mob-nav-item--active::before {
+    transform: scaleY(1);
+}
+
+.mob-nav-item--active .mob-nav-icon {
+    background: rgba(250, 204, 21, 0.2);
+    color: #FACC15;
+}
+
+.mob-nav-item--active .mob-nav-arrow {
+    color: #FACC15;
+}
+
+/* Divider */
+.mob-drawer-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(250, 204, 21, 0.2), transparent);
+    margin: 0.5rem 1.25rem;
+}
+
+/* Back button special style */
+.mob-nav-back:hover {
+    background: rgba(239, 68, 68, 0.07);
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.06),
+        inset 0 0 0 1px rgba(239, 68, 68, 0.08);
+}
+
+.mob-nav-back:hover .mob-nav-icon {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+}
+
+/* Vendor Profile item special style */
+.mob-nav-vendor {
+    color: #9CA3AF;
+}
+
+.mob-nav-vendor:hover {
+    background: rgba(99, 102, 241, 0.08);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.06),
+        inset 0 0 0 1px rgba(99, 102, 241, 0.1);
+}
+
+.mob-nav-vendor:hover .mob-nav-icon {
+    background: rgba(99, 102, 241, 0.18);
+    color: #818cf8;
+}
+
+/* ---- Drawer Footer ---- */
+.mob-drawer-footer {
+    padding: 1rem 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
+}
+
+.mob-drawer-footer p {
+    font-size: 0.75rem;
+    color: #374151;
+    text-align: center;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* =======================================================
+   DESKTOP NAV ENHANCEMENTS (for existing .nav-links)
+   ======================================================= */
+
+/* 3D lift on desktop nav links */
+.gaming-nav .nav-links a {
+    position: relative;
+    padding: 0.4rem 0.25rem;
+    transition: color 0.25s ease, transform 0.25s ease, text-shadow 0.25s ease;
+}
+
+/* Animated underline on desktop links */
+.gaming-nav .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    right: 50%;
+    height: 2px;
+    background: var(--gaming-red, #FACC15);
+    border-radius: 2px;
+    transition: left 0.3s ease, right 0.3s ease;
+}
+
+.gaming-nav .nav-links a:hover {
+    transform: translateY(-2px);
+    text-shadow: 0 0 12px rgba(250, 21, 21, 0.4);
+}
+
+.gaming-nav .nav-links a:hover::after {
+    left: 0;
+    right: 0;
+}

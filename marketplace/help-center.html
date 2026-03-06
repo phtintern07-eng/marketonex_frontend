@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center - Marketplace</title>
+    <link rel="stylesheet" href="css/marketplace.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .help-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .page-header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            font-size: 1.2em;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto 50px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            font-size: 16px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-color);
+            opacity: 0.5;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 50px;
+        }
+
+        .category-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow-medium);
+            border-color: var(--primary-color);
+        }
+
+        .category-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: white;
+        }
+
+        .category-card h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .category-card p {
+            color: var(--text-color);
+            opacity: 0.7;
+            line-height: 1.6;
+        }
+
+        .faq-section {
+            margin-bottom: 50px;
+        }
+
+        .faq-section h2 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: var(--text-color);
+        }
+
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background: var(--tag-bg);
+        }
+
+        .faq-question i {
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 20px;
+            color: var(--text-color);
+            opacity: 0.8;
+            line-height: 1.8;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 0 20px 20px;
+        }
+
+        .contact-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .contact-section h2 {
+            font-size: 2em;
+            margin-bottom: 16px;
+            color: var(--text-color);
+        }
+
+        .contact-section p {
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-bottom: 30px;
+        }
+
+        .contact-methods {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .contact-btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .contact-btn.primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .contact-btn.secondary {
+            background: var(--tag-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-light);
+        }
+
+        @media (max-width: 768px) {
+            .help-container {
+                padding: 0 20px;
+            }
+
+            .page-header h1 {
+                font-size: 2em;
+            }
+
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="logo">Marketplace</h1>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="actions">
+                <a href="marketplace.html" class="back-btn" style="text-decoration: none; color: inherit;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <a href="cart.html" class="cart-icon-link">
+                    <div class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-badge" class="cart-badge">0</span>
+                    </div>
+                </a>
+                <div class="theme-toggle">
+                    <button id="theme-toggle-btn" aria-label="Toggle theme">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                    <div id="theme-dropdown" class="dropdown-menu hidden">
+                        <button data-theme="light">Light</button>
+                        <button data-theme="dark">Dark</button>
+                        <button data-theme="brown">Brown</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="help-container">
+        <div class="page-header">
+            <h1>How can we help you?</h1>
+            <p>Find answers to your questions and get support</p>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="help-search" placeholder="Search for help articles...">
+            <i class="fas fa-search"></i>
+        </div>
+
+        <div class="categories-grid">
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <h3>Orders & Delivery</h3>
+                <p>Track orders, delivery status, and shipping information</p>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-undo"></i>
+                </div>
+                <h3>Returns & Refunds</h3>
+                <p>Return policies, refund process, and cancellations</p>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h3>Payments</h3>
+                <p>Payment methods, wallet, and transaction issues</p>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h3>Account Settings</h3>
+                <p>Manage profile, addresses, and preferences</p>
+            </div>
+        </div>
+
+        <div class="faq-section">
+            <h2>Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How do I track my order?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    You can track your order by going to "My Orders" from your profile menu. Click on the order you want
+                    to track, and you'll see real-time updates on its delivery status.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>What is the return policy?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    We offer a 7-day return policy for most products. Items must be unused and in original packaging.
+                    Simply go to your order details and click "Return Item" to initiate the process.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How long does delivery take?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Standard delivery typically takes 3-5 business days. Express delivery is available for 1-2 day
+                    shipping. Delivery times may vary based on your location and product availability.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>What payment methods do you accept?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    We accept credit/debit cards, UPI, net banking, wallet payments, and cash on delivery. All
+                    transactions are secure and encrypted.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How do I change my delivery address?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Go to Account Settings > Addresses to add, edit, or delete delivery addresses. You can also select a
+                    different address during checkout.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Can I cancel my order?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Yes, you can cancel your order before it's shipped. Go to "My Orders", select the order, and click
+                    "Cancel Order". Refunds will be processed within 5-7 business days.
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-section">
+            <h2>Still need help?</h2>
+            <p>Our support team is here to assist you</p>
+            <div class="contact-methods">
+                <a href="mailto:support@marketplace.com" class="contact-btn primary">
+                    <i class="fas fa-envelope"></i>
+                    Email Support
+                </a>
+                <a href="tel:+1234567890" class="contact-btn secondary">
+                    <i class="fas fa-phone"></i>
+                    Call Us
+                </a>
+                <button class="contact-btn secondary" onclick="openChat()">
+                    <i class="fas fa-comments"></i>
+                    Live Chat
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme handling
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+
+            // Theme toggle functionality
+            const themeToggleBtn = document.getElementById('theme-toggle-btn');
+            const themeDropdown = document.getElementById('theme-dropdown');
+
+            if (themeToggleBtn && themeDropdown) {
+                themeToggleBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    themeDropdown.classList.toggle('hidden');
+                });
+
+                themeDropdown.querySelectorAll('button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const theme = button.getAttribute('data-theme');
+                        document.body.setAttribute('data-theme', theme);
+                        localStorage.setItem('theme', theme);
+                        themeDropdown.classList.add('hidden');
+                    });
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!themeToggleBtn.contains(e.target) && !themeDropdown.contains(e.target)) {
+                        themeDropdown.classList.add('hidden');
+                    }
+                });
+            }
+
+            // FAQ accordion
+            document.querySelectorAll('.faq-item').forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    // Close other items
+                    document.querySelectorAll('.faq-item').forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                    // Toggle current item
+                    item.classList.toggle('active');
+                });
+            });
+
+            // Search functionality
+            document.getElementById('help-search').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    const question = item.querySelector('.faq-question span').textContent.toLowerCase();
+                    const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+                    if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = searchTerm ? 'none' : 'block';
+                    }
+                });
+            });
+        });
+
+        function openChat() {
+            alert('Live chat will open here. This feature will be implemented soon.');
+        }
+    </script>
+</body>
+
+</html>

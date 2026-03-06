@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Stuff - Marketplace</title>
+    <link rel="stylesheet" href="css/marketplace.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .stuff-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border-color);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            color: var(--text-color);
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .item-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .item-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .item-card:hover {
+            box-shadow: 0 8px 24px var(--shadow-medium);
+            transform: translateY(-4px);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: var(--tag-bg);
+        }
+
+        .item-info {
+            padding: 16px;
+        }
+
+        .item-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        .item-price {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-secondary {
+            background: var(--tag-bg);
+            color: var(--text-color);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-light);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4em;
+            color: var(--primary-color);
+            opacity: 0.3;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .empty-state p {
+            color: var(--text-color);
+            opacity: 0.7;
+            margin-bottom: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .review-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .review-product {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .review-rating {
+            color: #fbbf24;
+        }
+
+        .review-text {
+            color: var(--text-color);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .review-date {
+            font-size: 0.9em;
+            color: var(--text-color);
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            .stuff-container {
+                padding: 0 20px;
+            }
+
+            .item-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="logo">Marketplace</h1>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="actions">
+                <a href="marketplace.html" class="back-btn" style="text-decoration: none; color: inherit;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <a href="cart.html" class="cart-icon-link">
+                    <div class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-badge" class="cart-badge">0</span>
+                    </div>
+                </a>
+                <div class="theme-toggle">
+                    <button id="theme-toggle-btn" aria-label="Toggle theme">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                    <div id="theme-dropdown" class="dropdown-menu hidden">
+                        <button data-theme="light">Light</button>
+                        <button data-theme="dark">Dark</button>
+                        <button data-theme="brown">Brown</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="stuff-container">
+        <div class="page-header">
+            <h1>My Stuff</h1>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="rewards">
+                <i class="fas fa-trophy"></i> Rewards
+            </button>
+            <button class="tab-btn" data-tab="reviews">
+                <i class="fas fa-star"></i> Reviews & Ratings
+            </button>
+            <button class="tab-btn" data-tab="wishlist">
+                <i class="fas fa-heart"></i> Wishlist
+            </button>
+            <button class="tab-btn" data-tab="subscriptions">
+                <i class="fas fa-sync"></i> Subscriptions
+            </button>
+        </div>
+
+        <!-- Rewards Tab -->
+        <div id="rewards" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Reward Points</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">₹0</div>
+                    <div class="stat-label">Cashback Earned</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Coupons Available</div>
+                </div>
+            </div>
+            <div class="empty-state">
+                <i class="fas fa-gift"></i>
+                <h2>No Rewards Yet</h2>
+                <p>Start shopping to earn reward points and cashback</p>
+                <a href="marketplace.html" class="btn btn-primary"
+                    style="display: inline-block; text-decoration: none;">
+                    Browse Products
+                </a>
+            </div>
+        </div>
+
+        <!-- Reviews Tab -->
+        <div id="reviews" class="tab-content">
+            <div id="reviews-list">
+                <div class="empty-state">
+                    <i class="fas fa-star"></i>
+                    <h2>No Reviews Yet</h2>
+                    <p>Share your experience by reviewing products you've purchased</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wishlist Tab -->
+        <div id="wishlist" class="tab-content">
+            <div id="wishlist-grid" class="item-grid">
+                <!-- Wishlist items will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Subscriptions Tab -->
+        <div id="subscriptions" class="tab-content">
+            <div class="empty-state">
+                <i class="fas fa-sync-alt"></i>
+                <h2>No Active Subscriptions</h2>
+                <p>Subscribe to products for regular deliveries and exclusive discounts</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme handling
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+
+            // Theme toggle functionality
+            const themeToggleBtn = document.getElementById('theme-toggle-btn');
+            const themeDropdown = document.getElementById('theme-dropdown');
+
+            if (themeToggleBtn && themeDropdown) {
+                themeToggleBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    themeDropdown.classList.toggle('hidden');
+                });
+
+                themeDropdown.querySelectorAll('button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const theme = button.getAttribute('data-theme');
+                        document.body.setAttribute('data-theme', theme);
+                        localStorage.setItem('theme', theme);
+                        themeDropdown.classList.add('hidden');
+                    });
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!themeToggleBtn.contains(e.target) && !themeDropdown.contains(e.target)) {
+                        themeDropdown.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Tab switching
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabName = btn.dataset.tab;
+                    switchTab(tabName);
+                });
+            });
+
+            // Handle hash navigation
+            if (window.location.hash) {
+                const tab = window.location.hash.substring(1);
+                switchTab(tab);
+            }
+
+            // Load wishlist
+            loadWishlist();
+        });
+
+        function switchTab(tabName) {
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName)?.classList.add('active');
+
+            // Update URL hash
+            window.location.hash = tabName;
+        }
+
+        function loadWishlist() {
+            const wishlistGrid = document.getElementById('wishlist-grid');
+            const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+
+            if (wishlist.length === 0) {
+                wishlistGrid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <i class="fas fa-heart"></i>
+                        <h2>Your Wishlist is Empty</h2>
+                        <p>Add products you love to your wishlist</p>
+                        <a href="marketplace.html" class="btn btn-primary" style="display: inline-block; text-decoration: none;">
+                            Browse Products
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            wishlistGrid.innerHTML = wishlist.map(item => `
+                <div class="item-card">
+                    <img src="${item.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdHJhdGlvPSJ4TWlkWU1pZCBzbGljZSIgZm9jdXNhYmxlPSJmYWxzZSIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJQbGFjZWhvbGRlciI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2VlZSI+PC9yZWN0Pjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmaWxsPSIjYWFhIiBkeT0iLjNlbSIgc3R5bGU9ImZvbnQtZmFtaWx5OkFyaWFsO2ZvbnQtc2l6ZToyMHB4O3RleHQtYW5jaG9yOm1pZGRsZSI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+'}" alt="${item.name}" class="item-image">
+                    <div class="item-info">
+                        <div class="item-title">${item.name}</div>
+                        <div class="item-price">₹${item.price}</div>
+                        <div class="item-actions">
+                            <button class="btn btn-primary" onclick="addToCart('${item.id}')">
+                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                            </button>
+                            <button class="btn btn-secondary" onclick="removeFromWishlist('${item.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(productId) {
+            alert('Adding to cart: ' + productId);
+            // TODO: Implement add to cart functionality
+        }
+
+        function removeFromWishlist(productId) {
+            let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+            wishlist = wishlist.filter(item => item.id !== productId);
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            loadWishlist();
+        }
+    </script>
+</body>
+
+</html>

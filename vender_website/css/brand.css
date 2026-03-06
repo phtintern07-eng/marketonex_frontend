@@ -1,0 +1,133 @@
+/* Brand Design System - Premium SaaS Theme */
+
+:root {
+    /* -----------------------------------------------------------
+       1. Primitive Colors (The Palette)
+       ----------------------------------------------------------- */
+
+    /* Default Theme: Premium Dark Tech */
+    /* Main Background: #0B1120 */
+    --palette-bg-light: #0B1120;
+    /* Section/Card Background: #111827 */
+    --palette-card-light: #111827;
+    /* Primary Accent: #2563EB (Blue) */
+    --palette-primary-light: #2563EB;
+    /* Secondary Accent: #FACC15 (Gold) */
+    --palette-accent-light: #FACC15;
+    /* Text Primary: #F9FAFB */
+    --palette-text-main-light: #F9FAFB;
+    /* Text Secondary: #9CA3AF */
+    --palette-text-muted-light: #9CA3AF;
+    /* Border with subtle glow */
+    --palette-border-light: rgba(37, 99, 235, 0.3);
+
+    /* Dark Theme Primitives */
+    --palette-primary-dark: #6366F1;
+    /* Brighter Indigo/Purple */
+    --palette-accent-dark: #F59E0B;
+    /* Amber/Orange */
+    --palette-bg-dark: #0F172A;
+    /* Deep Slate Blue */
+    --palette-card-dark: #1E293B;
+    /* 800 Slate */
+    --palette-text-main-dark: #F9FAFB;
+    /* Off-white */
+    --palette-text-muted-dark: #CBD5E1;
+    /* Light Slate */
+    --palette-border-dark: #334155;
+    /* Dark Slate Border */
+
+    /* -----------------------------------------------------------
+       2. Semantic Variables (The Logic) - Defaults to Light
+       ----------------------------------------------------------- */
+
+    --primary: var(--palette-primary-light);
+    --primary-hover: color-mix(in srgb, var(--primary), black 10%);
+    --accent: var(--palette-accent-light);
+    --accent-hover: color-mix(in srgb, var(--accent), black 10%);
+
+    --bg-body: var(--palette-bg-light);
+    --bg-card: var(--palette-card-light);
+    --bg-hover: rgba(0, 0, 0, 0.05);
+    /* Subtle hover for light mode */
+
+    --text-primary: var(--palette-text-main-light);
+    --text-secondary: var(--palette-text-muted-light);
+
+    --border-color: var(--palette-border-light);
+
+    /* -----------------------------------------------------------
+       3. Shared Design Tokens (Spacing, Radius, Shadows)
+       ----------------------------------------------------------- */
+
+    /* Typography */
+    --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+    /* Spacing & Radius */
+    --radius-sm: 0.375rem;
+    /* 6px */
+    --radius-md: 0.5rem;
+    /* 8px */
+    --radius-lg: 0.75rem;
+    /* 12px */
+    --radius-xl: 1rem;
+    /* 16px */
+
+    /* Shadows (Soft & Premium) */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* -----------------------------------------------------------
+   4. Dark Mode Overrides
+   ----------------------------------------------------------- */
+
+.dark-mode {
+    --primary: var(--palette-primary-dark);
+    --accent: var(--palette-accent-dark);
+
+    --bg-body: var(--palette-bg-dark);
+    --bg-card: var(--palette-card-dark);
+    --bg-hover: rgba(255, 255, 255, 0.05);
+    /* Subtle hover for dark mode */
+
+    --text-primary: var(--palette-text-main-dark);
+    --text-secondary: var(--palette-text-muted-dark);
+
+    --border-color: var(--palette-border-dark);
+
+    /* Adjust shadow intensity for dark mode if needed, 
+       often dark mode needs lighter/different shadows or borders take precedence */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+/* -----------------------------------------------------------
+   5. Global Resets & Utilities
+   ----------------------------------------------------------- */
+
+body {
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    font-family: var(--font-family);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    transition: color 0.3s ease;
+}
+
+button,
+input,
+select,
+textarea {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}

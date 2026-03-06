@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - VendorVerse</title>
+    <link rel="stylesheet" href="/vendor-site/css/gaming-theme.css">
+    <link rel="stylesheet" href="/vendor-site/css/vendor-profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Prevent caching -->
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        .form-label {
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            background: var(--bg-main);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .form-input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 1. Navbar -->
+    <nav class="gaming-nav">
+        <div class="container-gaming" style="display: flex; justify-content: space-between; width: 100%;">
+            <!-- Left: Logo -->
+            <a href="/"
+                style="color: var(--text-main); font-weight: 800; font-size: 1.5rem; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; z-index: 10;">
+                <i class="fas fa-microchip" style="color: var(--accent);"></i> VENDORVERSE
+            </a>
+
+            <!-- Middle: Nav Links (Desktop Only) -->
+            <div class="nav-links" style="display: flex; align-items: center;">
+                <a href="/">Home</a>
+                <a href="/vendor-site/vendor_pc_builder.html">PC Builder</a>
+                <a href="/vendor-site/products.html">Shop</a>
+                <a href="/vendor-site/orders.html">Orders</a>
+                <a href="/" class="btn-gaming-outline"
+                    style="padding: 0.5rem 1rem; font-size: 0.8rem; margin-left: 0.5rem; text-decoration: none; color: var(--text-main); border: 1px solid var(--text-main);">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+
+            <!-- Right: Actions Group -->
+            <div class="nav-actions-group" style="display: flex; align-items: center; gap: 0.75rem;">
+                <!-- 🎨 Theme Switcher -->
+                <button id="customer-theme-toggle" class="nav-action-btn" aria-label="Toggle Theme">
+                    <i class="fas fa-palette"></i>
+                </button>
+
+                <!-- 🛒 Cart Button -->
+                <a href="/vendor-site/cart.html" class="nav-action-btn" aria-label="Cart">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="margin-top: 3rem; max-width: 600px; color: var(--text-primary);">
+        <h2 style="margin-bottom: 2rem;">My Profile</h2>
+
+        <div class="card" style="padding: 2rem; border-radius: 12px;">
+            <form id="profile-form">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="fullname" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="email" class="form-input" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" id="phone" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <textarea id="address" class="form-input" rows="3"></textarea>
+                </div>
+
+                <button type="submit" class="btn-gaming-primary"
+                    style="border: none; padding: 0.8rem 2rem; border-radius: 8px; cursor: pointer; width: 100%;">Update
+                    Profile</button>
+            </form>
+
+            <div style="border-top: 1px solid var(--border); margin-top: 2rem; padding-top: 2rem;" id="password">
+                <h3 style="margin-bottom: 1.5rem;">Change Password</h3>
+                <form id="password-form">
+                    <div class="form-group">
+                        <label class="form-label">Current Password</label>
+                        <input type="password" id="current-password" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input type="password" id="new-password" class="form-input" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" id="confirm-password" class="form-input" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn-gaming-primary"
+                        style="margin-top: 1rem; border: none; padding: 0.8rem 2rem; border-radius: 8px; cursor: pointer; width: 100%;">Update
+                        Password</button>
+                </form>
+            </div>
+
+            <div style="border-top: 1px solid var(--border); margin-top: 2rem; padding-top: 2rem;">
+                <button id="logout-btn" class="btn-gaming-outline"
+                    style="width: 100%; border-color: var(--danger); color: var(--danger); cursor: pointer; padding: 0.8rem;">
+                    Log Out
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/vendor-site/js/theme-switcher.js"></script>
+    <script>
+        async function loadProfile() {
+            try {
+                // Check if we are already logged in to avoid unnecessary redirects loop
+                // But we must validate session validity. 
+                const response = await fetch('/api/auth/status');
+                const data = await response.json();
+
+                if (!response.ok || !data.isAuthenticated) {
+                    console.warn('User not authenticated, redirecting to login');
+                    window.location.href = '/vendor/login.html';
+                    return;
+                }
+
+                if (data.user.role !== 'vendor') {
+                    console.warn('User is not a vendor, redirecting to home');
+                    window.location.href = '/';
+                    return;
+                }
+
+                const user = data.user;
+                document.getElementById('fullname').value = user.fullname || '';
+                document.getElementById('email').value = user.email || '';
+                document.getElementById('phone').value = user.phone || '';
+                document.getElementById('address').value = user.address || '';
+
+                // Handle initial hash
+                handleHashChange();
+
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                // Only redirect on critical failure if needed, otherwise just log
+            }
+        }
+
+        // Handle Hash Navigation (Tabs)
+        function handleHashChange() {
+            const hash = window.location.hash;
+            const profileSection = document.getElementById('profile-form').closest('.card').querySelector('form').parentElement; // The form container
+            const passwordSection = document.getElementById('password');
+            const profileForm = document.getElementById('profile-form');
+
+            // Default: Show Profile, Hide Password
+            // If hash is #password
+            if (hash === '#password') {
+                passwordSection.style.display = 'block';
+                profileForm.style.display = 'none';
+                // Update active link if needed
+            } else {
+                passwordSection.style.display = 'none';
+                profileForm.style.display = 'block';
+            }
+        }
+
+        window.addEventListener('hashchange', handleHashChange);
+
+        async function updateProfile(e) {
+            e.preventDefault();
+            // In a real app, we'd have a specific endpoint for customer profile updates
+            // Reusing vendor logic pattern or creating a new customer update endpoint would be ideal
+            // For now, let's assume a placeholder alert
+            alert('Profile update functionality coming soon!');
+        }
+
+        document.getElementById('profile-form').addEventListener('submit', updateProfile);
+
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            window.location.href = '/';
+        });
+
+        loadProfile();
+
+        // Password Change Logic
+        document.getElementById('password-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const btn = e.target.querySelector('button[type="submit"]');
+
+            // Client-side Validation
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match!');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                alert('Password must be at least 6 characters long.');
+                return;
+            }
+
+            try {
+                btn.disabled = true;
+                btn.innerText = 'Updating...';
+
+                const response = await fetch('/api/vendor/change-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        current_password: currentPassword,
+                        new_password: newPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    alert('Password updated successfully!');
+                    e.target.reset();
+                } else {
+                    alert(data.error || 'Failed to update password');
+                }
+
+            } catch (error) {
+                console.error('Password update error:', error);
+                alert('An error occurred. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Update Password';
+            }
+        });
+    </script>
+</body>
+
+</html>

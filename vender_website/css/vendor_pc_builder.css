@@ -1,0 +1,493 @@
+/* Vendor PC Builder CSS */
+
+:root {
+    --builder-bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --card-hover-transform: translateY(-5px);
+    --transition-speed: 0.3s;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+
+    /* Vendor Specific Colors if needed, otherwise using variables from gaming-theme.css if imported */
+    /* We assume gaming-theme.css is loaded before this */
+}
+
+[data-theme="dark"] {
+    --builder-bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --glass-bg: rgba(30, 30, 46, 0.7);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body {
+    background: var(--bg-main);
+    /* Match vendor site bg */
+}
+
+/* Main Layout */
+.builder-container {
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 0 40px;
+    min-height: 80vh;
+}
+
+.builder-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.builder-title {
+    font-size: 2.5em;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: var(--text-main);
+}
+
+.builder-subtitle {
+    font-size: 1.1em;
+    opacity: 0.7;
+    max-width: 600px;
+    margin: 0 auto;
+    color: var(--text-secondary);
+}
+
+/* Status Bar */
+.status-bar-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.status-pill {
+    background: var(--bg-card);
+    padding: 10px 25px;
+    border-radius: 50px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    color: var(--text-main);
+}
+
+.status-pill i {
+    color: var(--accent);
+}
+
+.status-pill.success i {
+    color: #10b981;
+}
+
+.status-pill.warning i {
+    color: #f59e0b;
+}
+
+.status-pill.error {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+}
+
+.status-pill.error i {
+    color: #ef4444;
+}
+
+/* Component Grid */
+.component-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+/* Component Card */
+.component-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 25px;
+    position: relative;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-speed) ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 320px;
+    overflow: hidden;
+}
+
+.component-card:hover {
+    transform: var(--card-hover-transform);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    border-color: var(--accent);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.component-type {
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    font-weight: 700;
+}
+
+.card-icon {
+    font-size: 1.2em;
+    color: var(--accent);
+    opacity: 0.8;
+}
+
+/* Empty State */
+.component-card.empty {
+    border-style: dashed;
+    border-width: 2px;
+    background: transparent;
+}
+
+.empty-state-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+    color: var(--text-secondary);
+    opacity: 0.5;
+}
+
+.add-component-btn {
+    margin-top: auto;
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+}
+
+.add-component-btn:hover {
+    background: var(--accent);
+    color: var(--bg-main);
+    border-color: var(--accent);
+}
+
+/* Filled State */
+.component-card.filled {
+    border-style: solid;
+}
+
+.product-preview {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.product-img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    transition: transform 0.3s;
+}
+
+.component-card:hover .product-img {
+    transform: scale(1.1);
+}
+
+.product-name {
+    font-size: 1.1em;
+    font-weight: 700;
+    margin-bottom: 5px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: var(--text-main);
+}
+
+.product-price {
+    font-size: 1.2em;
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.action-btn.edit:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.action-btn.remove {
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.action-btn.remove:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+}
+
+/* Summary Footer */
+.builder-footer {
+    position: sticky;
+    bottom: 20px;
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 20px 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border);
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+.total-price-display {
+    text-align: right;
+    color: var(--text-main);
+}
+
+.total-label {
+    font-size: 0.9em;
+    opacity: 0.7;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.total-amount {
+    font-size: 2em;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.buy-now-btn {
+    background: var(--accent);
+    color: black;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 12px;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.buy-now-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+    color: var(--bg-main);
+}
+
+/* Selection Overlay */
+#part-selection-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#part-selection-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.selection-modal {
+    width: 90%;
+    max-width: 1000px;
+    max-height: 85vh;
+    background: var(--bg-card);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(50px);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid var(--border);
+}
+
+#part-selection-overlay.active .selection-modal {
+    transform: translateY(0);
+}
+
+.modal-header {
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-card);
+    color: var(--text-main);
+}
+
+.modal-title {
+    font-size: 1.5em;
+    font-weight: 700;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    color: var(--text-main);
+    padding: 10px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-body {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    background: var(--bg-main);
+}
+
+/* Selection Item Card */
+.selection-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.2s;
+    cursor: pointer;
+    color: var(--text-main);
+}
+
+.selection-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    border-color: var(--accent);
+}
+
+.selection-item img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.selection-item h4 {
+    font-size: 0.95em;
+    margin-bottom: 5px;
+    line-height: 1.3;
+}
+
+.selection-item .price {
+    color: var(--accent);
+    font-weight: 700;
+    margin-top: auto;
+    padding-top: 10px;
+}
+
+/* Compatibility UI */
+.selection-item.incompatible-part {
+    opacity: 0.6;
+    cursor: not-allowed;
+    filter: grayscale(0.5);
+    border-color: #fee2e2;
+}
+
+.part-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.65em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.part-badge.comp-ok {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.part-badge.comp-err {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.comp-reason {
+    font-size: 0.75em;
+    color: #ef4444;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.component-card {
+    animation: fadeIn 0.5s ease backwards;
+}

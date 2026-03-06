@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order - Marketplace</title>
+    <link rel="stylesheet" href="css/marketplace.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .track-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            color: var(--text-color);
+            opacity: 0.7;
+            font-size: 1.1em;
+        }
+
+        .search-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 40px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 16px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-box button {
+            padding: 14px 32px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-box button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .search-hint {
+            font-size: 0.9em;
+            color: var(--text-color);
+            opacity: 0.6;
+        }
+
+        .tracking-result {
+            display: none;
+        }
+
+        .tracking-result.active {
+            display: block;
+        }
+
+        .order-info {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .order-id {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .order-status {
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #f59e0b;
+        }
+
+        .status-confirmed {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        .status-shipped {
+            background: rgba(139, 92, 246, 0.2);
+            color: #8b5cf6;
+        }
+
+        .status-delivered {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-label {
+            font-size: 0.9em;
+            color: var(--text-color);
+            opacity: 0.6;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .tracking-timeline {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .timeline-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--text-color);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 30px;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -29px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--card-bg);
+            border: 3px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .timeline-item.completed .timeline-dot {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .timeline-content {
+            padding-left: 20px;
+        }
+
+        .timeline-title-text {
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--text-color);
+        }
+
+        .timeline-date {
+            font-size: 0.9em;
+            color: var(--text-color);
+            opacity: 0.6;
+        }
+
+        .timeline-description {
+            margin-top: 8px;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .empty-state i {
+            font-size: 3em;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .track-container {
+                padding: 0 20px;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .order-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="logo">Marketplace</h1>
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="actions">
+                <a href="marketplace.html" class="back-btn" style="text-decoration: none; color: inherit;">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <a href="cart.html" class="cart-icon-link">
+                    <div class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-badge" class="cart-badge">0</span>
+                    </div>
+                </a>
+                <div class="theme-toggle">
+                    <button id="theme-toggle-btn" aria-label="Toggle theme">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                    <div id="theme-dropdown" class="dropdown-menu hidden">
+                        <button data-theme="light">Light</button>
+                        <button data-theme="dark">Dark</button>
+                        <button data-theme="brown">Brown</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="track-container">
+        <div class="page-header">
+            <h1>Track Your Order</h1>
+            <p>Enter your order ID to track your shipment</p>
+        </div>
+
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="order-id-input" placeholder="Enter Order ID (e.g., ORD123456)">
+                <button onclick="trackOrder()">
+                    <i class="fas fa-search"></i> Track Order
+                </button>
+            </div>
+            <p class="search-hint">You can find your order ID in your order confirmation email or My Orders page</p>
+        </div>
+
+        <div id="tracking-result" class="tracking-result">
+            <!-- Order info will be displayed here -->
+        </div>
+    </div>
+
+    <script src="js/common.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme handling
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+
+            // Theme toggle functionality
+            const themeToggleBtn = document.getElementById('theme-toggle-btn');
+            const themeDropdown = document.getElementById('theme-dropdown');
+
+            if (themeToggleBtn && themeDropdown) {
+                themeToggleBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    themeDropdown.classList.toggle('hidden');
+                });
+
+                themeDropdown.querySelectorAll('button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        const theme = button.getAttribute('data-theme');
+                        document.body.setAttribute('data-theme', theme);
+                        localStorage.setItem('theme', theme);
+                        themeDropdown.classList.add('hidden');
+                    });
+                });
+
+                document.addEventListener('click', (e) => {
+                    if (!themeToggleBtn.contains(e.target) && !themeDropdown.contains(e.target)) {
+                        themeDropdown.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Allow Enter key to track order
+            document.getElementById('order-id-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    trackOrder();
+                }
+            });
+        });
+
+        async function trackOrder() {
+            const orderId = document.getElementById('order-id-input').value.trim();
+            const resultDiv = document.getElementById('tracking-result');
+
+            if (!orderId) {
+                alert('Please enter an order ID');
+                return;
+            }
+
+            try {
+                // Fetch all orders and find the matching one
+                // Fetch all orders and find the matching one
+                const data = await ApiService.get('/orders');
+                const orders = data.orders || [];
+
+                // Find the order by ID
+                const order = orders.find(o => o.order_id === orderId || o.order_id === `ORD-${orderId}` || `ORD-${o.order_id}` === orderId);
+
+                if (!order) {
+                    throw new Error('Order not found. Please check your order ID.');
+                }
+
+                displayTrackingInfo(order);
+            } catch (error) {
+                console.error('Error tracking order:', error);
+                resultDiv.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Order Not Found</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+                resultDiv.classList.add('active');
+            }
+        }
+
+        function displayTrackingInfo(order) {
+            const resultDiv = document.getElementById('tracking-result');
+
+            const trackingSteps = [
+                { status: 'pending', title: 'Order Placed', icon: 'check-circle', description: 'Your order has been received' },
+                { status: 'confirmed', title: 'Order Confirmed', icon: 'clipboard-check', description: 'Seller has confirmed your order' },
+                { status: 'shipped', title: 'Shipped', icon: 'shipping-fast', description: 'Your order is on the way' },
+                { status: 'delivered', title: 'Delivered', icon: 'box-open', description: 'Order has been delivered' }
+            ];
+
+            const currentStatusIndex = trackingSteps.findIndex(step => step.status === order.status);
+
+            resultDiv.innerHTML = `
+                <div class="order-info">
+                    <div class="order-header">
+                        <div class="order-id">#${order.order_id}</div>
+                        <span class="order-status status-${order.status}">${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</span>
+                    </div>
+                    <div class="order-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Order Date</span>
+                            <span class="detail-value">${new Date(order.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Total Amount</span>
+                            <span class="detail-value">₹${parseFloat(order.total).toFixed(2)}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Delivery Address</span>
+                            <span class="detail-value">${order.city}, ${order.state}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Payment Method</span>
+                            <span class="detail-value">${order.payment_method}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tracking-timeline">
+                    <h2 class="timeline-title">Tracking Timeline</h2>
+                    <div class="timeline">
+                        ${trackingSteps.map((step, index) => `
+                            <div class="timeline-item ${index <= currentStatusIndex ? 'completed' : ''}">
+                                <div class="timeline-dot">
+                                    <i class="fas fa-${step.icon}"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <div class="timeline-title-text">${step.title}</div>
+                                    <div class="timeline-date">${index <= currentStatusIndex ? new Date().toLocaleDateString() : 'Pending'}</div>
+                                    <div class="timeline-description">${step.description}</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            resultDiv.classList.add('active');
+        }
+    </script>
+</body>
+
+</html>

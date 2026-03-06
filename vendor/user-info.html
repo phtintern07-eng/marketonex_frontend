@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendorVerse – My Account</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ── Page Wrapper ─────────────────────────────────────────── */
+        .ui-page {
+            padding: 36px 32px 56px;
+        }
+
+        .ui-page-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .ui-page-header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+        }
+
+        .ui-page-header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* ── Two-column grid ──────────────────────────────────────── */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* ── 3D Elevated Card Base ───────────────────────────────── */
+        .card-3d {
+            background: var(--bg-card, #141414);
+            border: 1px solid var(--border-color, #262626);
+            border-radius: 20px;
+            padding: 32px;
+            transition: transform 0.3s cubic-bezier(.4, 0, .2, 1),
+                box-shadow 0.3s cubic-bezier(.4, 0, .2, 1),
+                border-color 0.3s ease;
+            box-shadow:
+                0 2px 6px rgba(0, 0, 0, 0.12),
+                0 8px 20px rgba(0, 0, 0, 0.10),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .card-3d:hover {
+            transform: translateY(-4px);
+            box-shadow:
+                0 4px 10px rgba(0, 0, 0, 0.14),
+                0 16px 40px rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.07);
+            border-color: var(--accent-blue, #06B6D4);
+        }
+
+        [data-theme="light"] .card-3d {
+            background: #ffffff;
+            border-color: #bae3f5;
+            box-shadow:
+                0 2px 6px rgba(0, 144, 204, 0.06),
+                0 8px 20px rgba(0, 144, 204, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        [data-theme="light"] .card-3d:hover {
+            box-shadow:
+                0 4px 12px rgba(0, 144, 204, 0.12),
+                0 20px 40px rgba(0, 144, 204, 0.12);
+            border-color: #0090cc;
+        }
+
+        /* ── Avatar Section ─────────────────────────────────────── */
+        .avatar-section {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 32px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid var(--border-color, #262626);
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .avatar-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-blue, #06B6D4);
+            box-shadow:
+                0 0 0 4px rgba(6, 182, 212, 0.18),
+                0 8px 24px rgba(6, 182, 212, 0.25);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .avatar-wrapper:hover .avatar-img {
+            transform: scale(1.05);
+            box-shadow:
+                0 0 0 5px rgba(6, 182, 212, 0.28),
+                0 12px 32px rgba(6, 182, 212, 0.35);
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .avatar-overlay i {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+
+        .avatar-wrapper:hover .avatar-overlay {
+            opacity: 1;
+        }
+
+        .avatar-meta h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .avatar-meta p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .avatar-meta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(6, 182, 212, 0.12);
+            color: var(--accent-blue, #06B6D4);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ── Card Title Row ─────────────────────────────────────── */
+        .card-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .card-title-row h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .card-title-row .section-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(6, 182, 212, 0.12);
+            color: var(--accent-blue, #06B6D4);
+            font-size: 15px;
+        }
+
+        /* ── Form Grid ─────────────────────────────────────────── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .form-input {
+            background: var(--bg-input, #0f0f0f);
+            border: 1.5px solid var(--border-input, #262626);
+            border-radius: 10px;
+            padding: 11px 14px;
+            color: var(--text-input, #ffffff);
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s;
+            width: 100%;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-blue, #06B6D4);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.18);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        select.form-input {
+            cursor: pointer;
+        }
+
+        /* ── Save Button ─────────────────────────────────────────── */
+        .save-btn-3d {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 28px;
+            padding: 13px 28px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(.4, 0, .2, 1);
+            background: linear-gradient(135deg, var(--accent-blue, #06B6D4), #0072a8);
+            color: #fff;
+            box-shadow:
+                0 4px 12px rgba(6, 182, 212, 0.35),
+                0 1px 2px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .save-btn-3d::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), transparent);
+            pointer-events: none;
+        }
+
+        .save-btn-3d:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow:
+                0 8px 20px rgba(6, 182, 212, 0.50),
+                0 0 0 2px rgba(6, 182, 212, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .save-btn-3d:active:not(:disabled) {
+            transform: translateY(1px);
+            box-shadow: 0 2px 8px rgba(6, 182, 212, 0.25);
+        }
+
+        .save-btn-3d:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ── Business Card ───────────────────────────────────────── */
+        .business-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .biz-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .biz-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .biz-edit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1.5px solid var(--accent-blue, #06B6D4);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--accent-blue, #06B6D4);
+            cursor: pointer;
+            transition: all 0.22s ease;
+        }
+
+        .biz-edit-btn:hover {
+            background: var(--accent-blue, #06B6D4);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.35);
+        }
+
+        .biz-field {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border-color, #262626);
+        }
+
+        .biz-field:last-of-type {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .biz-field-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .biz-field-value {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Status badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.approved {
+            background: rgba(52, 211, 153, 0.12);
+            color: #34d399;
+            border: 1px solid rgba(52, 211, 153, 0.25);
+        }
+
+        .badge.pending {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.25);
+        }
+
+        .badge.rejected {
+            background: rgba(248, 113, 113, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+
+        .badge.not_submitted {
+            background: rgba(139, 146, 176, 0.12);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Social links */
+        .social-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .social-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(139, 146, 176, 0.08);
+            border: 1px solid var(--border-color, #262626);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 16px;
+            transition: all 0.22s ease;
+        }
+
+        .social-btn:hover {
+            background: var(--accent-blue, #06B6D4);
+            border-color: var(--accent-blue, #06B6D4);
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(6, 182, 212, 0.35);
+        }
+
+        /* ── Toast ──────────────────────────────────────────────── */
+        .toast-container {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9999;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #1a1a1a;
+            color: #fff;
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            border-left: 4px solid #34d399;
+            animation: toast-in 0.35s cubic-bezier(.4, 0, .2, 1);
+            min-width: 280px;
+        }
+
+        .toast.error {
+            border-left-color: #f87171;
+        }
+
+        [data-theme="light"] .toast {
+            background: #ffffff;
+            color: #0d2d3d;
+            box-shadow: 0 8px 24px rgba(0, 144, 204, 0.18);
+        }
+
+        @keyframes toast-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ── Responsive ─────────────────────────────────────────── */
+        @media (max-width: 1024px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ui-page {
+                padding: 24px 20px 40px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .avatar-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .avatar-meta-badge {
+                margin: 0 auto;
+            }
+
+            .card-3d {
+                padding: 22px;
+            }
+
+            .ui-page {
+                padding: 16px 12px 32px;
+            }
+
+            .save-btn-3d {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <i class="fas fa-layer-group"></i>
+            <span>VendorVerse</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="vender_profile.html" class="nav-item"><i class="fas fa-user"></i><span>My Profile</span></a>
+            <a href="products.html" class="nav-item"><i class="fas fa-box"></i><span>My Products</span></a>
+            <a href="orders.html" class="nav-item"><i class="fas fa-shopping-cart"></i><span>Orders</span></a>
+            <a href="insights.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Insights</span></a>
+            <a href="settings.html" class="nav-item"><i class="fas fa-cog"></i><span>Settings</span></a>
+            <a href="verification.html" class="nav-item"><i class="fas fa-shield-alt"></i><span>Verification</span></a>
+            <a href="reviews.html" class="nav-item"><i class="fas fa-star"></i><span>Reviews</span></a>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
+            <div class="theme-controls">
+                <button class="theme-btn" id="themeBtn"><i class="fas fa-palette"></i></button>
+                <div class="theme-menu" id="themeMenu">
+                    <div class="theme-option active" data-value="light"><span>Light</span></div>
+                    <div class="theme-option" data-value="dark"><span>Dark</span></div>
+                    <div class="theme-option" data-value="brown"><span>Brown</span></div>
+                </div>
+            </div>
+            <a href="user-info.html" class="user-avatar">
+                <img id="topbarAvatar" src="https://i.pravatar.cc/150?img=12" alt="User">
+            </a>
+        </div>
+
+        <!-- Page Content -->
+        <div class="ui-page">
+            <div class="ui-page-header">
+                <div>
+                    <h1>My Account</h1>
+                    <p>Manage your profile, contact details and business information.</p>
+                </div>
+            </div>
+
+            <div class="profile-grid">
+                <!-- ── Left Column: Profile Form ── -->
+                <div>
+                    <!-- Avatar Card -->
+                    <div class="card-3d" style="margin-bottom: 24px;">
+                        <div class="avatar-section">
+                            <div class="avatar-wrapper" id="profileImgContainer">
+                                <img id="userInfoProfileImg" src="https://i.pravatar.cc/150?img=12" alt="Profile Photo"
+                                    class="avatar-img">
+                                <div class="avatar-overlay">
+                                    <i class="fas fa-camera"></i>
+                                    Change Photo
+                                </div>
+                            </div>
+                            <input type="file" id="profilePhotoInput" hidden accept="image/*">
+                            <div class="avatar-meta">
+                                <h2 id="avatarName">—</h2>
+                                <p id="avatarEmail">—</p>
+                                <span class="avatar-meta-badge">
+                                    <i class="fas fa-store"></i> Vendor Account
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Personal Details Card -->
+                    <div class="card-3d">
+                        <div class="card-title-row">
+                            <h3>Personal Details</h3>
+                            <div class="section-icon"><i class="fas fa-user-edit"></i></div>
+                        </div>
+
+                        <form id="userProfileForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="u-name">Full Name</label>
+                                    <input type="text" id="u-name" name="name" class="form-input"
+                                        placeholder="Your full name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="u-dob">Date of Birth</label>
+                                    <input type="date" id="u-dob" name="dob" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="u-gender">Gender</label>
+                                    <select id="u-gender" name="gender" class="form-input">
+                                        <option value="">Select Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                        <option value="Prefer not to say">Prefer not to say</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="u-phone">Phone Number</label>
+                                    <input type="tel" id="u-phone" name="phone" class="form-input"
+                                        placeholder="+91 XXXXX XXXXX">
+                                </div>
+                                <div class="form-group full">
+                                    <label for="u-email">Email Address</label>
+                                    <input type="email" id="u-email" name="email" class="form-input"
+                                        placeholder="your@email.com">
+                                </div>
+                                <div class="form-group full">
+                                    <label for="u-address">Street Address</label>
+                                    <input type="text" id="u-address" name="address" class="form-input"
+                                        placeholder="House / Street / Locality">
+                                </div>
+                                <div class="form-group">
+                                    <label for="u-city">City</label>
+                                    <input type="text" id="u-city" name="city" class="form-input" placeholder="City">
+                                </div>
+                                <div class="form-group">
+                                    <label for="u-state">State</label>
+                                    <input type="text" id="u-state" name="state" class="form-input" placeholder="State">
+                                </div>
+                            </div>
+
+                            <button type="button" class="save-btn-3d" id="saveUserProfileBtn">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ── Right Column: Business Details ── -->
+                <div class="business-section">
+                    <div class="card-3d">
+                        <div class="biz-header">
+                            <h3>Business Details</h3>
+                            <button class="biz-edit-btn" id="businessDetailsBtn">
+                                <i class="fas fa-pen"></i> Update
+                            </button>
+                        </div>
+
+                        <div class="biz-field">
+                            <span class="biz-field-label">Business Name</span>
+                            <span class="biz-field-value" id="businessNameDisplay">—</span>
+                        </div>
+
+                        <div class="biz-field">
+                            <span class="biz-field-label">KYC Status</span>
+                            <span id="kycBadge" class="badge pending">
+                                <i class="fas fa-clock"></i> Pending
+                            </span>
+                        </div>
+
+                        <div class="biz-field">
+                            <span class="biz-field-label">Verification Status</span>
+                            <span id="verificationBadge" class="badge pending">
+                                <i class="fas fa-clock"></i> Pending
+                            </span>
+                        </div>
+
+                        <div class="biz-field">
+                            <span class="biz-field-label">Account Status</span>
+                            <span id="accountBadge" class="badge pending">
+                                <i class="fas fa-circle"></i> Limited
+                            </span>
+                        </div>
+
+                        <div style="margin-top: 8px;">
+                            <span class="biz-field-label" style="display:block; margin-bottom: 10px;">Social
+                                Links</span>
+                            <div class="social-row">
+                                <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="social-btn"><i class="fab fa-whatsapp"></i></a>
+                                <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links Card -->
+                    <div class="card-3d">
+                        <div class="card-title-row">
+                            <h3>Quick Actions</h3>
+                            <div class="section-icon"><i class="fas fa-bolt"></i></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <a href="verification.html" style="display:flex; align-items:center; gap:12px;
+                               padding: 12px 16px; border-radius: 10px;
+                               background: rgba(139,146,176,0.06); border: 1px solid var(--border-color);
+                               color: var(--text-primary); text-decoration: none;
+                               font-size: 14px; font-weight: 500;
+                               transition: all 0.2s ease;">
+                                <i class="fas fa-shield-alt" style="color: var(--accent-blue); width:18px;"></i>
+                                KYC / Verification
+                                <i class="fas fa-chevron-right"
+                                    style="margin-left:auto; color:var(--text-secondary); font-size:12px;"></i>
+                            </a>
+                            <a href="products.html" style="display:flex; align-items:center; gap:12px;
+                               padding: 12px 16px; border-radius: 10px;
+                               background: rgba(139,146,176,0.06); border: 1px solid var(--border-color);
+                               color: var(--text-primary); text-decoration: none;
+                               font-size: 14px; font-weight: 500;
+                               transition: all 0.2s ease;">
+                                <i class="fas fa-box" style="color: var(--accent-yellow); width:18px;"></i>
+                                Manage Products
+                                <i class="fas fa-chevron-right"
+                                    style="margin-left:auto; color:var(--text-secondary); font-size:12px;"></i>
+                            </a>
+                            <a href="orders.html" style="display:flex; align-items:center; gap:12px;
+                               padding: 12px 16px; border-radius: 10px;
+                               background: rgba(139,146,176,0.06); border: 1px solid var(--border-color);
+                               color: var(--text-primary); text-decoration: none;
+                               font-size: 14px; font-weight: 500;
+                               transition: all 0.2s ease;">
+                                <i class="fas fa-shopping-cart" style="color: var(--accent-green); width:18px;"></i>
+                                View Orders
+                                <i class="fas fa-chevron-right"
+                                    style="margin-left:auto; color:var(--text-secondary); font-size:12px;"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/user-info.js"></script>
+    <script src="js/common.js"></script>
+</body>
+
+</html>

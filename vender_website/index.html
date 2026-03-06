@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VendorVerse Gaming - Premium PC Parts</title>
+    <link rel="stylesheet" href="/vendor-site/css/gaming-theme.css">
+    <link rel="stylesheet" href="/vendor-site/css/vendor-profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-img-container {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50%;
+            height: 90%;
+            background: url('https://images.unsplash.com/photo-1593640408169-23706312a0c0?auto=format&fit=crop&w=1000&q=80') no-repeat center center;
+            background-size: contain;
+        }
+
+        .category-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- 1. Navbar -->
+    <nav class="gaming-nav">
+        <div class="container-gaming" style="display: flex; justify-content: space-between; width: 100%;">
+            <!-- Left: Logo -->
+            <a href="/"
+                style="color: var(--text-main); font-weight: 800; font-size: 1.5rem; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; z-index: 10;">
+                <i class="fas fa-microchip" style="color: var(--gaming-red);"></i> VENDORVERSE
+            </a>
+
+            <!-- Middle: Nav Links (Desktop Only) -->
+            <div class="nav-links" style="display: flex; align-items: center;">
+                <a href="/">Home</a>
+                <a href="/vendor-site/vendor_pc_builder.html">PC Builder</a>
+                <a href="#">CPU</a>
+                <a href="#">GPU</a>
+                <a href="#">Motherboards</a>
+                <a href="#">RAM</a>
+                <a href="#">Storage</a>
+                <a href="/" class="btn-gaming-outline"
+                    style="padding: 0.5rem 1rem; font-size: 0.8rem; margin-left: 0.5rem; text-decoration: none; color: var(--text-main); border: 1px solid var(--text-main);">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+            </div>
+
+            <a href="/vendor/vender_profile.html" class="btn-gaming-primary" id="vendor-profile-btn"
+                style="display: none;">
+                Vendor Profile
+            </a>
+
+            <!-- Right: Actions Group -->
+            <div class="nav-actions-group" style="display: flex; align-items: center; gap: 0.75rem;">
+
+                <!-- 🎨 Theme Switcher -->
+                <button id="customer-theme-toggle" class="nav-action-btn" aria-label="Toggle Theme">
+                    <i class="fas fa-palette"></i>
+                </button>
+
+                <!-- 🛒 Cart Button -->
+                <a href="/vendor-site/cart.html" class="nav-action-btn" aria-label="Cart">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+
+                <!-- 👤 User Profile Icon & Dropdown -->
+                <div class="profile-container">
+                    <button id="profile-icon-btn" class="nav-action-btn profile-icon-nav" aria-label="User Profile">
+                        <img id="profile-avatar" src="" alt="Profile" class="profile-avatar hidden">
+                        <div id="profile-initials" class="profile-initials"></div>
+                    </button>
+
+                    <!-- Profile Dropdown Panel -->
+                    <div id="profile-dropdown" class="profile-dropdown hidden">
+                        <!-- User Info Header -->
+                        <div class="profile-header">
+                            <img id="dropdown-avatar" src="" alt="Profile" class="dropdown-avatar">
+                            <div class="profile-info">
+                                <p class="profile-greeting">Hello!</p>
+                                <h3 id="profile-name" class="profile-name">Vendor</h3>
+                            </div>
+                        </div>
+
+                        <!-- Profile Menu Sections -->
+                        <div class="profile-menu">
+                            <!-- Vendor Dashboard -->
+                            <div class="profile-menu-section">
+                                <a href="/vendor-site/products.html" class="profile-menu-item">
+                                    <i class="fas fa-box"></i>
+                                    <div class="menu-item-content">
+                                        <span class="menu-item-title">My Products</span>
+                                        <span class="menu-item-desc">Manage your inventory</span>
+                                    </div>
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </div>
+
+                            <!-- Account Settings -->
+                            <div class="profile-menu-section">
+                                <h4 class="section-title">Account Settings</h4>
+                                <a href="/vendor-site/profile.html" class="profile-menu-item">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span class="menu-item-title">Profile Information</span>
+                                </a>
+                                <a href="/vendor-site/orders.html" class="profile-menu-item">
+                                    <i class="fas fa-shopping-bag"></i>
+                                    <span class="menu-item-title">Orders</span>
+                                </a>
+                            </div>
+
+                            <!-- Frequently Visited -->
+                            <div class="profile-menu-section">
+                                <h4 class="section-title">Frequently Visited</h4>
+                                <a href="/vendor-site/profile.html#password" class="profile-menu-item">
+                                    <i class="fas fa-key"></i>
+                                    <span class="menu-item-title">Change Password</span>
+                                </a>
+                                <a href="/vendor-site/help.html" class="profile-menu-item">
+                                    <i class="fas fa-question-circle"></i>
+                                    <span class="menu-item-title">Help Center</span>
+                                </a>
+                            </div>
+
+                            <!-- Logout -->
+                            <div class="profile-menu-section">
+                                <button id="profile-logout-btn" class="profile-menu-item logout-btn">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span class="menu-item-title">Logout</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ☰ Hamburger Toggle Button (Always visible now) -->
+                <button class="nav-action-btn hamburger-btn" id="hamburger-btn" aria-label="Open Menu"
+                    aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Slide-Out Drawer -->
+    <div class="mob-overlay" id="mob-overlay"></div>
+    <aside class="mob-drawer" id="mob-drawer" aria-hidden="true">
+        <!-- Drawer Header -->
+        <div class="mob-drawer-header">
+            <div class="mob-drawer-logo">
+                <i class="fas fa-microchip"></i> VENDORVERSE
+            </div>
+            <button class="mob-drawer-close" id="mob-drawer-close" aria-label="Close Menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Drawer Nav Links -->
+        <nav class="mob-drawer-nav">
+            <a href="/" class="mob-nav-item" data-icon="fa-home">
+                <span class="mob-nav-icon"><i class="fas fa-home"></i></span>
+                <span class="mob-nav-label">Home</span>
+                <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a href="/vendor-site/vendor_pc_builder.html" class="mob-nav-item" data-icon="fa-tools">
+                <span class="mob-nav-icon"><i class="fas fa-tools"></i></span>
+                <span class="mob-nav-label">PC Builder</span>
+                <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a href="#" class="mob-nav-item">
+                <span class="mob-nav-icon"><i class="fas fa-microchip"></i></span>
+                <span class="mob-nav-label">CPU</span>
+                <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a href="#" class="mob-nav-item">
+                <span class="mob-nav-icon"><i class="fas fa-layer-group"></i></span>
+                <span class="mob-nav-label">GPU</span>
+                <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a href="#" class="mob-nav-item">
+                <span class="mob-nav-icon"><i class="fas fa-server"></i></span>
+                <span class="mob-nav-label">Motherboards</span>
+                <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a href="#" class="mob-nav-item">
+                <span class="mob-nav-icon"><i class="fas fa-memory"></i></span>
+                <span class="mob-nav-label">RAM</span>
+                <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a href="#" class="mob-nav-item">
+                <span class="mob-nav-icon"><i class="fas fa-hdd"></i></span>
+                <span class="mob-nav-label">Storage</span>
+                <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a href="/vendor-site/cart.html" class="mob-nav-item">
+                <span class="mob-nav-icon"><i class="fas fa-shopping-cart"></i></span>
+                <span class="mob-nav-label">Cart</span>
+                <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a href="/vendor-site/profile.html" class="mob-nav-item">
+                <span class="mob-nav-icon"><i class="fas fa-user-circle"></i></span>
+                <span class="mob-nav-label">Profile</span>
+                <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <a href="/vendor/vender_profile.html" class="mob-nav-item mob-nav-vendor" id="mob-vendor-profile-link"
+                style="display: none;">
+                <span class="mob-nav-icon"><i class="fas fa-store"></i></span>
+                <span class="mob-nav-label">Vendor Profile</span>
+                <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+            <div class="mob-nav-item" id="mob-theme-toggle" style="cursor: pointer;">
+                <span class="mob-nav-icon"><i class="fas fa-palette"></i></span>
+                <span class="mob-nav-label">Switch Theme</span>
+                <span class="mob-nav-arrow"><i class="fas fa-sync-alt"></i></span>
+            </div>
+            <div class="mob-drawer-divider"></div>
+            <a href="/" class="mob-nav-item mob-nav-back">
+                <span class="mob-nav-icon"><i class="fas fa-arrow-left"></i></span>
+                <span class="mob-nav-label">Back to Marketplace</span>
+                <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
+            </a>
+        </nav>
+
+        <!-- Drawer Footer -->
+        <div class="mob-drawer-footer">
+            <p>&copy; 2024 VendorVerse</p>
+        </div>
+    </aside>
+
+    <!-- 2. Hero Section -->
+    <header class="gaming-hero">
+        <div class="container-gaming hero-container-inner">
+            <div class="gaming-hero-content fade-in-up">
+                <h1 id="hero-title">PREMIUM PC<br>COMPONENTS</h1>
+                <p id="hero-description">Latest CPUs, High-Speed RAM & Ultra-Fast SSDs. Build your dream PC with
+                    top-tier components from trusted brands.</p>
+                <div class="hero-btns">
+                    <a href="/vendor-site/products.html" class="btn-gaming-primary">Browse Parts</a>
+                    <a href="/vendor-site/vendor_pc_builder.html" class="btn-gaming-outline">PC Builder</a>
+                </div>
+            </div>
+            <div class="hero-img-container">
+                <img src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=800&q=80"
+                    alt="Gaming Hardware">
+            </div>
+        </div>
+
+        <div class="hero-dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot active"></div>
+            <div class="dot"></div>
+        </div>
+    </header>
+
+    <!-- PC Builder Section -->
+    <section class="pc-builder-promo">
+        <div class="container-gaming">
+            <h2>Build Your Custom PC</h2>
+            <p>Select compatible components and create your own PC configuration.</p>
+            <a href="/vendor-site/vendor_pc_builder.html" class="btn-gaming-primary promo-btn">Start Building</a>
+        </div>
+    </section>
+
+    <!-- 3. Shop By Category -->
+    <section class="featured-categories">
+        <div class="container-gaming">
+            <h2 class="section-title">Shop by Category</h2>
+            <div class="category-marquee-wrapper">
+                <div class="category-marquee">
+                    <div class="category-scroll-track">
+                        <div class="category-card" data-category="motherboard">
+                            <div class="category-image">
+                                <img src="/images/category/motherboard.png" alt="Motherboard">
+                            </div>
+                            <h3>Motherboard</h3>
+                        </div>
+                        <div class="category-card" data-category="cpu">
+                            <div class="category-image">
+                                <img src="/images/category/cpu.png" alt="Central Processing Unit (CPU)">
+                            </div>
+                            <h3>Central Processing Unit (CPU)</h3>
+                        </div>
+                        <div class="category-card" data-category="hdd">
+                            <div class="category-image">
+                                <img src="/images/category/hdd.png" alt="Hard Disk">
+                            </div>
+                            <h3>Hard Disk</h3>
+                        </div>
+                        <div class="category-card" data-category="psu">
+                            <div class="category-image">
+                                <img src="/images/category/psu.png" alt="Power Supply">
+                            </div>
+                            <h3>Power Supply</h3>
+                        </div>
+                        <div class="category-card" data-category="ssd">
+                            <div class="category-image">
+                                <img src="/images/category/ssd.png" alt="SSDs">
+                            </div>
+                            <h3>SSDs</h3>
+                        </div>
+                        <div class="category-card" data-category="monitor">
+                            <div class="category-image">
+                                <img src="/images/category/monitor.png" alt="Monitor">
+                            </div>
+                            <h3>Monitor</h3>
+                        </div>
+                        <div class="category-card" data-category="mouse">
+                            <div class="category-image">
+                                <img src="/images/category/mouse.png" alt="Mouse">
+                            </div>
+                            <h3>Mouse</h3>
+                        </div>
+                        <div class="category-card" data-category="gpu">
+                            <div class="category-image">
+                                <img src="/images/category/gpu.png" alt="Graphics Processing Unit (GPU)">
+                                <span class="badge-new">NEW</span>
+                            </div>
+                            <h3>Graphics Processing Unit (GPU)</h3>
+                        </div>
+                        <div class="category-card" data-category="printer">
+                            <div class="category-image">
+                                <img src="/images/category/printer.png" alt="Printer">
+                            </div>
+                            <h3>Printer</h3>
+                        </div>
+                        <div class="category-card" data-category="ram">
+                            <div class="category-image">
+                                <img src="/images/category/ram.png" alt="RAM">
+                            </div>
+                            <h3>RAM</h3>
+                        </div>
+                        <div class="category-card" data-category="input-devices">
+                            <div class="category-image">
+                                <img src="/images/category/input-devices.png" alt="Input Devices">
+                            </div>
+                            <h3>Input Devices</h3>
+                        </div>
+                        <div class="category-card" data-category="microphone">
+                            <div class="category-image">
+                                <img src="/images/category/microphone.png" alt="Microphone">
+                            </div>
+                            <h3>Microphone</h3>
+                        </div>
+                        <div class="category-card" data-category="output-devices">
+                            <div class="category-image">
+                                <img src="/images/category/output-devices.png" alt="Output Devices">
+                            </div>
+                            <h3>Output Devices</h3>
+                        </div>
+                        <div class="category-card" data-category="peripherals">
+                            <div class="category-image">
+                                <img src="/images/category/peripherals.png" alt="Peripherals">
+                            </div>
+                            <h3>Peripherals</h3>
+                        </div>
+
+                        <div class="category-card" data-category="computer">
+                            <div class="category-image">
+                                <img src="/images/category/computer.png" alt="Computer">
+                            </div>
+                            <h3>Computer</h3>
+                        </div>
+                        <div class="category-card" data-category="cases">
+                            <div class="category-image">
+                                <img src="/images/category/cases.png" alt="Computer Cases">
+                            </div>
+                            <h3>Computer Cases</h3>
+                        </div>
+                        <div class="category-card" data-category="memory">
+                            <div class="category-image">
+                                <img src="/images/category/memory.png" alt="Random Access Memory">
+                            </div>
+                            <h3>Random Access Memory</h3>
+                        </div>
+                        <div class="category-card" data-category="storage-devices">
+                            <div class="category-image">
+                                <img src="/images/category/storage-devices.png" alt="Storage Devices">
+                            </div>
+                            <h3>Storage Devices</h3>
+                        </div>
+
+                        <div class="category-card" data-category="keyboard">
+                            <div class="category-image">
+                                <img src="/images/category/keyboard.png" alt="Computer Keyboard">
+                            </div>
+                            <h3>Computer Keyboard</h3>
+                        </div>
+                    </div>
+                    <!-- Duplicate for seamless loop -->
+                    <div class="category-scroll-track">
+                        <div class="category-card" data-category="motherboard">
+                            <div class="category-image">
+                                <img src="/images/category/motherboard.png" alt="Motherboard">
+                            </div>
+                            <h3>Motherboard</h3>
+                        </div>
+                        <div class="category-card" data-category="cpu">
+                            <div class="category-image">
+                                <img src="/images/category/cpu.png" alt="Central Processing Unit (CPU)">
+                            </div>
+                            <h3>Central Processing Unit (CPU)</h3>
+                        </div>
+                        <div class="category-card" data-category="hdd">
+                            <div class="category-image">
+                                <img src="/images/category/hdd.png" alt="Hard Disk">
+                            </div>
+                            <h3>Hard Disk</h3>
+                        </div>
+                        <div class="category-card" data-category="psu">
+                            <div class="category-image">
+                                <img src="/images/category/psu.png" alt="Power Supply">
+                            </div>
+                            <h3>Power Supply</h3>
+                        </div>
+                        <div class="category-card" data-category="ssd">
+                            <div class="category-image">
+                                <img src="/images/category/ssd.png" alt="SSDs">
+                            </div>
+                            <h3>SSDs</h3>
+                        </div>
+                        <div class="category-card" data-category="monitor">
+                            <div class="category-image">
+                                <img src="/images/category/monitor.png" alt="Monitor">
+                            </div>
+                            <h3>Monitor</h3>
+                        </div>
+                        <div class="category-card" data-category="mouse">
+                            <div class="category-image">
+                                <img src="/images/category/mouse.png" alt="Mouse">
+                            </div>
+                            <h3>Mouse</h3>
+                        </div>
+                        <div class="category-card" data-category="gpu">
+                            <div class="category-image">
+                                <img src="/images/category/gpu.png" alt="Graphics Processing Unit (GPU)">
+                                <span class="badge-new">NEW</span>
+                            </div>
+                            <h3>Graphics Processing Unit (GPU)</h3>
+                        </div>
+                        <div class="category-card" data-category="printer">
+                            <div class="category-image">
+                                <img src="/images/category/printer.png" alt="Printer">
+                            </div>
+                            <h3>Printer</h3>
+                        </div>
+                        <div class="category-card" data-category="ram">
+                            <div class="category-image">
+                                <img src="/images/category/ram.png" alt="RAM">
+                            </div>
+                            <h3>RAM</h3>
+                        </div>
+                        <div class="category-card" data-category="input-devices">
+                            <div class="category-image">
+                                <img src="/images/category/input-devices.png" alt="Input Devices">
+                            </div>
+                            <h3>Input Devices</h3>
+                        </div>
+                        <div class="category-card" data-category="microphone">
+                            <div class="category-image">
+                                <img src="/images/category/microphone.png" alt="Microphone">
+                            </div>
+                            <h3>Microphone</h3>
+                        </div>
+                        <div class="category-card" data-category="output-devices">
+                            <div class="category-image">
+                                <img src="/images/category/output-devices.png" alt="Output Devices">
+                            </div>
+                            <h3>Output Devices</h3>
+                        </div>
+                        <div class="category-card" data-category="peripherals">
+                            <div class="category-image">
+                                <img src="/images/category/peripherals.png" alt="Peripherals">
+                            </div>
+                            <h3>Peripherals</h3>
+                        </div>
+
+                        <div class="category-card" data-category="computer">
+                            <div class="category-image">
+                                <img src="/images/category/computer.png" alt="Computer">
+                            </div>
+                            <h3>Computer</h3>
+                        </div>
+                        <div class="category-card" data-category="cases">
+                            <div class="category-image">
+                                <img src="/images/category/cases.png" alt="Computer Cases">
+                            </div>
+                            <h3>Computer Cases</h3>
+                        </div>
+                        <div class="category-card" data-category="memory">
+                            <div class="category-image">
+                                <img src="/images/category/memory.png" alt="Random Access Memory">
+                            </div>
+                            <h3>Random Access Memory</h3>
+                        </div>
+                        <div class="category-card" data-category="storage-devices">
+                            <div class="category-image">
+                                <img src="/images/category/storage-devices.png" alt="Storage Devices">
+                            </div>
+                            <h3>Storage Devices</h3>
+                        </div>
+
+                        <div class="category-card" data-category="keyboard">
+                            <div class="category-image">
+                                <img src="/images/category/keyboard.png" alt="Computer Keyboard">
+                            </div>
+                            <h3>Computer Keyboard</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Featured Review (Split) -->
+    <section class="gaming-split-section">
+        <div class="split-left">
+            <span
+                style="color: var(--text-gray); text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem; margin-bottom: 1rem;">Featured
+                Review</span>
+            <h2 style="font-size: 3rem; color: var(--accent); margin-bottom: 2rem;">CHRONOS</h2>
+            <h4 style="margin-bottom: 1rem;">Key Features:</h4>
+            <ul class="feature-list">
+                <li>Compact design with premium build quality</li>
+                <li>High-performance components for gaming & professional workloads</li>
+                <li>Advanced thermal management system</li>
+                <li>Reliable performance backed by expert reviews</li>
+            </ul>
+            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                <a href="#"
+                    style="border: 2px solid var(--text-primary); padding: 1rem 2rem; color: var(--text-primary); text-decoration: none; font-weight: 700;">SHOP
+                    NOW</a>
+                <span
+                    style="background-color: var(--accent); padding: 1rem 2rem; color: var(--bg-main); font-weight: 700; display: flex; align-items: center;">PC
+                    EDITORS' CHOICE</span>
+            </div>
+        </div>
+        <div class="split-right" id="testimonial-container">
+            <h3 style="color: var(--gaming-red); margin-bottom: 2rem;">CUSTOMER TESTIMONIALS</h3>
+            <div id="testimonial-content">
+                <h4 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--text-primary);">"Smooth Order
+                    Processing!"</h4>
+                <p class="testimonial-text">
+                    "The entire ordering process was seamless. I received regular updates via email and SMS about my
+                    build progress."
+                </p>
+            </div>
+            <div id="testimonial-dots" style="display: flex; gap: 0.5rem; margin-top: 2rem;">
+                <span style="width: 10px; height: 10px; background: #ccc; border-radius: 50%;"></span>
+                <span style="width: 10px; height: 10px; background: var(--gaming-red); border-radius: 50%;"></span>
+                <span style="width: 10px; height: 10px; background: #ccc; border-radius: 50%;"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Info Cards Section (White) -->
+    <section class="gaming-info-section">
+        <div class="container-gaming">
+            <div class="info-grid">
+                <!-- Card 1 -->
+                <div class="info-card-white" style="background-color: var(--bg-card); color: var(--text-primary);">
+                    <div class="info-icon-box info-icon-red">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="info-card-title">FINANCING</div>
+                    <div class="info-card-subtitle">Play Now and Pay Later</div>
+                    <ul class="info-card-list">
+                        <li>Easy to apply</li>
+                        <li>Get instant pre-approved offers and rates</li>
+                        <li>Three months same as cash available*</li>
+                        <li>No prepayment penalties</li>
+                        <li>Up to 36 months of payment options</li>
+                    </ul>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="info-card-white" style="background-color: var(--bg-card); color: var(--text-primary);">
+                    <div class="info-icon-box info-icon-blue">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="info-card-title">AFFILIATES</div>
+                    <div class="info-card-subtitle">Join the Best</div>
+                    <p style="color: var(--text-secondary); line-height: 1.6; font-size: 0.9rem; margin-bottom: 1rem;">
+                        Partner up with the best custom PC system builder in the world and earn extra cash! Become An
+                        Official MARKETPLACE Affiliate Today!
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="info-card-white" style="background-color: var(--bg-card); color: var(--text-primary);">
+                    <div class="info-icon-box info-icon-purple">
+                        <i class="fas fa-comment-dots"></i>
+                    </div>
+                    <div class="info-card-title">SUPPORT</div>
+                    <div class="info-card-subtitle">US Based Support</div>
+                    <p style="color: var(--text-secondary); line-height: 1.6; font-size: 0.9rem; margin-bottom: 1rem;">
+                        Once you join us, we will have you covered. With every system, MARKETPLACE provides a free phone
+                        and online lifetime service guarantee. Available from 6am - 8pm PST.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Red CTA Banner -->
+    <section class="gaming-cta-banner" style="background-color: var(--accent); color: var(--bg-main);">
+        <h2>Ready to Grow Your Business?</h2>
+    </section>
+
+    <!-- Footer -->
+    <footer class="gaming-footer">
+        <div class="container-gaming">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>ABOUT</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>SUPPORT</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Returns</a></li>
+                        <li><a href="#">Warranty</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 id="footer-logo">MARKETPLACE</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>CATEGORIES</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Electronics</a></li>
+                        <li><a href="#">Fashion</a></li>
+                        <li><a href="#">Beauty</a></li>
+                        <li><a href="#">Home & Living</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>FOLLOW US</h4>
+                    <div class="social-icons">
+                        <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-btn"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="border-top: 1px solid var(--border); padding-top: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
+                &copy; 2024 Marketplace. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script src="/vendor-site/js/theme-switcher.js"></script>
+
+
+    </script>
+
+    <!-- Mobile Menu Role-Based Visibility -->
+    <script>
+        (function () {
+            function applyMobileMenuRole(role) {
+                const vendorLink = document.getElementById('mob-vendor-profile-link');
+                const desktopBtn = document.getElementById('vendor-profile-btn');
+                if (!vendorLink) return;
+                if (role === 'vendor') {
+                    vendorLink.style.display = 'flex';
+                    if (desktopBtn) desktopBtn.style.display = 'inline-block';
+                } else {
+                    vendorLink.style.display = 'none';
+                    if (desktopBtn) desktopBtn.style.display = 'none';
+                }
+            }
+
+            // Immediate check from localStorage (fastest — no network)
+            const cachedRole = localStorage.getItem('userRole');
+            if (cachedRole) applyMobileMenuRole(cachedRole);
+
+            // Authoritative check from backend session
+            fetch('/api/profile', { credentials: 'include' })
+                .then(res => res.ok ? res.json() : null)
+                .then(data => {
+                    if (!data) return;
+                    const user = data.profile?.user || data.vendor || data.user || data;
+                    const role = user?.role || user?.user_type || '';
+                    if (role) {
+                        localStorage.setItem('userRole', role);
+                        applyMobileMenuRole(role);
+                    }
+                })
+                .catch(() => { }); // silent fail — localStorage fallback still applies
+        })();
+    </script>
+
+    <!-- Profile dropdown mobile overlay (MutationObserver — no existing logic changed) -->
+    <script>
+        (function () {
+            // Wait for DOM + vendor-profile.js to initialise the dropdown
+            window.addEventListener('load', function () {
+                const dropdown = document.getElementById('profile-dropdown');
+                if (!dropdown) return;
+
+                function syncOverlay() {
+                    if (window.innerWidth <= 480) {
+                        const isOpen = !dropdown.classList.contains('hidden');
+                        document.body.classList.toggle('profile-open', isOpen);
+                    } else {
+                        document.body.classList.remove('profile-open');
+                    }
+                }
+
+                // Watch for hidden class changes
+                new MutationObserver(syncOverlay).observe(dropdown, {
+                    attributes: true,
+                    attributeFilter: ['class']
+                });
+
+                // Close dropdown + overlay when tapping the backdrop
+                document.addEventListener('click', function (e) {
+                    if (window.innerWidth <= 480 &&
+                        document.body.classList.contains('profile-open') &&
+                        !dropdown.contains(e.target) &&
+                        e.target.id !== 'profile-icon-btn') {
+                        document.body.classList.remove('profile-open');
+                    }
+                });
+            });
+        })();
+    </script>
+    <script src="/vendor-site/js/vendor-profile.js"></script>
+    <script src="/vendor-site/js/landingpage.js"></script>
+    <script>
+        // ── Vendor Slug Propagation ───────────────────────────────────────────
+        // When a user opens /vendor/nikhil-1, this detects "nikhil-1" and:
+        //  1. Saves it to localStorage so products.html can read it even
+        //     when navigated via hard-coded /vendor-site/... links.
+        //  2. Rewrites all /vendor-site/ links to use /vendor/nikhil-1/
+        //     so the slug stays in the URL.
+        (function () {
+            const parts = window.location.pathname.split('/').filter(Boolean);
+            // Support both URL patterns:
+            //   /vendor/<slug>       → parts[0]='vendor', parts[1]='nikhil-1'
+            //   /<slug>              → parts[0]='nikhil-1'
+            let slug = null;
+            if (parts[0] === 'vendor' && parts[1] && !parts[1].includes('.html')) {
+                slug = parts[1];
+            } else if (parts[0] && !parts[0].includes('.html') && !parts[0].includes('.') && parts[0] !== 'vendor-site') {
+                slug = parts[0];
+            }
+            if (!slug) return;
+
+            // Persist so products.html can fall back to localStorage
+            localStorage.setItem('vendor_store_slug', slug);
+
+            // Fetch generic vendor elements from DB via the new endpoint
+            fetch(`/api/vendor-website/${slug}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.settings) {
+                        const s = data.settings;
+
+                        // Hero Section
+                        if (s.hero_title) document.getElementById('hero-title').textContent = s.hero_title;
+                        if (s.hero_description) document.getElementById('hero-description').textContent = s.hero_description;
+                        if (s.hero_image) {
+                            const heroImgContainer = document.querySelector('.hero-img-container');
+                            if (heroImgContainer) {
+                                heroImgContainer.style.backgroundImage = `url('${s.hero_image}')`;
+                                // ensure inner img is hidden or synced
+                                const innerImg = heroImgContainer.querySelector('img');
+                                if (innerImg) innerImg.style.display = 'none';
+                            }
+                        }
+
+                        // Feature Section
+                        const featureH2 = document.querySelector('.split-left h2');
+                        if (s.feature_title && featureH2) featureH2.textContent = s.feature_title;
+
+                        const featureSpan = document.querySelector('.split-left span[style*="background-color: var(--accent)"]');
+                        if (s.feature_badge && featureSpan) featureSpan.textContent = s.feature_badge;
+
+                        const featureListContainer = document.querySelector('.split-left .feature-list');
+                        if (s.feature_list && Array.isArray(s.feature_list) && featureListContainer) {
+                            featureListContainer.innerHTML = s.feature_list.map(f => `<li>${f}</li>`).join('');
+                        }
+
+                        // Testimonial
+                        const testTitle = document.querySelector('#testimonial-content h4');
+                        const testText = document.querySelector('#testimonial-content .testimonial-text');
+                        if (s.testimonial_title && testTitle) testTitle.textContent = s.testimonial_title;
+                        if (s.testimonial_text && testText) testText.textContent = `"${s.testimonial_text}"`;
+
+                        // Info Cards
+                        const cards = document.querySelectorAll('.info-card-white');
+                        if (cards.length >= 3) {
+                            // Financing
+                            if (s.financing_title) cards[0].querySelector('.info-card-title').textContent = s.financing_title;
+                            if (s.financing_subtitle) cards[0].querySelector('.info-card-subtitle').textContent = s.financing_subtitle;
+                            if (s.financing_items && Array.isArray(s.financing_items)) {
+                                const ul = cards[0].querySelector('.info-card-list');
+                                if (ul) ul.innerHTML = s.financing_items.map(i => `<li>${i}</li>`).join('');
+                            }
+
+                            // Affiliates
+                            if (s.affiliate_title) cards[1].querySelector('.info-card-title').textContent = s.affiliate_title;
+                            if (s.affiliate_subtitle) cards[1].querySelector('.info-card-subtitle').textContent = s.affiliate_subtitle;
+                            if (s.affiliate_description) {
+                                const p = cards[1].querySelector('p');
+                                if (p) p.textContent = s.affiliate_description;
+                            }
+
+                            // Support
+                            if (s.support_title) cards[2].querySelector('.info-card-title').textContent = s.support_title;
+                            if (s.support_subtitle) cards[2].querySelector('.info-card-subtitle').textContent = s.support_subtitle;
+                            if (s.support_description) {
+                                const p = cards[2].querySelector('p');
+                                if (p) p.textContent = s.support_description;
+                            }
+                        }
+
+                        // Social Links
+                        const socialIcons = document.querySelector('.footer-col .social-icons');
+                        if (socialIcons) {
+                            const facebookLink = socialIcons.querySelector('.fa-facebook-f')?.parentElement;
+                            const twitterLink = socialIcons.querySelector('.fa-twitter')?.parentElement;
+                            const instagramLink = socialIcons.querySelector('.fa-instagram')?.parentElement;
+                            const youtubeLink = socialIcons.querySelector('.fa-youtube')?.parentElement;
+
+                            if (facebookLink) facebookLink.href = s.facebook_link || '#';
+                            if (twitterLink) twitterLink.href = s.twitter_link || '#';
+                            if (instagramLink) instagramLink.href = s.instagram_link || '#';
+                            if (youtubeLink) youtubeLink.href = s.youtube_link || '#';
+                        }
+                    }
+                })
+                .catch(err => console.error("Error fetching vendor website config:", err));
+
+            // Rewrite all internal /vendor-site/... hrefs to /vendor/<slug>/...
+            document.querySelectorAll('a[href^="/vendor-site/"]').forEach(el => {
+                const oldHref = el.getAttribute('href');
+                const page = oldHref.replace('/vendor-site/', '');
+                el.setAttribute('href', `/vendor/${slug}/${page}`);
+            });
+        })();
+    </script>
+</body>
+
+</html>
+```

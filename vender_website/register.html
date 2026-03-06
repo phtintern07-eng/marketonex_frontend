@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - VendorVerse</title>
+    <link rel="stylesheet" href="/vendor-site/css/gaming-theme.css">
+    <link rel="stylesheet" href="/vendor-site/css/main.css">
+    <link rel="stylesheet" href="/vendor-site/css/parsley.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 500px;
+            background: var(--bg-card);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-option {
+            flex: 1;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-main);
+            color: var(--text-primary);
+        }
+
+        .role-option.active {
+            border-color: var(--accent);
+            background-color: var(--bg-card);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .form-label {
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            background: var(--bg-main);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Create Account</h1>
+            <p style="color: var(--text-secondary);">Join VendorVerse today</p>
+        </div>
+
+        <div class="role-selector">
+            <div class="role-option active" data-role="customer" onclick="selectRole('customer')">
+                Customer
+            </div>
+            <div class="role-option" data-role="vendor" onclick="selectRole('vendor')">
+                Vendor
+            </div>
+        </div>
+
+        <form id="register-form" data-parsley-validate>
+            <input type="hidden" id="role" value="customer">
+
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="fullname" class="form-input" required data-parsley-trigger="change">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="email" class="form-input" required type="email" data-parsley-trigger="change">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Phone</label>
+                <input type="tel" id="phone" class="form-input" required data-parsley-type="digits"
+                    data-parsley-length="[10, 15]" data-parsley-trigger="change">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="password" class="form-input" required minlength="6"
+                    data-parsley-trigger="change">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Sign Up</button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
+            <p>Already have an account? <a href="/vendor/login.html">Login</a></p>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/parsley.js/2.9.2/parsley.min.js"></script>
+    <script src="/js/theme-switcher.js"></script>
+    <script>
+        function selectRole(role) {
+            document.getElementById('role').value = role;
+            document.querySelectorAll('.role-option').forEach(el => {
+                el.classList.remove('active');
+                if (el.dataset.role === role) el.classList.add('active');
+            });
+        }
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Parsley validation
+            if (!$('#register-form').parsley().isValid()) return;
+
+            const formData = {
+                fullname: document.getElementById('fullname').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                password: document.getElementById('password').value,
+                role: document.getElementById('role').value
+            };
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Registration successful! Please login.');
+                    window.location.href = '/vendor/login.html';
+                } else {
+                    alert(data.error || 'Registration failed');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('An error occurred');
+            }
+        });
+    </script>
+</body>
+
+</html>
