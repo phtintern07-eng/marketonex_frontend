@@ -1,5 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Theme Loader ---
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.body.setAttribute('data-theme', savedTheme);
+
     // --- Constants ---
+    const MAP_API_KEY = 'd6b961e852ba08ddc2f9d888e156b5d0';
     const SHIPPING_THRESHOLD = 5000;
     const SHIPPING_COST = 100;
     const VAT_RATE = 0.05;
@@ -11,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedPaymentMethod = 'upi';
     let isPaymentVerified = false;
     let mapUpdateTimer = null; // Debounce timer
+    let sessionUser = null;   // Populated by checkAuthAndAutofill; used by processOrder
 
     // --- Initialization ---
     checkAuthAndAutofill();
@@ -20,68 +26,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Functions ---
 
-    function checkAuthAndAutofill() {
-        const isLoggedIn = localStorage.getItem('vendorLoggedIn') === 'true';
-
-        if (!isLoggedIn) {
-            // Not logged in - redirect to login page
-            window.location.href = '/vendor/login.html';
-            return;
-        }
-
-        // Auto-fill details if logged in
-        const userName = localStorage.getItem('userName');
-        const userEmail = localStorage.getItem('vendorEmail');
-
-        if (userName) {
-            const nameInput = document.getElementById('fullname');
-            if (nameInput) nameInput.value = userName;
-        }
-
-        if (userEmail) {
-            const emailInput = document.getElementById('email');
-            if (emailInput) emailInput.value = userEmail;
-        }
-    }
-
-    // Helper to get vendor slug from URL
-    function getVendorSlug() {
-        const path = window.location.pathname;
-        const parts = path.split('/');
-        if (parts.length >= 3 && parts[1] === 'vendor') {
-            return parts[2];
-        }
-        return null;
-    }
-
-    async function loadVendorProfile(slug) {
+    async function checkAuthAndAutofill() {
         try {
-            const res = await fetch(`/api/vendors/info/${slug}`);
-            if (!res.ok) return;
-            const vendor = await res.json();
+            // Verify session server-side — don't rely on localStorage flags
+            const res = await fetch('/api/auth/status', { credentials: 'include' });
+            const data = await res.json();
 
-            // Update navigation brand and page title
-            const brands = document.querySelectorAll('.nav-brand');
-            brands.forEach(b => {
-                b.innerHTML = `<i class="fas fa-microchip"></i> ${vendor.business_name || vendor.fullname}`;
-            });
-            document.title = `Checkout - ${vendor.business_name || vendor.fullname}`;
+            if (!res.ok || !data.isAuthenticated) {
+                // Not logged in — redirect to marketonex login
+                sessionStorage.setItem('returnAfterLogin', window.location.href);
+                window.location.href = 'login.html';
+                return;
+            }
+
+            sessionUser = data.user || {};
+
+            // Auto-fill name and email from session data (read-only so user can't accidentally change email)
+            const nameInput = document.getElementById('fullname');
+            const emailInput = document.getElementById('email');
+
+            if (nameInput && (sessionUser.name || sessionUser.fullname)) {
+                nameInput.value = sessionUser.name || sessionUser.fullname || '';
+            }
+            if (emailInput && sessionUser.email) {
+                emailInput.value = sessionUser.email;
+                emailInput.setAttribute('readonly', 'readonly'); // prevent accidental email mismatch
+            }
         } catch (err) {
-            console.error('Failed to load vendor profile:', err);
+            console.warn('[Checkout] Auth check failed, assuming guest mode', err);
         }
     }
 
     function loadCart() {
-        const slug = getVendorSlug();
-        if (slug) loadVendorProfile(slug);
-
-        const cartKey = slug ? `vendor_cart_${slug}` : 'vendor_cart';
-        const savedCart = localStorage.getItem(cartKey);
+        const savedCart = localStorage.getItem('marketonex_cart');
         cart = savedCart ? JSON.parse(savedCart) : [];
 
         if (cart.length === 0) {
-            const redirectUrl = slug ? `/vendor/${slug}/cart.html` : '/vendor-site/cart.html';
-            window.location.href = redirectUrl;
+            window.location.href = 'cart.html';
             return;
         }
         renderOrderSummary();
@@ -91,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('checkout-items');
         container.innerHTML = cart.map((item) => `
             <div class="checkout-item">
-                <img src="${item.image || 'https://picsum.photos/400/400?random=' + Math.random()}" alt="${item.name}">
+                <img src="${item.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQgc2xpY2UiIGZvY3VzYWJsZT0iZmFsc2UiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iUGxhY2Vob2xkZXIiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNlZWUiPjwvcmVjdD48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZmlsbD0iI2FhYSIgZHk9Ii4zZW0iIHN0eWxlPSJmb250LWZhbWlseTpBcmlhbDtmb250LXNpemU6MTBweDt0ZXh0LWFuY2hvcjptaWRkbGUiPk5vPC90ZXh0Pjwvc3ZnPg=='}" alt="${item.name}">
                 <div class="checkout-item-details">
                     <h4>${item.name}</h4>
                     <p>Qty: ${item.quantity} × ₹${item.price}</p>
@@ -123,12 +104,22 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('summary-tax').textContent = `₹${vat.toFixed(2)}`;
         document.getElementById('summary-shipping').textContent = shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`;
         document.getElementById('summary-total').textContent = `₹${Math.max(0, total).toFixed(2)}`;
+
+        if (discount > 0) {
+            // Check if discount row already exists to avoid dupes
+            if (!document.getElementById('discount-row-display')) {
+                const discountRow = document.createElement('div');
+                discountRow.id = 'discount-row-display';
+                discountRow.className = 'row';
+                discountRow.style.color = 'var(--primary-color)';
+                discountRow.innerHTML = `<span>Discount</span><span>-₹${discount.toFixed(2)}</span>`;
+                const totalRow = container.parentElement.querySelector('.total-row');
+                totalRow.parentNode.insertBefore(discountRow, totalRow);
+            }
+        }
     }
 
     function initMap() {
-        if (!document.getElementById('map')) return;
-
-        // Default to India center
         map = L.map('map').setView([20.5937, 78.9629], 5);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -163,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (area.length < 3 || city.length < 3) return;
 
         const query = `${area}, ${city}, ${state || ''}, ${pincode || ''}, India`;
+        console.log("Geocoding Query:", query);
 
         try {
             const baseUrl = window.API_BASE_URL || '';
@@ -219,6 +211,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Reset manual entry requirement
         unlockAddressFields();
 
+        // Best effort mapping logic
+        // Nominatim fields: house_number, road, neighbourhood, suburb, city, state, postcode
+
         houseInput.value = addr.house_number || '';
         buildingInput.value = addr.building || '';
 
@@ -238,6 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function unlockAddressFields() {
+        // Remove readonly if it was set (though we removed it in HTML for this task, good safety)
         document.getElementById('house-no').removeAttribute('readonly');
         document.getElementById('building').removeAttribute('readonly');
         document.getElementById('area').removeAttribute('readonly');
@@ -248,53 +244,105 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupEventListeners() {
         // Locate Me
-        const locateBtn = document.getElementById('locate-me-btn');
-        if (locateBtn) {
-            locateBtn.addEventListener('click', () => {
-                if (!navigator.geolocation) {
-                    alert('Geolocation is not supported by your browser');
-                    return;
-                }
+        document.getElementById('locate-me-btn').addEventListener('click', () => {
+            const btn = document.getElementById('locate-me-btn');
 
-                locateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
+            console.log('[GEOLOCATION] Button clicked');
+            console.log('[GEOLOCATION] navigator.geolocation available:', !!navigator.geolocation);
+            console.log('[GEOLOCATION] Current protocol:', window.location.protocol);
+            console.log('[GEOLOCATION] Is secure context:', window.isSecureContext);
 
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const latlng = { lat: position.coords.latitude, lng: position.coords.longitude };
-                        handleMapClick(latlng);
-                        locateBtn.innerHTML = '<i class="fas fa-check"></i> Location Found';
-                        setTimeout(() => {
-                            locateBtn.innerHTML = '<i class="fas fa-crosshairs"></i> Use My Current Location';
-                        }, 2000);
-                    },
-                    (error) => {
-                        console.warn('Geolocation failed:', error);
-                        alert('Could not get your location. Please enter manually.');
-                        locateBtn.innerHTML = '<i class="fas fa-crosshairs"></i> Use My Current Location';
-                        unlockAddressFields();
-                    },
-                    { enableHighAccuracy: true, timeout: 10000 }
-                );
-            });
-        }
+            if (!navigator.geolocation) {
+                console.error('[GEOLOCATION] Geolocation API not supported by browser');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-times"></i> Geo Not Supported';
+                btn.classList.add('btn-error');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('btn-error');
+                }, 2000);
+                return;
+            }
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
+            console.log('[GEOLOCATION] Requesting current position...');
+
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            };
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    console.log('[GEOLOCATION] ✅ Success! Position:', position);
+                    console.log('[GEOLOCATION] Latitude:', position.coords.latitude);
+                    console.log('[GEOLOCATION] Longitude:', position.coords.longitude);
+                    console.log('[GEOLOCATION] Accuracy:', position.coords.accuracy, 'meters');
+
+                    const latlng = { lat: position.coords.latitude, lng: position.coords.longitude };
+                    handleMapClick(latlng);
+                    btn.innerHTML = '<i class="fas fa-check"></i> Location Found';
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fas fa-crosshairs"></i> Use My Current Location';
+                    }, 2000);
+                },
+                (error) => {
+                    console.warn('[GEOLOCATION] Geolocation request status:', error.code, error.message);
+
+                    // Detailed error handling
+                    let errorMsg = '';
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMsg = 'Location access denied by user';
+                            console.info('[GEOLOCATION] User denied the request for Geolocation.');
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMsg = 'Location information unavailable';
+                            console.warn('[GEOLOCATION] Location information is unavailable.');
+                            break;
+                        case error.TIMEOUT:
+                            errorMsg = 'Geolocation request timed out';
+                            console.warn('[GEOLOCATION] The request to get user location timed out.');
+                            break;
+                        default:
+                            errorMsg = 'An unknown geolocation error occurred';
+                            console.warn('[GEOLOCATION] An unknown error occurred.');
+                            break;
+                    }
+
+                    console.info('[GEOLOCATION] Falling back to manual entry');
+                    unlockAddressFields(); // Enable manual entry
+                    document.getElementById('house-no').focus(); // Auto-focus first field
+
+                    btn.innerHTML = '<i class="fas fa-keyboard"></i> Enter Details Manually';
+                    btn.classList.add('btn-warning'); // Use warning style instead of error
+
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fas fa-crosshairs"></i> Use My Current Location';
+                        btn.classList.remove('btn-warning');
+                    }, 4000);
+                },
+                options
+            );
+        });
 
         // Strict Mobile Validation (10 digits only)
         const mobileInput = document.getElementById('mobile');
         mobileInput.addEventListener('input', (e) => {
+            // Remove non-numeric
             e.target.value = e.target.value.replace(/[^0-9]/g, '');
+            // Limit to 10
             if (e.target.value.length > 10) e.target.value = e.target.value.slice(0, 10);
         });
 
         // Map Sync: Address Input -> Map (Debounced)
         const addressInputs = ['area', 'city', 'state', 'pincode'];
         addressInputs.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.addEventListener('input', () => {
-                    clearTimeout(mapUpdateTimer);
-                    mapUpdateTimer = setTimeout(updateMapFromAddress, 1500);
-                });
-            }
+            document.getElementById(id).addEventListener('input', () => {
+                clearTimeout(mapUpdateTimer);
+                mapUpdateTimer = setTimeout(updateMapFromAddress, 1500); // Wait 1.5s after typing stops
+            });
         });
 
         // Payment Toggle
@@ -332,19 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             if (validateForm()) processOrder();
         });
-
-        // Continue Shopping (Modal)
-        const finishBtn = document.getElementById('finish-btn');
-        if (finishBtn) {
-            finishBtn.addEventListener('click', () => {
-                const slug = getVendorSlug();
-                if (slug) {
-                    window.location.href = `/vendor/${slug}/orders.html`;
-                } else {
-                    window.location.href = '/vendor-site/orders.html';
-                }
-            });
-        }
     }
 
     function validateForm() {
@@ -407,14 +442,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const total = subtotal + vat + shipping - discount;
 
-            // Create Order Object
-            const orderId = 'ORD-' + Date.now() + Math.floor(Math.random() * 1000);
-            const orderDate = new Date().toISOString();
-
-            const newOrder = {
-                order_id: orderId,
-                created_at: orderDate,
-                status: 'pending', // Default status
+            // Map frontend field names to backend expected names
+            const orderData = {
                 fullname: document.getElementById('fullname').value,
                 email: document.getElementById('email').value,
                 mobile: document.getElementById('mobile').value,
@@ -427,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 pincode: document.getElementById('pincode').value,
                 payment_method: selectedPaymentMethod,
                 payment_id: selectedPaymentMethod === 'upi' ? document.getElementById('upi-id').value :
-                    (selectedPaymentMethod === 'card' ? 'CARD-' + Date.now() : 'COD'),
+                    (selectedPaymentMethod === 'card' ? document.getElementById('card-number').value : 'COD'),
                 subtotal: subtotal,
                 tax: vat,
                 shipping: shipping,
@@ -438,56 +467,65 @@ document.addEventListener('DOMContentLoaded', () => {
                     product_name: item.name,
                     quantity: item.quantity,
                     price: item.price,
-                    image: item.image || '',
                     vendor_id: item.vendor_id || 'unknown'
                 }))
             };
 
-            // Simulating network delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            console.log('Sending order to backend:', orderData);
 
-            // --- BACKEND API CALL ---
-            const apiResponse = await fetch('/api/orders', {
+            // Call backend API
+            const baseUrl = window.API_BASE_URL || '';
+            const response = await fetch(`${baseUrl}/api/orders`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify({
-                    ...newOrder,
-                    order_source: 'vendor_site'
-                })
+                body: JSON.stringify(orderData)
             });
 
-            if (!apiResponse.ok) {
-                const errorData = await apiResponse.json();
-                throw new Error(errorData.error || 'Server error');
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Failed to create order');
             }
 
-            const apiResult = await apiResponse.json();
-            const createdOrder = apiResult.order;
-            console.log('Order created on backend:', createdOrder.order_id);
+            console.log('Order created successfully:', result);
+
+            // --- UNIFIED ORDER SYNC: Save to localStorage ---
+            try {
+                const allOrders = JSON.parse(localStorage.getItem('allOrders') || '[]');
+
+                // Add unique order details for dashboard rendering
+                const unifiedOrder = {
+                    ...orderData,
+                    order_id: result.order.order_id,
+                    created_at: new Date().toISOString(),
+                    status: 'pending'
+                };
+
+                allOrders.unshift(unifiedOrder);
+                localStorage.setItem('allOrders', JSON.stringify(allOrders));
+                console.log('Order synced to unified storage:', result.order.order_id);
+            } catch (e) {
+                console.warn('Failed to save order to unified storage', e);
+            }
 
             // Clear cart
-            const slug = getVendorSlug();
-            const cartKey = slug ? `vendor_cart_${slug}` : 'vendor_cart';
-            localStorage.removeItem(cartKey);
+            localStorage.removeItem('marketonex_cart');
             localStorage.removeItem('appliedCoupon');
 
-            // Success - Show Modal
-            overlay.classList.add('hidden');
+            if (typeof window.updateCartBadge === 'function') {
+                window.updateCartBadge();
+            }
 
-            // Update Modal Content
-            document.getElementById('success-order-id').textContent = '#' + createdOrder.order_id;
-            document.getElementById('success-pay-id').textContent = createdOrder.payment_id;
-
-            const successOverlay = document.getElementById('order-success-overlay');
-            successOverlay.classList.remove('hidden');
+            // Redirect to confirmation page
+            window.location.href = `order-confirmation.html?orderId=${result.order.order_id}&payId=${orderData.payment_id}`;
 
         } catch (error) {
             console.error('Error creating order:', error);
             overlay.classList.add('hidden');
-            alert('Failed to place order: ' + error.message);
+            alert('Failed to place order: ' + error.message + '\n\nPlease try again or contact support.');
         }
     }
 });

@@ -4,71 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - VendorVerse</title>
-    <!-- Core Vendor Site CSS -->
-    <link rel="stylesheet" href="/vendor-site/css/gaming-theme.css">
-    <link rel="stylesheet" href="/vendor-site/css/main.css">
-
-    <!-- Profile Dropdown CSS -->
-    <link rel="stylesheet" href="/vendor-site/css/vendor-profile.css">
-
-    <!-- Checkout CSS (Replicated from Marketonex) -->
-    <link rel="stylesheet" href="/vendor-site/css/checkout.css">
-
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Checkout - Marketonex</title>
+    <link rel="stylesheet" href="css/checkout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Leaflet CSS for Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 </head>
 
-<body class="checkout-page">
-    <!-- 1. Navbar -->
-    <nav class="gaming-nav">
-        <div class="container-gaming" style="display: flex; justify-content: space-between; width: 100%;">
-            <!-- Left: Logo -->
-            <a href="/"
-                style="color: var(--text-main); font-weight: 800; font-size: 1.5rem; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; z-index: 10;">
-                <i class="fas fa-microchip" style="color: var(--accent);"></i> VENDORVERSE
-            </a>
-
-            <!-- Middle: Nav Links (Desktop Only) -->
-            <div class="nav-links" style="display: flex; align-items: center;">
-                <a href="/">Home</a>
-                <a href="/vendor-site/vendor_pc_builder.html">PC Builder</a>
-                <a href="/vendor-site/products.html">Shop</a>
-                <a href="/vendor-site/orders.html">Orders</a>
-                <a href="/" class="btn-gaming-outline"
-                    style="padding: 0.5rem 1rem; font-size: 0.8rem; margin-left: 0.5rem; text-decoration: none; color: var(--text-main); border: 1px solid var(--text-main);">
-                    <i class="fas fa-arrow-left"></i> Back
-                </a>
-            </div>
-
-            <!-- Right: Actions Group -->
-            <div class="nav-actions-group" style="display: flex; align-items: center; gap: 0.75rem;">
-                <!-- 🎨 Theme Switcher -->
-                <button id="customer-theme-toggle" class="nav-action-btn" aria-label="Toggle Theme">
-                    <i class="fas fa-palette"></i>
-                </button>
-
-                <!-- 🛒 Cart Button -->
-                <a href="/vendor-site/cart.html" class="nav-action-btn" aria-label="Cart">
-                    <i class="fas fa-shopping-cart"></i>
-                </a>
-            </div>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="logo">Checkout</h1>
+            <a href="cart.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Cart</a>
         </div>
-    </nav>
+    </header>
 
-    <div class="container" style="margin-top: 2rem; color: var(--text-primary);">
-        <a href="/vendor-site/cart.html" class="back-link"
-            style="display: inline-flex; align-items: center; gap: 0.5rem; color: var(--accent); text-decoration: none; margin-bottom: 1rem; font-weight: 500;"><i
-                class="fas fa-arrow-left"></i> Back to Cart</a>
-        <h1
-            style="margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; color: var(--text-primary);">
-            Checkout</h1>
-    </div>
-
-    <!-- Main Checkout Container -->
-    <main class="checkout-container" style="margin-top: 0;">
+    <main class="checkout-container">
         <form id="checkout-form" class="checkout-layout">
             <!-- LEFT COLUMN: Forms -->
             <div class="checkout-left">
@@ -124,15 +76,15 @@
                         </div>
                         <div class="form-group">
                             <label for="city">City</label>
-                            <input type="text" id="city" name="city" required>
+                            <input type="text" id="city" name="city" required readonly>
                         </div>
                         <div class="form-group">
                             <label for="state">State</label>
-                            <input type="text" id="state" name="state" required>
+                            <input type="text" id="state" name="state" required readonly>
                         </div>
                         <div class="form-group">
                             <label for="pincode">Pincode</label>
-                            <input type="text" id="pincode" name="pincode" required>
+                            <input type="text" id="pincode" name="pincode" required readonly>
                         </div>
                     </div>
                 </section>
@@ -271,12 +223,9 @@
             </div>
             <h2>Order Placed Successfully!</h2>
             <p>Thank you for your purchase.</p>
-            <div class="order-details-mini"
-                style="margin: 1.5rem 0; background: var(--background-color); padding: 1rem; border-radius: 8px; text-align: left;">
-                <p style="margin: 0.5rem 0;">Order ID: <span id="success-order-id"
-                        style="font-weight: 700; color: var(--primary-color);">#ORD-12345</span></p>
-                <p style="margin: 0.5rem 0;">Payment ID: <span id="success-pay-id"
-                        style="font-weight: 700;">PAY-98765</span></p>
+            <div class="order-details-mini">
+                <p>Order ID: <span id="success-order-id">#ORD-12345</span></p>
+                <p>Payment ID: <span id="success-pay-id">PAY-98765</span></p>
             </div>
             <button id="finish-btn" class="primary-btn">Continue Shopping</button>
         </div>
@@ -285,11 +234,8 @@
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-    <!-- Scripts -->
-    <script src="/vendor-site/js/theme-switcher.js"></script>
-    <script src="/vendor-site/js/vendor-profile.js"></script>
-    <script src="/vendor-site/js/checkout.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/checkout.js"></script>
 </body>
 
 </html>

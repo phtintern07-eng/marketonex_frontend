@@ -890,7 +890,7 @@
         // ── Load product ──────────────────────────────────────────────────────
         async function loadProduct() {
             try {
-                const res = await fetch(`/api/marketplace/products/${productId}`);
+                const res = await fetch(`/api/marketonex/products/${productId}`);
                 if (!res.ok) throw new Error('Product not found');
 
                 const envelope = await res.json();

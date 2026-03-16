@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Handle vendor-only error
                     const errCode = response.error || response.code || '';
                     if (errCode === 'not_a_vendor') {
-                        alert('This login portal is for Vendors only. Please use the Marketplace login instead.');
+                        alert('This login portal is for Vendors only. Please use the Marketonex login instead.');
                     } else if (errCode === 'email_not_verified') {
                         alert('Please verify your email address before logging in.\n\nGo to the Signup page, enter your email, and click "Send Verification" to get a new verification link.');
                         window.location.href = 'signup.html';

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - Marketonex</title>
+    <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="logo">Shopping Cart</h1>
+            <div class="actions">
+                <div class="theme-toggle">
+                    <button id="theme-toggle-btn" aria-label="Toggle theme">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                    <div id="theme-dropdown" class="dropdown-menu hidden">
+                        <button data-theme="light">Light</button>
+                        <button data-theme="dark">Dark</button>
+                        <button data-theme="brown">Brown</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="cart-container">
+        <div class="cart-content">
+            <!-- Product List Section -->
+            <div class="cart-products-section">
+                <div class="section-header">
+                    <h2>Product</h2>
+                    <h2 class="total-header">Total</h2>
+                </div>
+
+                <div id="cart-items-container" class="cart-items">
+                    <!-- Cart items will be dynamically inserted here -->
+                </div>
+
+                <div id="empty-cart-message" class="empty-cart hidden">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Your cart is empty</h3>
+                    <p>Add some products to get started!</p>
+                </div>
+
+                <div class="cart-footer">
+                    <p class="help-text">Need help? Check our <a href="#">help and support</a> or <a href="#">contact
+                            us</a></p>
+                    <button id="back-to-shopping" class="back-btn">
+                        <i class="fas fa-arrow-left"></i> Go back to shopping
+                    </button>
+                </div>
+            </div>
+
+            <!-- Order Summary Panel -->
+            <div class="order-summary-panel">
+                <div class="order-summary-sticky">
+                    <h2>Order Summary</h2>
+
+                    <div class="summary-details">
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="subtotal-amount">₹0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>V.A.T</span>
+                            <span id="vat-amount">₹0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Shipping</span>
+                            <span id="shipping-amount">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="coupon-section">
+                        <button id="coupon-toggle" class="coupon-toggle">
+                            <span>Add a coupon</span>
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <div id="coupon-form" class="coupon-form">
+                            <input type="text" id="coupon-input" placeholder="Enter your code">
+                            <button id="apply-coupon-btn" class="apply-coupon-btn">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        <div id="coupon-message" class="coupon-message hidden"></div>
+                        <div id="applied-discount" class="summary-row discount-row hidden">
+                            <span>Discount (<span id="discount-code"></span>)</span>
+                            <span id="discount-amount">-₹0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span id="total-amount">₹0.00</span>
+                    </div>
+
+                    <button id="checkout-btn" class="checkout-btn">
+                        Proceed to checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="toast-notification hidden">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="js/cart.js"></script>
+</body>
+
+</html>

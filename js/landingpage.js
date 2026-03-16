@@ -7,16 +7,16 @@ document.addEventListener('DOMContentLoaded', () => {
     categoryCards.forEach(card => {
         card.addEventListener('click', () => {
             const category = card.getAttribute('data-category');
-            // Navigate to marketplace with category filter
-            window.location.href = `marketplace/marketplace.html?category=${category}`;
-        });
+            // Navigate to marketonex with category filter
+            window.location.href = `marketonex/marketonex.html?category=${category}`;
+        });?
     });
 
     // Cart icon click handlers
     const cartIcons = document.querySelectorAll('.cart-icon');
     cartIcons.forEach(icon => {
         icon.addEventListener('click', () => {
-            window.location.href = 'marketplace/cart.html';
+            window.location.href = 'marketonex/cart.html';
         });
     });
 
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const cartCountElements = document.querySelectorAll('.cart-count');
 
         // Get cart from localStorage
-        const cart = JSON.parse(localStorage.getItem('marketplace_cart') || '[]');
+        const cart = JSON.parse(localStorage.getItem('marketonex_cart') || '[]');
         const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
         cartCountElements.forEach(el => {
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen for storage changes (when cart is updated in another tab/window)
     window.addEventListener('storage', (e) => {
-        if (e.key === 'marketplace_cart') {
+        if (e.key === 'marketonex_cart') {
             updateCartCount();
         }
     });
@@ -62,10 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (searchBar) {
             const searchQuery = searchBar.value.trim();
             if (searchQuery) {
-                window.location.href = `marketplace/marketplace.html?search=${encodeURIComponent(searchQuery)}`;
+                window.location.href = `marketonex/marketonex.html?search=${encodeURIComponent(searchQuery)}`;
             } else {
-                // If empty, just navigate to marketplace
-                window.location.href = 'marketplace/marketplace.html';
+                // If empty, just navigate to marketonex
+                window.location.href = 'marketonex/marketonex.html';
             }
         }
     }

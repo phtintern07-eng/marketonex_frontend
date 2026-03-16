@@ -1,4 +1,6 @@
-const API_URL = window.location.protocol === 'file:' ? 'http://127.0.0.1:5000' : '';
+const API_BASE_URL = window.location.protocol === 'file:' ? 'http://127.0.0.1:5000' : '';
+window.API_BASE_URL = API_BASE_URL;
+const API_URL = API_BASE_URL;
 
 class ApiService {
     static async request(endpoint, method = 'GET', data = null) {
@@ -8,7 +10,7 @@ class ApiService {
             credentials: 'include'
         };
 
-        // Only set Content-Type header if we have data to send
+        // Only set Content-Type header if we're sending data
         if (data) {
             options.headers['Content-Type'] = 'application/json';
             options.body = JSON.stringify(data);
@@ -18,30 +20,35 @@ class ApiService {
             // Ensure endpoint starts with /
             const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
             const response = await fetch(`${API_URL}/api${path}`, options);
-            const result = await response.json();
+
+            // Try to parse JSON response
+            let result;
+            try {
+                result = await response.json();
+            } catch (jsonError) {
+                // If JSON parsing fails, get text response for debugging
+                const textResponse = await response.text();
+                console.error(`Failed to parse JSON response from ${endpoint}:`, textResponse);
+                throw new Error(`Invalid JSON response: ${textResponse.substring(0, 100)}`);
+            }
 
             if (!response.ok) {
                 if (response.status === 401) {
                     localStorage.removeItem('vendorLoggedIn');
                     localStorage.removeItem('vendorEmail');
                 }
-                // Attach full response data so callers can inspect error codes
-                const err = new Error(result.error || result.message || 'Something went wrong');
-                err.responseData = result;
-                err.status = response.status;
-                throw err;
+                throw new Error(result.error || result.message || 'Something went wrong');
             }
-            if (typeof hideLoading === 'function') hideLoading();
             return result;
         } catch (error) {
-            if (typeof showError === 'function') showError(error.message);
+            console.error(`API Error [${method} ${endpoint}]:`, error);
             throw error;
         }
     }
 
     static async get(endpoint) { return this.request(endpoint, 'GET'); }
     static async post(endpoint, data) { return this.request(endpoint, 'POST', data); }
-    static async put(endpoint, data) { return this.request(endpoint, 'PUT', data); }
+    static async put(endpoint, data) { return this.request(endpoint, 'PUT', data, 'PUT'); }
     static async delete(endpoint) { return this.request(endpoint, 'DELETE'); }
 
     static async upload(endpoint, file) {
@@ -80,141 +87,111 @@ async function checkAuth() {
             if (currentUser && currentUser.email) {
                 localStorage.setItem('vendorEmail', currentUser.email);
             }
-            if (currentUser && (currentUser.id || currentUser.user_id)) {
-                localStorage.setItem('vendorId', currentUser.id || currentUser.user_id);
-            }
-
-            // Redirect unverified vendors to pending page if they are on protected pages
-            // STRICT ROLE CHECK: If logged in but NOT a vendor, redirect to vendor login
-            if (currentUser.role !== 'vendor') {
-                // Allow non-vendors to stay on the login or signup page if they want to switch roles/register
-                const isAuthPage = path.includes('loginvender.html') || path.includes('signup.html');
-                if (!isAuthPage) {
-                    window.location.href = '../marketonex/marketonex.html';
-                    return;
-                }
-            }
-
-            if (currentUser.role === 'vendor') {
-                // Stage 0: Email Verification Check
-                // Note: We check !== true because it might be 0 or false
-                if (currentUser.email_verified !== true && currentUser.email_verified !== 1) {
-                    if (!path.endsWith('signup.html')) {
-                        window.location.href = 'signup.html';
-                        return;
-                    }
-                }
-
-                // Stage 1: Admin approval check (existing logic)
-                if (!currentUser.verified || currentUser.verified === 'false' || currentUser.verified === 0) {
-                    const verificationPages = ['signup.html', 'verification.html', 'verification_biz_verification_website_editor.html', 'vender_profile_products_add-product.html', 'loginvender.html'];
-                    const isAllowedPage = verificationPages.some(page => path.endsWith(page));
-
-                    if (!isAllowedPage) {
-                        window.location.href = 'verification.html?msg=restricted';
-                        return;
-                    }
-
-                    // Specific logic for unverified vendors on allowed pages (e.g. sidebar restrictions)
-                    restrictUnverifiedSidebar();
-                } else {
-                    // Stage 2: KYC / account_status check
-                    // If email is verified but KYC not yet approved, restrict products/orders/insights
-                    const accountStatus = currentUser.account_status;
-                    const kycStatus = currentUser.kyc_status;
-
-                    if (accountStatus && accountStatus !== 'active') {
-                        // Pages that require full KYC approval
-                        const restrictedPages = ['products.html', 'orders.html', 'insights.html'];
-                        const isRestricted = restrictedPages.some(page => path.endsWith(page));
-
-                        if (isRestricted) {
-                            let redirectTarget = 'verification.html';
-                            // KYC pending stays on verification page for status info
-                            window.location.href = redirectTarget + '?msg=kyc_required';
-                            return;
-                        }
-
-                        // Apply sidebar restrictions for limited-mode vendors
-                        restrictUnverifiedSidebar();
-                    }
-                }
-            }
-
             updateUIWithUser(currentUser);
-
-            // Load products ONLY if verified and on products page
-            if (path.includes('products.html') || path.includes('vender_profile_products_add-product.html') || path.includes('orders_feedback_insights_settings_user-info_reviews.html')) {
-                if (currentUser.role === 'vendor' && currentUser.verified) {
-                    if (typeof window.loadProducts === 'function') {
-                        window.loadProducts();
-                    }
-                }
-            }
         } else {
             // Backend says not authenticated - clear local flags
             localStorage.removeItem('vendorLoggedIn');
             localStorage.removeItem('vendorEmail');
-            localStorage.removeItem('products'); // Clear cached products on logout/auth fail
 
-            // Skip redirect for public pages (login/signup/landing)
-            if (path.includes('login.html') || path.includes('loginvender.html') || path.includes('signup.html') || path.includes('landingpage.html')) return;
+            // Skip redirect for public pages (login/signup/index/landing)
+            const isPublicPage = path.includes('login.html') ||
+                path.includes('signup.html') ||
+                path.includes('landingpage.html') ||
+                path.endsWith('/') ||
+                path.endsWith('index.html');
+
+            if (isPublicPage) return;
 
             // Protected Routes
-            const protectedPages = ['vender_profile_products_add-product.html', 'profile.html', 'orders_feedback_insights_settings_user-info_reviews.html', 'settings.html', 'user-info.html', 'verification_biz_verification_website_editor.html'];
+            const protectedPages = [
+                'marketonex.html',
+                'checkout.html',
+                'account-settings.html',
+                'my-orders.html',
+                'my-stuff.html',
+                'payments.html',
+                'track-order.html',
+                'add_product_marketonex.html'
+            ];
             const isProtected = protectedPages.some(page => path.endsWith(page));
 
             if (isProtected) {
-                window.location.href = 'loginvender.html';
+                console.warn('[Auth Check] Redirecting to login.html');
+                window.location.href = 'login.html';
             }
         }
     } catch (e) {
+        console.error('Auth check failed:', e);
     }
 }
 
 function updateUIWithUser(user) {
     if (!user) return;
-    // 1. Handle Profile Image & Initials
+    // 1. Common Elements (Sidebar/TopBar avatars if any)
     const avatars = document.querySelectorAll('.user-avatar img, .profile-img');
-    const avatarContainers = document.querySelectorAll('.user-avatar, .profile-img-container'); // Adjust selectors as needed
-
-    const hasImage = user.profile_picture && !user.profile_picture.includes('default') && user.profile_picture !== '';
     const timestamp = new Date().getTime();
+    const hasImage = user.profile_picture && !user.profile_picture.includes('default') && user.profile_picture !== '';
 
-    // Update Image Elements
     avatars.forEach(img => {
         if (hasImage) {
-            // Backend now sends /static/images/..., allowing full path usage
-            const src = user.profile_picture.startsWith('http')
+            img.src = user.profile_picture.startsWith('http')
                 ? user.profile_picture
-                : `${user.profile_picture}?t=${timestamp}`; // Add cache buster
-            img.src = src;
-            img.style.display = 'block';
-            // Hide initials if they exist as a sibling/parent logic (implementation depends on HTML structure)
-        } else {
-            // If no image, maybe hide img or show default
-            // For now, let's assume we keep the img tag but maybe set a default placeholder if needed
-            // or rely on initials elsewhere.
+                : `${user.profile_picture}?t=${timestamp}`;
         }
     });
 
-    // Update Initials (if elements exist)
-    const initialsEls = document.querySelectorAll('.profile-initials, .user-initials');
-    if (initialsEls.length > 0) {
-        const initials = getInitials(user.full_name || user.email);
-        initialsEls.forEach(el => {
-            el.textContent = initials;
-            // Toggle visibility: Show initials if NO image, Hide if HAS image
-            el.style.display = hasImage ? 'none' : 'flex';
-        });
+    // 2. Marketonex Header Profile Elements
+    const profileAvatar = document.getElementById('profile-avatar');
+    const profileInitials = document.getElementById('profile-initials');
+    const dropdownAvatar = document.getElementById('dropdown-avatar');
+    const profileName = document.getElementById('profile-name');
 
-        // Also toggle avatar images visibility inversely
-        avatars.forEach(img => {
-            img.style.display = hasImage ? 'block' : 'none';
-        });
+    // Initials Generation
+    const initials = getInitials(user.full_name || user.name || user.email);
+
+    // Update Header Avatar/Initials
+    if (profileAvatar && profileInitials) {
+        if (hasImage) {
+            const src = user.profile_picture.startsWith('http')
+                ? user.profile_picture
+                : `${user.profile_picture}?t=${timestamp}`;
+            profileAvatar.src = src;
+            profileAvatar.classList.remove('hidden');
+            profileAvatar.style.display = 'block';
+
+            profileInitials.classList.add('hidden');
+            profileInitials.style.display = 'none';
+        } else {
+            profileAvatar.classList.add('hidden');
+            profileAvatar.style.display = 'none';
+
+            profileInitials.textContent = initials;
+            profileInitials.classList.remove('hidden');
+            profileInitials.style.display = 'flex';
+        }
     }
 
-    // 2. Update Text Fields
+    // Update Dropdown Avatar
+    if (dropdownAvatar) {
+        if (hasImage) {
+            const src = user.profile_picture.startsWith('http')
+                ? user.profile_picture
+                : `${user.profile_picture}?t=${timestamp}`;
+            dropdownAvatar.src = src;
+            dropdownAvatar.style.display = 'block';
+        } else {
+            // Option: Show default avatar or reuse initials logic if dropdown supports it
+            // For now, hiding image if no custom picture
+            dropdownAvatar.style.display = 'none';
+        }
+    }
+
+    // Update Profile Name
+    if (profileName) {
+        profileName.textContent = user.full_name || user.name || user.email;
+    }
+
+    // 3. Update Profile Page Fields (if on settings page)
     if (document.getElementById('u-name')) {
         document.getElementById('u-name').value = user.full_name || '';
         document.getElementById('u-email').value = user.email || '';
@@ -226,172 +203,11 @@ function updateUIWithUser(user) {
         if (user.gender) document.getElementById('u-gender').value = user.gender;
     }
 
-    // 3. Update Dashboard/Profile Sidebar Text
-    const profileName = document.querySelector('.profile-info h2');
-    const profileEmail = document.querySelector('.profile-info p');
-    if (profileName) profileName.textContent = user.full_name || user.name || user.email;
-    if (profileEmail) profileEmail.textContent = user.email;
-
-    // 4. Update Business Details (Vendor Profile Specific)
-    const bizNameEl = document.getElementById('profileBusinessName');
-    if (bizNameEl) {
-        bizNameEl.textContent = user.business_name || 'My Store';
-    }
-
-    const bizStatusBadge = document.getElementById('profileBizStatusBadge');
-    if (bizStatusBadge && user.biz_verification_status) {
-        const status = user.biz_verification_status.toLowerCase();
-        bizStatusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-        bizStatusBadge.className = `status-badge ${status}`;
-
-        // Always check for business verification details on the profile page
-        // to show any remaining rejected documents even if status is pending
-        if (window.location.pathname.includes('vender_profile_products_add-product.html')) {
-            loadBusinessVerificationDetails();
-            loadVendorReviews();
-            loadBankDetails();
-        }
-    }
-}
-
-async function loadBankDetails() {
-    try {
-        const res = await ApiService.get('/vendor/bank/status');
-        let data = res;
-
-        // If not found in new table, try settings (legacy fallback)
-        if (!data || data.status === 'not_submitted') {
-            const settingsRes = await ApiService.get('/vendor/settings');
-            if (settingsRes.settings) {
-                data = {
-                    bank_name: settingsRes.settings.bank_name,
-                    ifsc_code: settingsRes.settings.ifsc_code,
-                    account_number: settingsRes.settings.account_number,
-                    verification_status: 'not_submitted'
-                };
-            } else {
-                return;
-            }
-        }
-
-        const bankNameEl = document.getElementById('displayBankName');
-        const ifscEl = document.getElementById('displayIFSC');
-        const accNumEl = document.getElementById('displayAccountNumber');
-        const statusBadge = document.getElementById('bankStatusBadge');
-
-        if (bankNameEl) bankNameEl.textContent = data.bank_name || 'Not Linked';
-        if (ifscEl) ifscEl.textContent = data.ifsc_code || 'Not Linked';
-        if (accNumEl) {
-            if (data.account_number) {
-                const acc = data.account_number;
-                accNumEl.textContent = acc.length > 4 ? 'XXXX-XXXX-' + acc.slice(-4) : acc;
-            } else {
-                accNumEl.textContent = 'Not Linked';
-            }
-        }
-
-        if (statusBadge) {
-            const status = data.verification_status || 'not_submitted';
-            statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-            statusBadge.className = `status-badge ${status}`;
-            statusBadge.style.display = 'inline-block';
-
-            // Premium styling for the badge if it's missing specific colors
-            if (status === 'pending') statusBadge.style.backgroundColor = '#f59e0b';
-            if (status === 'approved') statusBadge.style.backgroundColor = '#10b981';
-            if (status === 'rejected') statusBadge.style.backgroundColor = '#ef4444';
-            if (status === 'not_submitted') statusBadge.style.backgroundColor = '#6b7280';
-            statusBadge.style.color = 'white';
-        }
-    } catch (err) {
-    }
-}
-
-async function loadBusinessVerificationDetails() {
-    try {
-        const container = document.getElementById('rejectedDocumentsContainer');
-        if (!container) return;
-
-        const res = await ApiService.get('/vendor/biz-verification/status');
-        const data = res.data;
-        if (!data || !data.rejection_reason) return;
-
-        // Count how many items are actually rejected (not REUPLOADED)
-        const lines = data.rejection_reason.split('\n');
-        const rejectedLines = lines.filter(l => l.includes(']:') && !l.includes('REUPLOADED'));
-
-        if (rejectedLines.length === 0) return;
-
-        container.style.display = 'block';
-        container.innerHTML = `
-            <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.1); border-radius: 12px; padding: 1.25rem;">
-                <h4 style="color: #ef4444; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <span>Rejected Documents</span>
-                </h4>
-                <div id="rejectedList" style="display: flex; flex-direction: column; gap: 0.75rem;"></div>
-                <div style="margin-top: 1.25rem; border-top: 1px solid rgba(239, 68, 68, 0.1); padding-top: 1rem;">
-                    <a href="verification_biz_verification_website_editor.html#store-verification-page" class="update-btn" style="width: 100%; text-decoration: none; justify-content: center;">
-                        <i class="fas fa-upload"></i>
-                        <span>Fix in Verification Page</span>
-                    </a>
-                </div>
-            </div>
-        `;
-
-        const list = document.getElementById('rejectedList');
-        // lines is already declared above
-
-        const labelToFieldMap = {
-            'Shop Front Photo': 'shop_front_photo',
-            'Shop Board Photo': 'shop_board_photo',
-            'Shop Video': 'shop_video',
-            'Vendor Photo': 'vendor_photo',
-            'Brand Authorization Certificate': 'brand_auth_certificate',
-            'Service Certification': 'service_certification',
-            'Business Proof': 'business_proof'
-        };
-
-        lines.forEach(line => {
-            if (line.includes(']:') && !line.includes('REUPLOADED')) {
-                const [label, reason] = line.split(']:').map(s => s.trim().replace('[', ''));
-                const field = labelToFieldMap[label];
-
-                const item = document.createElement('div');
-                item.style = "padding: 0.85rem; background: #fff5f5; border-radius: 10px; border: 1px solid #feb2b2; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;";
-
-                let previewHtml = '';
-                if (field && data[field]) {
-                    const fullPath = `/static/images/${data[field]}`;
-                    if (data[field].toLowerCase().match(/\.(mp4|webm|mov)$/)) {
-                        previewHtml = `<div style="width: 60px; height: 60px; background: #000; border-radius: 6px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-video" style="color: white;"></i></div>`;
-                    } else if (data[field].toLowerCase().endsWith('.pdf')) {
-                        previewHtml = `<div style="width: 60px; height: 60px; background: #fee2e2; border-radius: 6px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-file-pdf" style="color: #ef4444;"></i></div>`;
-                    } else {
-                        previewHtml = `<img src="${fullPath}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;">`;
-                    }
-                }
-
-                item.innerHTML = `
-                    <div style="display: flex; gap: 0.75rem; align-items: flex-start; flex: 1;">
-                        <div style="position: relative;">
-                            ${previewHtml}
-                            <span style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 10px; font-weight: 800; border: 2px solid white; text-transform: uppercase;">Rejected</span>
-                        </div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: 700; font-size: 0.9rem; color: #9b1c1c; margin-bottom: 0.25rem;">${label}</div>
-                            <div style="font-size: 0.8rem; color: #c81e1e; line-height: 1.4;"><strong>Reason:</strong> ${reason}</div>
-                        </div>
-                    </div>
-                    <a href="verification_biz_verification_website_editor.html#store-verification-page" style="background: #ef4444; color: white; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; text-decoration: none; font-weight: 700; white-space: nowrap; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);">
-                        <i class="fas fa-upload"></i> Re-upload
-                    </a>
-                `;
-                list.appendChild(item);
-            }
-        });
-    } catch (err) {
-    }
+    // 4. Update Dashboard/Profile Sidebar
+    const sideProfileName = document.querySelector('.profile-info h2');
+    const sideProfileEmail = document.querySelector('.profile-info p');
+    if (sideProfileName) sideProfileName.textContent = user.full_name || user.name;
+    if (sideProfileEmail) sideProfileEmail.textContent = user.email;
 }
 
 function getInitials(name) {
@@ -403,77 +219,41 @@ function getInitials(name) {
     return name.substring(0, 2).toUpperCase();
 }
 
-function restrictUnverifiedSidebar() {
-    const restrictedLinks = [
-        'products.html',
-        'orders.html',
-        'insights.html',
-        'add-product.html'
-    ];
-
-    const hideRestrictedElements = () => {
-        // Select all links in sidebar/nav
-        const links = document.querySelectorAll('a[href]');
-
-        links.forEach(link => {
-            const href = link.getAttribute('href');
-
-            // Check if link points to a restricted page
-            if (href && restrictedLinks.some(page => href.includes(page))) {
-                // Strict Hiding as requested
-                link.style.display = 'none';
-
-                // If wrapped in a list item or nav-item container, hide that too
-                if (link.parentElement.tagName === 'LI' || link.classList.contains('nav-item')) {
-                    // Start from the link itself or its parent
-                    let container = link.classList.contains('nav-item') ? link : link.parentElement;
-                    container.style.display = 'none';
-                }
-            }
-        });
-
-        // Hide Add Product buttons
-        const actionButtons = document.querySelectorAll('.add-product-btn, .create-order-btn');
-        actionButtons.forEach(btn => {
-            btn.style.display = 'none';
-        });
-    };
-
-    // Run immediately
-    hideRestrictedElements();
-
-    // Run again after a short delay to catch dynamic renders (like sidebar includes)
-    setTimeout(hideRestrictedElements, 100);
-    setTimeout(hideRestrictedElements, 500);
-    setTimeout(hideRestrictedElements, 1000);
-}
-
 // Initialize Auth
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
 
-    // --- Mobile Menu Toggle ---
-    const topBar = document.querySelector('.top-bar');
-    const sidebar = document.querySelector('.sidebar');
+    // --- Cart Synchronization Logic ---
+    function updateCartBadge() {
+        const cartBadge = document.getElementById('cart-badge');
+        if (!cartBadge) return;
 
-    if (topBar && sidebar) {
-        const menuBtn = document.createElement('button');
-        menuBtn.className = 'mobile-menu-btn';
-        menuBtn.innerHTML = '<i class="fas fa-bars"></i>';
-        topBar.prepend(menuBtn);
+        try {
+            const cart = JSON.parse(localStorage.getItem('marketonex_cart') || '[]');
+            const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+            cartBadge.textContent = totalItems;
 
-        menuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            sidebar.classList.toggle('active');
-        });
-
-        // Close sidebar when clicking outside
-        document.addEventListener('click', (e) => {
-            if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
-                sidebar.classList.remove('active');
-            }
-        });
+            // Optional: add animation class
+            cartBadge.classList.add('updating');
+            setTimeout(() => cartBadge.classList.remove('updating'), 400);
+        } catch (e) {
+            console.error('Failed to update cart badge:', e);
+            cartBadge.textContent = '0';
+        }
     }
+
+    // Export to window so it can be called from other scripts
+    window.updateCartBadge = updateCartBadge;
+
+    // Initial update
+    updateCartBadge();
+
+    // Listen for changes in other tabs/windows
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'marketonex_cart') {
+            updateCartBadge();
+        }
+    });
 
     // Orders will be fetched from backend API - no seed data needed
 
@@ -484,91 +264,64 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!tbody) return;
 
         let orders = ordersToRender;
-        let redirect = null;
 
-        // If no orders provided, check LocalStorage first for sync, then fallback to API
+        // If no orders provided, fetch from backend
         if (!orders) {
             try {
-                const storedOrders = localStorage.getItem('allOrders');
-                const currentVendorId = localStorage.getItem('vendorId');
+                console.log('Fetching orders from /api/vendor/orders...');
+                const response = await ApiService.get('/vendor/orders');
+                console.log('Orders API response:', response);
+                const backendOrders = response.orders || [];
+                console.log(`Received ${backendOrders.length} orders from backend`);
 
-                if (storedOrders && currentVendorId) {
-                    const localOrders = JSON.parse(storedOrders);
-                    // Filter for this vendor
-                    const filteredLocal = localOrders.filter(o => {
-                        return o.items && o.items.some(item => String(item.vendor_id) === String(currentVendorId));
+                // Transform backend order format to frontend format
+                orders = backendOrders.map(order => {
+                    // Calculate total items from order items
+                    const itemCount = order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
+
+                    // Format date
+                    const orderDate = new Date(order.created_at);
+                    const formattedDate = orderDate.toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
                     });
 
-                    if (filteredLocal.length > 0) {
-                        orders = filteredLocal.map(o => ({
-                            id: o.order_id || o.id || 'N/A',
-                            customer: o.fullname || o.customer_name || 'Unknown',
-                            payment: o.payment_method || 'Success',
-                            fulfillment: o.status === 'delivered' ? 'Fulfilled' : 'Unfulfilled',
-                            date: new Date(o.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
-                            rawDate: o.created_at,
-                            total: parseFloat(o.total || 0).toFixed(2),
-                            items: o.items ? o.items.reduce((sum, item) => sum + (item.quantity || 1), 0) : 0
-                        }));
+                    // Determine payment status based on payment_method and status
+                    let paymentStatus = 'Pending';
+                    if (order.status === 'confirmed' || order.status === 'shipped' || order.status === 'delivered') {
+                        paymentStatus = 'Success';
                     }
-                }
 
-                if (!orders) {
-                    const response = await ApiService.get('/vendor/orders');
-                    const backendOrders = response.orders || [];
+                    // Determine fulfillment status
+                    let fulfillmentStatus = 'Unfulfilled';
+                    if (order.status === 'delivered') {
+                        fulfillmentStatus = 'Fulfilled';
+                    } else if (order.status === 'shipped') {
+                        fulfillmentStatus = 'Unfulfilled'; // In transit
+                    }
 
-                    // Transform backend order format to frontend format
-                    orders = backendOrders.map(order => {
-                        // Calculate total items from order items
-                        const itemCount = order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
-
-                        // Format date
-                        const orderDate = new Date(order.created_at);
-                        const formattedDate = orderDate.toLocaleDateString('en-GB', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                        });
-
-                        // Determine payment status based on payment_method and status
-                        let paymentStatus = 'Pending';
-                        if (order.status === 'confirmed' || order.status === 'shipped' || order.status === 'delivered') {
-                            paymentStatus = 'Success';
-                        }
-
-                        // Determine fulfillment status
-                        let fulfillmentStatus = 'Unfulfilled';
-                        if (order.status === 'delivered') {
-                            fulfillmentStatus = 'Fulfilled';
-                        } else if (order.status === 'shipped') {
-                            fulfillmentStatus = 'Unfulfilled'; // In transit
-                        }
-
-                        return {
-                            id: order.vendor_order_id || order.order_id || order.id || 'N/A',
-                            customer: order.customer_name || order.fullname || 'Unknown',
-                            payment: paymentStatus,
-                            fulfillment: fulfillmentStatus,
-                            date: formattedDate || 'N/A',
-                            rawDate: order.created_at,
-                            total: order.total ? parseFloat(order.total).toFixed(2) : '0.00',
-                            items: itemCount || 0
-                        };
-                    });
-                    const user = response.data ? response.data.user : response.user;
-                    redirect = response.data ? response.data.redirect : response.redirect;
-                    console.log('Transformed orders:', orders);
-                }
+                    return {
+                        id: order.order_id,
+                        customer: order.fullname,
+                        payment: paymentStatus,
+                        fulfillment: fulfillmentStatus,
+                        date: formattedDate,
+                        rawDate: order.created_at,
+                        total: parseFloat(order.total).toFixed(2),
+                        items: itemCount
+                    };
+                });
+                console.log('Transformed orders:', orders);
             } catch (error) {
+                console.error('Failed to fetch orders:', error);
+                console.error('Error message:', error.message);
                 // Check for authentication error
                 if (error.message && (error.message.includes('401') || error.message.includes('Not authenticated'))) {
+                    console.error('AUTHENTICATION ERROR: Please log in first');
                     alert('Please log in to view orders');
-                    window.location.href = 'loginvender.html';
+                    // Redirect handled by checkAuth for protected pages
                     return;
-                }
-                // Use backend-provided redirect
-                if (redirect) {
-                    window.location.href = redirect;
                     return;
                 }
                 orders = [];
@@ -577,13 +330,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         tbody.innerHTML = '';
 
-        if (!orders || orders.length === 0) {
+        if (orders.length === 0) {
             tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 20px;">No orders found matching your criteria.</td></tr>';
-            updateStats(orders || []);
+            updateStats(orders);
             return;
         }
 
-        orders.forEach((order, index) => {
+        orders.forEach(order => {
             const payClass = order.payment === 'Success' ? 'success' : 'pending';
             const fulfillClass = order.fulfillment === 'Fulfilled' ? 'fulfilled' : 'unfulfilled';
 
@@ -656,78 +409,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function filterOrders(criteria) {
-        // --- SYNC WITH CHECKOUT: Fetch orders from LocalStorage first ---
-        const storedOrders = localStorage.getItem('allOrders');
-        const currentVendorId = localStorage.getItem('vendorId');
-        let allOrdersLocal = [];
+        // Fetch orders from backend first
+        const response = await ApiService.get('/vendor/orders');
+        const backendOrders = response.orders || [];
 
-        if (storedOrders && currentVendorId) {
-            const localOrders = JSON.parse(storedOrders);
-            // Filter for this vendor
-            const filteredLocal = localOrders.filter(o => {
-                return o.items && o.items.some(item => String(item.vendor_id) === String(currentVendorId));
-            });
+        // Transform to frontend format
+        const allOrders = backendOrders.map(order => {
+            const itemCount = order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
+            const orderDate = new Date(order.created_at);
+            const formattedDate = orderDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            let paymentStatus = order.status === 'confirmed' || order.status === 'shipped' || order.status === 'delivered' ? 'Success' : 'Pending';
+            let fulfillmentStatus = order.status === 'delivered' ? 'Fulfilled' : 'Unfulfilled';
 
-            allOrdersLocal = filteredLocal.map(order => {
-                const itemCount = order.items ? order.items.reduce((sum, item) => sum + (item.quantity || 1), 0) : 0;
-                const orderDate = new Date(order.created_at);
-                const formattedDate = orderDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                let paymentStatus = order.status === 'confirmed' || order.status === 'shipped' || order.status === 'delivered' ? 'Success' : 'Pending';
-                let fulfillmentStatus = order.status === 'delivered' ? 'Fulfilled' : 'Unfulfilled';
+            return {
+                id: order.order_id,
+                customer: order.fullname,
+                payment: paymentStatus,
+                fulfillment: fulfillmentStatus,
+                date: formattedDate,
+                rawDate: order.created_at,
+                total: parseFloat(order.total).toFixed(2),
+                items: itemCount
+            };
+        });
 
-                return {
-                    id: order.vendor_order_id || order.order_id || order.id,
-                    customer: order.customer_name || order.fullname,
-                    payment: paymentStatus,
-                    fulfillment: fulfillmentStatus,
-                    date: formattedDate,
-                    rawDate: order.created_at,
-                    total: parseFloat(order.total || 0).toFixed(2),
-                    items: itemCount
-                };
-            });
-        }
-
-        let filtered = allOrdersLocal;
-
-        // If local is empty, fallback to API (original logic)
-        if (allOrdersLocal.length === 0) {
-            try {
-                const response = await ApiService.get('/vendor/orders');
-                const backendOrders = response.orders || [];
-
-                const allOrdersApi = backendOrders.map(order => {
-                    const itemCount = order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
-                    const orderDate = new Date(order.created_at);
-                    const formattedDate = orderDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                    let paymentStatus = order.status === 'confirmed' || order.status === 'shipped' || order.status === 'delivered' ? 'Success' : 'Pending';
-                    let fulfillmentStatus = order.status === 'delivered' ? 'Fulfilled' : 'Unfulfilled';
-
-                    return {
-                        id: order.vendor_order_id || order.order_id || order.id,
-                        customer: order.customer_name || order.fullname,
-                        payment: paymentStatus,
-                        fulfillment: fulfillmentStatus,
-                        date: formattedDate,
-                        rawDate: order.created_at,
-                        total: parseFloat(order.total).toFixed(2),
-                        items: itemCount
-                    };
-                });
-                filtered = allOrdersApi;
-            } catch (err) { console.error(err); }
-        }
-
-        const allOrdersToFilter = filtered;
+        let filtered = allOrders;
 
         if (criteria === 'unfulfilled') {
-            filtered = allOrdersToFilter.filter(o => o.fulfillment === 'Unfulfilled');
+            filtered = allOrders.filter(o => o.fulfillment === 'Unfulfilled');
         } else if (criteria === 'unpaid') {
-            filtered = allOrdersToFilter.filter(o => o.payment === 'Pending');
+            filtered = allOrders.filter(o => o.payment === 'Pending');
         } else if (criteria === 'open') {
-            filtered = allOrdersToFilter.filter(o => o.fulfillment === 'Unfulfilled');
+            filtered = allOrders.filter(o => o.fulfillment === 'Unfulfilled');
         } else if (criteria === 'closed') {
-            filtered = allOrdersToFilter.filter(o => o.fulfillment === 'Fulfilled');
+            filtered = allOrders.filter(o => o.fulfillment === 'Fulfilled');
         }
 
         renderOrdersTable(filtered);
@@ -739,63 +454,31 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput.addEventListener('input', async (e) => {
             const term = e.target.value.toLowerCase();
 
-            // SYNC WITH CHECKOUT: Fetch from LocalStorage and filter
-            const storedOrders = localStorage.getItem('allOrders');
-            const currentVendorId = localStorage.getItem('vendorId');
-            let ordersToSearch = [];
+            // Fetch orders from backend
+            const response = await ApiService.get('/vendor/orders');
+            const backendOrders = response.orders || [];
 
-            if (storedOrders && currentVendorId) {
-                const localOrders = JSON.parse(storedOrders);
-                // Filter for this vendor
-                const filteredLocal = localOrders.filter(o => {
-                    return o.items && o.items.some(item => String(item.vendor_id) === String(currentVendorId));
-                });
-                ordersToSearch = filteredLocal.map(order => {
-                    const itemCount = order.items ? order.items.reduce((sum, item) => sum + (item.quantity || 1), 0) : 0;
-                    const orderDate = new Date(order.created_at);
-                    const formattedDate = orderDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                    let paymentStatus = order.status === 'confirmed' || order.status === 'shipped' || order.status === 'delivered' ? 'Success' : 'Pending';
-                    let fulfillmentStatus = order.status === 'delivered' ? 'Fulfilled' : 'Unfulfilled';
+            // Transform and filter
+            const allOrders = backendOrders.map(order => {
+                const itemCount = order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
+                const orderDate = new Date(order.created_at);
+                const formattedDate = orderDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                let paymentStatus = order.status === 'confirmed' || order.status === 'shipped' || order.status === 'delivered' ? 'Success' : 'Pending';
+                let fulfillmentStatus = order.status === 'delivered' ? 'Fulfilled' : 'Unfulfilled';
 
-                    return {
-                        id: order.vendor_order_id || order.order_id || order.id,
-                        customer: order.customer_name || order.fullname,
-                        payment: paymentStatus,
-                        fulfillment: fulfillmentStatus,
-                        date: formattedDate,
-                        rawDate: order.created_at,
-                        total: parseFloat(order.total || 0).toFixed(2),
-                        items: itemCount
-                    };
-                });
-            }
+                return {
+                    id: order.order_id,
+                    customer: order.fullname,
+                    payment: paymentStatus,
+                    fulfillment: fulfillmentStatus,
+                    date: formattedDate,
+                    rawDate: order.created_at,
+                    total: parseFloat(order.total).toFixed(2),
+                    items: itemCount
+                };
+            });
 
-            if (ordersToSearch.length === 0) {
-                try {
-                    const response = await ApiService.get('/vendor/orders');
-                    const backendOrders = response.orders || [];
-                    ordersToSearch = backendOrders.map(order => {
-                        const itemCount = order.items ? order.items.reduce((sum, item) => sum + item.quantity, 0) : 0;
-                        const orderDate = new Date(order.created_at);
-                        const formattedDate = orderDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                        let paymentStatus = order.status === 'confirmed' || order.status === 'shipped' || order.status === 'delivered' ? 'Success' : 'Pending';
-                        let fulfillmentStatus = order.status === 'delivered' ? 'Fulfilled' : 'Unfulfilled';
-
-                        return {
-                            id: order.vendor_order_id || order.order_id || order.id,
-                            customer: order.customer_name || order.fullname,
-                            payment: paymentStatus,
-                            fulfillment: fulfillmentStatus,
-                            date: formattedDate,
-                            rawDate: order.created_at,
-                            total: parseFloat(order.total).toFixed(2),
-                            items: itemCount
-                        };
-                    });
-                } catch (err) { }
-            }
-
-            const filtered = ordersToSearch.filter(o =>
+            const filtered = allOrders.filter(o =>
                 o.id.toLowerCase().includes(term) ||
                 o.customer.toLowerCase().includes(term) ||
                 o.payment.toLowerCase().includes(term)
@@ -823,8 +506,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     let fulfillmentStatus = order.status === 'delivered' ? 'Fulfilled' : 'Unfulfilled';
 
                     return {
-                        id: order.vendor_order_id || order.order_id || order.id,
-                        customer: order.customer_name || order.fullname,
+                        id: order.order_id,
+                        customer: order.fullname,
                         payment: paymentStatus,
                         fulfillment: fulfillmentStatus,
                         date: formattedDate,
@@ -1002,88 +685,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Calculate Metrics
-    async function calculateDashboardMetrics() {
-        try {
-            console.log('[DASHBOARD] Fetching real-time statistics...');
+    function calculateDashboardMetrics() {
+        const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        const products = JSON.parse(localStorage.getItem('products') || '[]');
+        const staticProductCount = 12; // Base products
 
-            // --- UNIFIED ORDER SYNC: Fallback to LocalStorage for orders/sales ---
-            const storedOrders = localStorage.getItem('allOrders');
-            const currentVendorId = localStorage.getItem('vendorId');
+        const totalProducts = staticProductCount + products.length;
+        const totalSales = 98765.43;
+        const totalOrdersCount = 1450;
+        const overallRating = 4.8;
 
-            let filteredLocal = [];
-            if (storedOrders && currentVendorId) {
-                const localOrders = JSON.parse(storedOrders);
-                filteredLocal = localOrders.filter(o => {
-                    return o.items && o.items.some(item => String(item.vendor_id) === String(currentVendorId));
-                });
-            }
+        const elSales = document.getElementById('dashboardTotalSales');
+        const elOrders = document.getElementById('dashboardTotalOrders');
+        const elProducts = document.getElementById('dashboardTotalProducts');
+        const elRating = document.getElementById('dashboardOverallRating');
 
-            let apiStats = {};
-            try {
-                const response = await ApiService.request('/vendor/stats', 'GET');
-                apiStats = response.data || response;
-            } catch (apiErr) {
-                console.warn('[DASHBOARD] API stats failed, using local data only:', apiErr);
-            }
+        const elSalesChange = document.getElementById('dashboardSalesChange');
+        const elOrdersChange = document.getElementById('dashboardOrdersChange');
+        const elProductsChange = document.getElementById('dashboardProductsChange');
 
-            // Merge or prioritize local data for orders/sales
-            const totalOrdersCount = filteredLocal.length || apiStats.total_orders || 0;
-            const totalSales = filteredLocal.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0) || apiStats.total_sales || 0;
-
-            // Products and Rating still come from API if available
-            const totalProducts = apiStats.total_products || 0;
-            const overallRating = apiStats.overall_rating || 0;
-
-            const elSales = document.getElementById('dashboardTotalSales');
-            const elOrders = document.getElementById('dashboardTotalOrders');
-            const elProducts = document.getElementById('dashboardTotalProducts');
-            const elRating = document.getElementById('dashboardOverallRating');
-
-            const elSalesChange = document.getElementById('dashboardSalesChange');
-            const elOrdersChange = document.getElementById('dashboardOrdersChange');
-            const elProductsChange = document.getElementById('dashboardProductsChange');
-            const elRatingChange = document.getElementById('dashboardRatingChange');
-
-            if (elSales) {
-                elSales.textContent = '₹' + totalSales.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                if (elSalesChange && apiStats.changes) {
-                    elSalesChange.innerHTML = `${apiStats.changes.sales} <span style="color: inherit; font-size: 0.9em; font-weight: normal;">from last month</span>`;
-                }
-            }
-            if (elOrders) {
-                elOrders.textContent = totalOrdersCount.toLocaleString();
-                if (elOrdersChange && apiStats.changes) {
-                    elOrdersChange.innerHTML = `${apiStats.changes.orders} <span style="color: inherit; font-size: 0.9em; font-weight: normal;">from last month</span>`;
-                }
-            }
-            if (elProducts) {
-                elProducts.textContent = totalProducts.toLocaleString();
-                if (elProductsChange && apiStats.changes) {
-                    elProductsChange.innerHTML = `${apiStats.changes.products} <span style="color: inherit; font-size: 0.9em; font-weight: normal;">this month</span>`;
-                }
-            }
-            if (elRating) {
-                elRating.textContent = overallRating.toFixed(1);
-                if (elRatingChange && apiStats.changes) {
-                    elRatingChange.className = 'stat-change positive';
-                    elRatingChange.innerHTML = `${apiStats.changes.rating} <span style="color: inherit; font-size: 0.9em; font-weight: normal;">from last month</span>`;
-                }
-            }
-        } catch (error) {
-            console.error('[DASHBOARD ERROR] Failed to fetch real-time statistics:', error);
-
-            // Fallback for UI if API fails (optional, keeps UI from looking broken if server is down)
-            const elSales = document.getElementById('dashboardTotalSales');
-            if (elSales && elSales.textContent === '₹0.00') {
-                elSales.textContent = 'Loading...';
+        if (elSales) {
+            elSales.textContent = '₹' + totalSales.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (elSalesChange) elSalesChange.innerHTML = '+19.2% <span style="color: inherit; font-size: 0.9em; font-weight: normal;">from last month</span>';
+        }
+        if (elOrders) {
+            elOrders.textContent = totalOrdersCount.toLocaleString();
+            if (elOrdersChange) elOrdersChange.innerHTML = '+23.1% <span style="color: inherit; font-size: 0.9em; font-weight: normal;">from last month</span>';
+        }
+        if (elProducts) {
+            elProducts.textContent = totalProducts;
+            if (elProductsChange) elProductsChange.innerHTML = '+5 new <span style="color: inherit; font-size: 0.9em; font-weight: normal;">this week</span>';
+        }
+        if (elRating) {
+            elRating.textContent = overallRating;
+            const ratingChange = document.getElementById('dashboardRatingChange');
+            if (ratingChange) {
+                ratingChange.className = 'stat-change positive';
+                ratingChange.innerHTML = '+0.2 <span style="color: inherit; font-size: 0.9em; font-weight: normal;">from last month</span>';
             }
         }
     }
 
-    // Only run dashboard stats fetch on the actual dashboard page
-    if (document.getElementById('dashboardTotalSales') || document.getElementById('salesChart') || document.querySelector('[data-dashboard]')) {
-        calculateDashboardMetrics();
-    }
+    calculateDashboardMetrics();
 
 
     // --- Chart Initialization (Dynamic Data) ---
@@ -1133,11 +776,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Theme Switcher Logic ---
+    const themes = ['dark', 'light', 'brown'];
     const themeBtn = document.getElementById('themeBtn');
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
     const themeMenu = document.getElementById('themeMenu');
     const themeOptions = document.querySelectorAll('.theme-option');
 
     function setTheme(theme) {
+        if (!themes.includes(theme)) theme = 'dark';
         document.documentElement.setAttribute('data-theme', theme);
         try {
             localStorage.setItem('theme', theme);
@@ -1152,7 +798,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Update Toggle Button Icon
+        if (themeToggleBtn) {
+            const icon = themeToggleBtn.querySelector('i');
+            if (icon) {
+                if (theme === 'light') icon.className = 'fas fa-sun';
+                else if (theme === 'brown') icon.className = 'fas fa-coffee';
+                else icon.className = 'fas fa-moon';
+            }
+        }
+
         updateChartColors();
+
+        // Dispatch event for other listeners
+        window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme } }));
     }
 
     function updateChartColors() {
@@ -1160,14 +819,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof Chart !== 'undefined') {
             const chart = Chart.getChart('salesChart'); // Get the chart instance
             if (chart) {
-                // Handle chart colors based on theme
                 if (theme === 'light') {
-                    chart.data.datasets[0].backgroundColor = '#3b82f6'; // Blue for light mode
+                    chart.data.datasets[0].backgroundColor = '#3b82f6';
                 } else if (theme === 'brown') {
-                    chart.data.datasets[0].backgroundColor = '#a1887f'; // Warm brown
+                    chart.data.datasets[0].backgroundColor = '#a1887f';
                 } else {
-                    // Dark mode (default)
-                    chart.data.datasets[0].backgroundColor = '#4f46e5'; // Indigo
+                    chart.data.datasets[0].backgroundColor = '#4f46e5';
                 }
                 chart.update();
             }
@@ -1184,6 +841,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!themeBtn.contains(e.target) && !themeMenu.contains(e.target)) {
                 themeMenu.classList.remove('active');
             }
+        });
+    }
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+            const currentIndex = themes.indexOf(currentTheme);
+            const nextIndex = (currentIndex + 1) % themes.length;
+            setTheme(themes[nextIndex]);
         });
     }
 
@@ -1248,18 +914,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelDrawerBtn = document.querySelector('.add-product-drawer .cancel-btn');
     const addProductForm = document.getElementById('addProductForm');
 
-    console.log('Add Product elements:', {
-        addProductBtn: !!addProductBtn,
-        addProductDrawer: !!addProductDrawer,
-        drawerOverlay: !!drawerOverlay,
-        closeDrawerBtn: !!closeDrawerBtn,
-        cancelDrawerBtn: !!cancelDrawerBtn,
-        addProductForm: !!addProductForm
-    });
+    // Only log and setup drawer if elements exist (not all pages have drawer UI)
+    if (addProductDrawer && drawerOverlay) {
+        console.log('Add Product drawer elements found, initializing...');
+    }
 
     function openDrawer() {
-        console.log('openDrawer called');
-
         if (addProductDrawer && drawerOverlay) {
             // Auto-generate ID
             const date = new Date();
@@ -1299,29 +959,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Correct Add Product Button to Reset Form
-    if (addProductBtn) {
-        // Remove old listeners to prevent double firing if any (safety)
-        // Actually we prefer replacing the element or just ensuring logic is robust
-
+    // Only attach handler if drawer elements exist (for pages that use drawer UI)
+    if (addProductBtn && addProductDrawer && drawerOverlay) {
         addProductBtn.addEventListener('click', () => {
             // Reset Edit State
             editingProductId = null;
             editingProductCard = null;
 
-            // Reset UI
+            // Reset UI (only if elements exist)
             if (addProductForm) addProductForm.reset();
-            document.querySelector('.drawer-header h2').textContent = 'Add New Product';
-            document.querySelector('.save-product-btn').textContent = 'Save Product';
 
-            // Open Drawer (using our drawer logic, not page redirect if we want drawer)
-            // User requested "redesign add product page" earlier, but for "Add" on products page, drawer is good.
-            // If we want to use drawer:
+            const drawerHeader = document.querySelector('.drawer-header h2');
+            const saveBtn = document.querySelector('.save-product-btn');
+
+            if (drawerHeader) drawerHeader.textContent = 'Add New Product';
+            if (saveBtn) saveBtn.textContent = 'Save Product';
+
+            // Open Drawer
             openDrawer();
-            // If we want redirect:
-            // window.location.href = 'add-product.html'; 
-            // We stick to drawer for consistency with "Edit in product page" logic which uses drawer.
         });
     }
+    // Note: If drawer doesn't exist, the page-specific JS (e.g., marketonex.js) handles the button
 
     // --- Image Upload Drawer Logic ---
     const imageUploadArea = document.getElementById('imageUploadArea');
@@ -1631,8 +1289,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Initialize Products
-    // Initialize Products - Removed to prevent race condition (moved to checkAuth)
-    // loadProducts();
+    loadProducts();
 
 
     // --- Product Detail View Logic (Updated with Vertical Gallery + Zoom/Scroll) ---
@@ -1664,13 +1321,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Ensure images is array
-            let rawImages = Array.isArray(productData.images) ? productData.images : [productData.image || productData.images];
-
-            // Filter out null, undefined, and the string "null"
-            currentImageArray = rawImages.filter(img => img && img !== 'null' && img !== 'undefined');
-
+            currentImageArray = Array.isArray(productData.images) ? productData.images : [productData.image || productData.images];
             if (currentImageArray.length === 0) {
-                console.warn('No valid images provided for detail view, using fallback');
+                console.warn('No images provided for detail view');
                 currentImageArray = ['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop'];
             }
 
@@ -1767,9 +1420,6 @@ document.addEventListener('DOMContentLoaded', () => {
             thumbsContainer.style.transform = `translate3d(0px, 0px, 0px)`;
 
             currentImageArray.forEach((imgSrc, index) => {
-                // Defensive check to avoid 404 /vendor/null
-                if (!imgSrc || imgSrc === 'null' || imgSrc === 'undefined') return;
-
                 const thumb = document.createElement('div');
                 thumb.className = `thumb-item ${index === currentImageIndex ? 'active' : ''}`;
                 thumb.innerHTML = `<img src="${imgSrc}" alt="Thumbnail ${index + 1}">`;
@@ -2014,37 +1664,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Global Helper Functions & Initialization ---
 
     function createProductCardHTML(product) {
-        const isPublished = product.is_published === true;
-        const statusBadge = isPublished
-            ? '<span class="status-badge published" style="background:#d1fae5; color:#065f46; padding:2px 8px; border-radius:12px; font-size:0.75rem;">Published</span>'
-            : '<span class="status-badge unpublished" style="background:#f3f4f6; color:#1f2937; padding:2px 8px; border-radius:12px; font-size:0.75rem;">Unpublished</span>';
-
-        const publishAction = isPublished
-            ? `<button class="menu-item unpublish-btn" data-id="${product.product_id || product.id}"><i class="fas fa-eye-slash"></i> Unpublish</button>`
-            : `<button class="menu-item publish-btn" data-id="${product.product_id || product.id}"><i class="fas fa-globe"></i> Publish</button>`;
-
         return `
-            <div class="product-card dynamic" data-id="${product.id}" data-pid="${product.product_id || product.id}" data-category="${product.category || 'Uncategorized'}" data-price="${product.price.toString().replace('$', '')}" data-vendor="${product.brand || 'Your Store'}">
+            <div class="product-card dynamic" data-id="${product.id}" data-category="${product.category || 'Uncategorized'}" data-price="${product.price.toString().replace('$', '')}" data-vendor="${product.brand || 'Your Store'}">
                 <div class="product-image">
-                    <img src="${product.image || (product.images && product.images[0]) || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdHJhdGlvPSJ4TWlkWU1pZCBzbGljZSIgZm9jdXNhYmxlPSJmYWxzZSIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJQbGFjZWhvbGRlciI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2VlZSI+PC9yZWN0Pjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmaWxsPSIjYWFhIiBkeT0iLjNlbSIgc3R5bGU9ImZvbnQtZmFtaWx5OkFyaWFsO2ZvbnQtc2l6ZToyMHB4O3RleHQtYW5jaG9yOm1pZGRsZSI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+'}" alt="${product.name}" class="p-img">
-                    <div class="card-badges" style="position:absolute; top:8px; left:8px; z-index:2;">
-                        ${statusBadge}
-                    </div>
+                    <img src="${product.image}" alt="${product.name}" class="p-img">
                 </div>
                 <div class="product-info">
                     <h3>${product.name}</h3>
-                    <p class="product-desc">${product.desc || product.product_description || ''}</p>
+                    <p class="product-desc">${product.desc}</p>
                     <div class="product-meta">
                         <span class="vendor-name">${product.brand || 'Your Store'}</span>
-                        <span class="product-price">$${product.price}</span>
+                        <span class="product-price">${product.price}</span>
                     </div>
                     <div class="product-footer">
-                        <span class="stock-pill">${product.available_stock || product.quantity} in stock</span>
+                        <span class="stock-pill">${product.quantity} in stock</span>
                         <div class="card-menu-container">
                             <button class="card-menu-btn"><i class="fas fa-ellipsis-h"></i></button>
                             <div class="card-menu-dropdown">
-                                ${publishAction}
-                                <button class="menu-item add-to-website-btn"><i class="fas fa-plus"></i> Add to Website</button>
                                 <button class="menu-item edit-btn"><i class="fas fa-edit"></i> Edit</button>
                                 <button class="menu-item delete-btn"><i class="fas fa-trash"></i> Delete</button>
                             </div>
@@ -2061,82 +1697,29 @@ document.addEventListener('DOMContentLoaded', () => {
     window.createProductCardHTML = createProductCardHTML;
 
 
-    // Expose loadProducts globally for checkAuth
-    async function loadProducts() {
+    function loadProducts() {
         const grid = document.querySelector('.products-grid');
         if (!grid) return;
 
-        // Clear existing static/local content to avoid duplicates with API
-        // grid.innerHTML = ''; // Optional: decide if we want to wipe it first or append. 
-        // For distinct "vendor dashboard", we likely want to show what's real.
-        // Let's wipe static placeholders but keep structure if grid is empty container.
-
-        let apiProducts = [];
-        let loadedFromApi = false;
-
+        let savedProducts = [];
         try {
-            const res = await fetch(`${window.API_BASE_URL || '/api'}/vendor/products`, {
-                method: 'GET',
-                credentials: 'include'
-            });
-            if (res.ok) {
-                const data = await res.json();
-                if (data.products) {
-                    apiProducts = data.products.map(p => {
-                        // Normalize API data to match frontend expectations
-                        let images = [];
-                        try {
-                            images = typeof p.product_images === 'string' ? JSON.parse(p.product_images) : p.product_images;
-                        } catch (e) { images = []; }
-
-                        return {
-                            id: p.id,
-                            product_id: p.product_id,
-                            name: p.product_name,
-                            desc: p.product_description,
-                            price: p.price,
-                            quantity: p.available_stock,
-                            available_stock: p.available_stock,
-                            brand: p.brand_name || p.company_name || 'My Store',
-                            image: (images && images.length > 0) ? images[0] : null,
-                            images: images,
-                            category: p.product_category,
-                            is_published: p.is_published
-                        };
-                    });
-                    loadedFromApi = true;
-                }
-            } else if (res.status === 401 || res.status === 403) {
-                console.warn('Unauthorized access to products. Clearing cache.');
-                localStorage.removeItem('products');
-            }
+            savedProducts = JSON.parse(localStorage.getItem('products') || '[]');
         } catch (e) {
-            console.error('Failed to load products from API:', e);
+            console.error('Error parsing products:', e);
+            savedProducts = [];
         }
 
-        // If API data found, use it. Otherwise fallback to localStorage (ONLY if no auth error occurred ideally, but clearing above helps)
-        const productsToRender = loadedFromApi ? apiProducts : JSON.parse(localStorage.getItem('products') || '[]');
-
-        // Render
-        grid.innerHTML = ''; // Clear placeholders
-        if (productsToRender.length === 0) {
-            grid.innerHTML = '<div class="empty-state">No products found. Start by adding one!</div>';
-        } else {
-            productsToRender.forEach(product => {
-                // Prevent duplicates if something is weird
-                if (!grid.querySelector(`.product-card[data-pid="${product.product_id || product.id}"]`)) {
-                    if (typeof window.createProductCardHTML === 'function') {
-                        const cardHTML = window.createProductCardHTML(product);
-                        grid.insertAdjacentHTML('afterbegin', cardHTML);
-                    }
+        savedProducts.forEach(product => {
+            if (!grid.querySelector(`.product-card[data-id="${product.id}"]`)) {
+                if (typeof window.createProductCardHTML === 'function') {
+                    const cardHTML = window.createProductCardHTML(product);
+                    grid.insertAdjacentHTML('afterbegin', cardHTML);
                 }
-            });
-        }
+            }
+        });
 
-        // Re-attach listeners to new elements
         document.querySelectorAll('.product-card').forEach(attachGlobalCardListener);
     }
-    window.loadProducts = loadProducts;
 
     function attachGlobalCardListener(card) {
         const img = card.querySelector('.product-image img');
@@ -2169,27 +1752,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (deleteBtn) {
-            deleteBtn.addEventListener('click', async (e) => {
+            deleteBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const pid = deleteBtn.getAttribute('data-id') || card.getAttribute('data-pid');
-                if (!pid) return alert('Error: Product ID not found');
-
-                if (confirm('Delete product? This cannot be undone.')) {
-                    try {
-                        deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                        await ApiService.delete(`/vendor/products/${pid}`);
-                        card.remove();
-                        // Also remove from local cache to prevent seeing it on immediate reload if cache used
-                        try {
-                            const prods = JSON.parse(localStorage.getItem('products') || '[]');
-                            const newP = prods.filter(p => p.id != pid && p.product_id != pid);
-                            localStorage.setItem('products', JSON.stringify(newP));
-                        } catch (e) { }
-                        alert('Product deleted successfully');
-                    } catch (err) {
-                        console.error(err);
-                        alert('Delete failed: ' + err.message);
-                        deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+                if (confirm('Delete product?')) {
+                    card.remove();
+                    const pData = extractProductData(card);
+                    if (pData.id) {
+                        const prods = JSON.parse(localStorage.getItem('products') || '[]');
+                        const newP = prods.filter(p => p.id != pData.id);
+                        localStorage.setItem('products', JSON.stringify(newP));
                     }
                 }
             });
@@ -2200,114 +1771,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 dropdown.classList.remove('show');
                 const pData = extractProductData(card);
                 if (window.openEditDrawer) window.openEditDrawer(pData, card);
-            });
-
-        }
-
-        const addToWebsiteBtn = card.querySelector('.add-to-website-btn');
-        if (addToWebsiteBtn) {
-            addToWebsiteBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                dropdown.classList.remove('show');
-                const pData = extractProductData(card);
-                // Tag with current vendor ID so orders can be filtered
-                pData.vendor_id = localStorage.getItem('vendorId') || 'unknown';
-
-                // Add to vendorWebsiteProducts in localStorage (vendor-specific)
-                try {
-                    const vendorId = localStorage.getItem('vendorId');
-                    if (!vendorId) {
-                        alert('Vendor ID not found. Please log in again.');
-                        return;
-                    }
-
-                    const vendorKey = `vendorWebsiteProducts_${vendorId}`;
-                    const currentWebsiteProducts = JSON.parse(localStorage.getItem(vendorKey) || '[]');
-
-                    // Check for duplicates
-                    const exists = currentWebsiteProducts.some(p => p.id === pData.id);
-                    if (exists) {
-                        alert('Product is already added to your website!');
-                        return;
-                    }
-
-                    currentWebsiteProducts.push(pData);
-                    localStorage.setItem(vendorKey, JSON.stringify(currentWebsiteProducts));
-                    alert('Product added to Website successfully');
-                } catch (err) {
-                    console.error('Error adding to website:', err);
-                    alert('Failed to add product to website.');
-                }
-            });
-        }
-
-        // Publish/Unpublish Logic
-        const publishBtn = card.querySelector('.publish-btn');
-        const unpublishBtn = card.querySelector('.unpublish-btn');
-
-        if (publishBtn) {
-            publishBtn.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                dropdown.classList.remove('show');
-                const pid = publishBtn.getAttribute('data-id');
-                if (!pid) return alert('Error: Product ID not found');
-
-                if (confirm('Publish this product to marketonex?')) {
-                    try {
-                        publishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publishing...';
-                        const res = await fetch(`${window.API_BASE_URL || '/api'}/marketonex/products/${pid}/publish`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' }, // Credentials handled globally if set, else rely on cookie
-                            credentials: 'include', // Important for session based auth
-                            body: JSON.stringify({})
-                        });
-                        const data = await res.json();
-                        if (res.ok) {
-                            alert('Product Published Successfully!');
-                            location.reload(); // Reload to show updated status (or update DOM dynamically)
-                        } else {
-                            alert('Publish Failed: ' + (data.error || data.message));
-                            publishBtn.innerHTML = '<i class="fas fa-globe"></i> Publish';
-                        }
-                    } catch (err) {
-                        console.error(err);
-                        alert('Network Error: ' + err.message);
-                        publishBtn.innerHTML = '<i class="fas fa-globe"></i> Publish';
-                    }
-                }
-            });
-        }
-
-        if (unpublishBtn) {
-            unpublishBtn.addEventListener('click', async (e) => {
-                e.stopPropagation();
-                dropdown.classList.remove('show');
-                const pid = unpublishBtn.getAttribute('data-id');
-                if (!pid) return alert('Error: Product ID not found');
-
-                if (confirm('Unpublish this product from marketonex?')) {
-                    try {
-                        unpublishBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                        const res = await fetch(`${window.API_BASE_URL || '/api'}/marketonex/products/${pid}/unpublish`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            credentials: 'include',
-                            body: JSON.stringify({})
-                        });
-                        const data = await res.json();
-                        if (res.ok) {
-                            alert('Product Unpublished Successfully!');
-                            location.reload();
-                        } else {
-                            alert('Unpublish Failed: ' + (data.error || data.message));
-                            unpublishBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Unpublish';
-                        }
-                    } catch (err) {
-                        console.error(err);
-                        alert('Network Error: ' + err.message);
-                        unpublishBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Unpublish';
-                    }
-                }
             });
         }
     }
@@ -2333,8 +1796,8 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // Call load globally removed - moved to checkAuth to prevent 403 race condition
-    // loadProducts();
+    // Call load globally
+    loadProducts();
 
 
     // --- Settings & Profile Logic ---
@@ -2349,41 +1812,20 @@ document.addEventListener('DOMContentLoaded', () => {
             profileUpload.click();
         });
 
-        profileUpload.addEventListener('change', async (e) => {
+        profileUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (!file) return;
-
-            // 1. Immediate local preview
-            const reader = new FileReader();
-            reader.onload = function (ev) {
-                const previewSrc = ev.target.result;
-                if (profileImg) profileImg.src = previewSrc;
-                if (topBarAvatar) topBarAvatar.src = previewSrc;
-            };
-            reader.readAsDataURL(file);
-
-            // 2. Upload to backend for persistence
-            try {
-                const formData = new FormData();
-                formData.append('photo', file);
-
-                const res = await fetch('/api/profile/upload-photo', {
-                    method: 'POST',
-                    credentials: 'include',
-                    body: formData
-                });
-
-                const result = await res.json();
-                if (!res.ok) throw new Error(result.error || 'Upload failed');
-
-                const url = result.profile_picture + '?t=' + Date.now();
-                if (profileImg) profileImg.src = url;
-                if (topBarAvatar) topBarAvatar.src = url;
-                document.querySelectorAll('.user-avatar img').forEach(img => img.src = url);
-                alert('Profile photo updated!');
-            } catch (err) {
-                console.error('[Common] Photo upload error:', err);
-                alert('Photo upload failed: ' + err.message);
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const result = e.target.result;
+                    if (profileImg) profileImg.src = result;
+                    if (topBarAvatar) topBarAvatar.src = result;
+                    try {
+                        localStorage.setItem('profileImage', result);
+                    } catch (e) { console.warn('Profile image save failed'); }
+                    alert('Profile photo updated!');
+                }
+                reader.readAsDataURL(file);
             }
         });
     }
@@ -2398,8 +1840,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
-
+    const savedImg = localStorage.getItem('profileImage');
+    if (savedImg) {
+        if (profileImg) profileImg.src = savedImg;
+        if (topBarAvatar) topBarAvatar.src = savedImg;
+    }
 
 
     // --- Settings Tabs & Forms ---
@@ -2565,8 +2010,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (e) { console.error('Error loading settings api data', e); }
     }
-    // Only load settings data if we are on the settings page
-    if (document.getElementById('setting-name')) {
+
+    // Only load settings data if we're on a settings page (check for settings elements)
+    if (document.getElementById('setting-name') || document.getElementById('setting-business-name')) {
         loadSettingsData();
     }
 
@@ -2626,6 +2072,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Authentication Handlers ---
+    // COMMENTED OUT: Handled by specific login.js and signup.js files to avoid conflicts and stale API endpoints
+    /*
     const loginForm = document.getElementById('loginForm');
     const signupForm = document.getElementById('signupForm');
 
@@ -2652,20 +2100,21 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = true;
 
             try {
-                // Use vendor-only login endpoint to ensure correct role isolation
-                const res = await ApiService.request('/auth/vendor-login', 'POST', { email, password });
+                const res = await ApiService.request('/login', 'POST', { email, password });
+                // Set login flag for marketonex
                 localStorage.setItem('vendorLoggedIn', 'true');
                 localStorage.setItem('vendorEmail', email);
 
+                // Check if user came from Add Product flow
                 const urlParams = new URLSearchParams(window.location.search);
                 const redirect = urlParams.get('redirect');
 
-                if (res.redirect) {
-                    window.location.href = res.redirect;
-                } else if (redirect === 'addProduct') {
+                if (redirect === 'addProduct') {
+                    // Redirect to marketonex with openAddProduct parameter
                     window.location.href = 'marketonex.html?openAddProduct=true';
                 } else {
-                    window.location.href = 'vender_profile_products_add-product.html';
+                    // Success - redirect to marketonex
+                    window.location.href = 'marketonex.html';
                 }
             } catch (err) {
                 alert('Login failed: ' + err.message);
@@ -2675,9 +2124,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // NOTE: Signup form is handled exclusively by signup.js.
-    // Do NOT add a signupForm listener here to avoid dual API calls.
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = signupForm.querySelector('button[type="submit"]');
 
+            const password = signupForm.querySelector('#password').value;
+            const confirmPassword = signupForm.querySelector('#confirm-password').value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            const originalText = btn.textContent;
+            btn.textContent = 'Creating account...';
+            btn.disabled = true;
+
+            const fullname = signupForm.querySelector('#fullname').value;
+            const email = signupForm.querySelector('#email').value;
+
+            try {
+                const res = await ApiService.request('/register', 'POST', { fullname, email, password });
+                alert('Account created! Please sign in.');
+                window.location.href = 'login.html';
+            } catch (err) {
+                alert('Registration failed: ' + err.message);
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        });
+    }
+    */
 
     // --- Profile Save (User Info Page) Update to API ---
     // Overwriting the previous localStorage logic for #userProfileForm
@@ -2711,7 +2189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                const res = await ApiService.request('/vendor/profile', 'PUT', data);
+                const res = await ApiService.request('/profile', 'PUT', data);
                 updateUIWithUser(res.user || res.vendor || res);
                 alert('Profile updated successfully!');
             } catch (err) {
@@ -2723,275 +2201,224 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-});
+    // ============================================================================
+    // USER PROFILE PANEL FUNCTIONALITY
+    // ============================================================================
 
-/**
- * 3D Review System Integration
- */
-async function loadVendorReviews() {
-    const vendorId = localStorage.getItem('vendorId');
-    const grid = document.getElementById('vendorReviewGrid');
-    if (!grid) return;
+    const profileIconBtn = document.getElementById('profile-icon-btn');
+    const profileDropdown = document.getElementById('profile-dropdown');
+    const profileLogoutBtn = document.getElementById('profile-logout-btn');
 
-    if (!vendorId) {
-        grid.innerHTML = '<div class="no-reviews">Error: Vendor ID not found in session</div>';
-        return;
-    }
+    if (profileIconBtn && profileDropdown) {
+        // Initialize profile panel
+        initProfilePanel();
 
-    try {
-        const res = await ApiService.get(`/feedback/vendor/${vendorId}`);
-        const { feedback, count, average_rating } = res;
+        // Toggle profile dropdown
+        profileIconBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleProfilePanel();
+        });
 
-        // 1. Update Stats Display
-        const avgDisplay = document.getElementById('avgRatingDisplay');
-        const countDisplay = document.getElementById('reviewCountDisplay');
-        const starsDisplay = document.getElementById('avgStarsDisplay');
-        const dashRating = document.getElementById('dashboardOverallRating');
+        // Profile Image Upload Trigger
+        const profileUploadTrigger = document.getElementById('profile-upload-trigger');
+        const headerProfileUpload = document.getElementById('header-profile-upload');
 
-        if (avgDisplay) animateNumber(avgDisplay, 0, average_rating, 1500);
-        if (dashRating) dashRating.textContent = average_rating.toFixed(1);
-        if (countDisplay) countDisplay.textContent = `Based on ${count} reviews from your products.`;
-        if (starsDisplay) starsDisplay.innerHTML = generateStarRating(average_rating);
+        if (profileUploadTrigger && headerProfileUpload) {
+            profileUploadTrigger.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent dropdown toggle
+                headerProfileUpload.click();
+            });
 
-        // 2. Render Review Cards
-        if (!feedback || feedback.length === 0) {
-            grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); padding: 40px; background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 12px;">No reviews yet. Share your store link to get feedback!</div>';
-            return;
-        }
+            headerProfileUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const result = e.target.result;
 
-        grid.innerHTML = feedback.map((f, index) => `
-            <div class="review-card-3d" style="animation-delay: ${index * 0.1}s">
-                <div class="reviewer-header">
-                    <span class="reviewer-name">${f.name}</span>
-                    <span class="review-product-tag">${f.product_name}</span>
-                </div>
-                <div class="review-stars">
-                    ${generateStarRating(f.rating)}
-                </div>
-                <p class="review-text">${f.message}</p>
-                <span class="review-date">${new Date(f.created_at).toLocaleDateString()}</span>
-            </div>
-        `).join('');
+                        // Update UI immediately
+                        const profileAvatar = document.getElementById('profile-avatar');
+                        const profileInitials = document.getElementById('profile-initials');
+                        const dropdownAvatar = document.getElementById('dropdown-avatar');
 
-    } catch (err) {
-        console.error('Failed to load reviews:', err);
-        if (grid) grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--accent-red); padding: 20px;">Failed to load reviews: ${err.message}</div>`;
-    }
-}
+                        if (profileAvatar) {
+                            profileAvatar.src = result;
+                            profileAvatar.classList.remove('hidden');
+                        }
+                        if (profileInitials) {
+                            profileInitials.textContent = '';
+                        }
+                        if (dropdownAvatar) {
+                            dropdownAvatar.src = result;
+                            dropdownAvatar.style.display = 'block';
+                        }
 
-function generateStarRating(rating) {
-    let stars = '';
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = (rating % 1) >= 0.5;
-
-    for (let i = 1; i <= 5; i++) {
-        if (i <= fullStars) {
-            stars += '<i class="fas fa-star star-icon"></i>';
-        } else if (i === fullStars + 1 && hasHalfStar) {
-            stars += '<i class="fas fa-star-half-alt star-icon"></i>';
-        } else {
-            stars += '<i class="far fa-star star-icon empty"></i>';
-        }
-    }
-    return stars;
-}
-
-function animateNumber(element, start, end, duration) {
-    if (!element) return;
-    let startTime = null;
-    const step = (timestamp) => {
-        if (!startTime) startTime = timestamp;
-        const progress = Math.min((timestamp - startTime) / duration, 1);
-        const current = (progress * (end - start) + start).toFixed(1);
-        element.textContent = current;
-        if (progress < 1) {
-            window.requestAnimationFrame(step);
-        }
-    };
-    window.requestAnimationFrame(step);
-}
-
-/* ================================================================
-   VENDOR PROFILE SYNC — populates dynamic vendor fields site-wide
-   ================================================================ */
-async function syncVendorProfile() {
-    try {
-        const res = await fetch('/api/profile', { credentials: 'include' });
-        if (!res.ok) return;
-        const data = await res.json();
-        const user = data.vendor || data.customer || data.user || data;
-        if (!user) return;
-
-        // Top-bar avatar — use DB as primary source; fall back to placeholder only if no pic at all
-        const pic = user.profile_picture || user.photo_url || '';
-        if (pic) {
-            const cacheBustedUrl = pic + '?t=' + Date.now();
-            document.querySelectorAll('.user-avatar img, #topbarAvatar, #userInfoProfileImg').forEach(img => {
-                img.src = cacheBustedUrl;
+                        // Save to LocalStorage
+                        try {
+                            localStorage.setItem('userProfileImage', result);
+                        } catch (err) {
+                            console.warn('Failed to save profile image to localStorage', err);
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
         }
 
-        // Helper utils
-        const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '\u2014'; };
-
-        // vender_profile.html profile card
-        setTxt('profileName', user.fullname || user.name);
-        setTxt('profileEmail', user.email);
-        setTxt('profilePhone', user.phone || user.phone_number);
-        setTxt('profileDob', user.date_of_birth || user.dob);
-        setTxt('profileBusinessName', user.business_name || user.biz_name);
-
-        // Dynamic Back to Landing Page Link & My Store URL
-        const backBtn = document.getElementById('backToLandingPage');
-        const storeUrlEl = document.getElementById('displayStoreURL');
-
-        if (backBtn || storeUrlEl) {
-            const slug = user.vendor_slug || user.slug;
-            if (slug) {
-                const cleanUrl = `${window.location.origin}/${slug}`;
-
-                if (backBtn) backBtn.href = cleanUrl;
-                if (storeUrlEl) storeUrlEl.textContent = cleanUrl;
-
-                // Store in window for open/copy functions
-                window.vendorStoreURL = cleanUrl;
-            }
-        }
-
-        // Business verification badge
-        const biz = document.getElementById('profileBizStatusBadge');
-        if (biz) {
-            const s = (user.biz_verification_status || 'pending').toLowerCase();
-            const map = {
-                approved: { cls: 'approved', label: 'Approved' },
-                pending: { cls: 'pending', label: 'Pending' },
-                rejected: { cls: 'rejected', label: 'Rejected' },
-            };
-            const cfg = map[s] || map['pending'];
-            biz.className = 'status-badge ' + cfg.cls;
-            biz.textContent = cfg.label;
-        }
-
-        // user-info.html avatar meta
-        const avatarName = document.getElementById('avatarName');
-        const avatarEmail = document.getElementById('avatarEmail');
-        if (avatarName) avatarName.textContent = user.fullname || user.name || '\u2014';
-        if (avatarEmail) avatarEmail.textContent = user.email || '\u2014';
-
-    } catch (err) {
-        console.warn('[syncVendorProfile]', err.message);
-    }
-}
-
-// Auto-run after page load on all vendor pages
-if (!window.location.pathname.includes('loginvender') &&
-    !window.location.pathname.includes('signup')) {
-    window.addEventListener('load', () => setTimeout(syncVendorProfile, 400));
-}
-
-/* ================================================================
-   PAGINATOR — generic reusable pagination widget
-   new Paginator(items[], perPage, renderFn, '#containerSelector')
-   ================================================================ */
-class Paginator {
-    constructor(items, perPage, renderFn, containerSel) {
-        this._all = items || [];
-        this._perPage = perPage || 10;
-        this._renderFn = renderFn;
-        this._container = document.querySelector(containerSel);
-        this._current = 1;
-    }
-
-    get _totalPages() { return Math.max(1, Math.ceil(this._all.length / this._perPage)); }
-
-    init() { this._render(); }
-
-    setData(newItems) { this._all = newItems || []; this._current = 1; this._render(); }
-
-    goTo(page) {
-        this._current = Math.min(Math.max(1, page), this._totalPages);
-        this._render();
-    }
-
-    _render() {
-        const start = (this._current - 1) * this._perPage;
-        this._renderFn(this._all.slice(start, start + this._perPage));
-        this._renderBar();
-    }
-
-    _renderBar() {
-        if (!this._container) return;
-        if (this._totalPages <= 1) { this._container.innerHTML = ''; return; }
-        const c = this._current, t = this._totalPages;
-        let html = '<nav class="pagination-bar" aria-label="Pagination">';
-        html += `<button class="pg-btn pg-prev" ${c === 1 ? 'disabled' : ''} aria-label="Previous">
-                    <i class="fas fa-chevron-left"></i>
-                 </button>`;
-        this._pageRange(c, t).forEach(p => {
-            if (p === '\u2026') {
-                html += `<span class="pg-ellipsis">\u2026</span>`;
-            } else {
-                html += `<button class="pg-btn pg-num${p === c ? ' active' : ''}" data-page="${p}">${p}</button>`;
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!profileIconBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                closeProfilePanel();
             }
         });
-        html += `<button class="pg-btn pg-next" ${c === t ? 'disabled' : ''} aria-label="Next">
-                    <i class="fas fa-chevron-right"></i>
-                 </button>`;
-        html += `<span class="pg-info">Page ${c} of ${t}</span>`;
-        html += '</nav>';
-        this._container.innerHTML = html;
-        this._container.querySelectorAll('.pg-num').forEach(btn =>
-            btn.addEventListener('click', () => this.goTo(+btn.dataset.page)));
-        const prev = this._container.querySelector('.pg-prev');
-        const next = this._container.querySelector('.pg-next');
-        if (prev) prev.addEventListener('click', () => this.goTo(c - 1));
-        if (next) next.addEventListener('click', () => this.goTo(c + 1));
+
+        // Logout functionality
+        if (profileLogoutBtn) {
+            profileLogoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                await handleLogout();
+            });
+        }
     }
 
-    _pageRange(c, t) {
-        if (t <= 7) return Array.from({ length: t }, (_, i) => i + 1);
-        const r = [1];
-        if (c > 3) r.push('\u2026');
-        for (let p = Math.max(2, c - 1); p <= Math.min(t - 1, c + 1); p++) r.push(p);
-        if (c < t - 2) r.push('\u2026');
-        r.push(t);
-        return r;
+    async function initProfilePanel() {
+        // Check if user is logged in
+        const isLoggedIn = localStorage.getItem('vendorLoggedIn') === 'true';
+
+        if (!isLoggedIn) {
+            // If not logged in, clicking profile icon should redirect to login
+            profileIconBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = 'login.html';
+            });
+
+            // Show login icon instead of profile
+            document.getElementById('profile-initials').textContent = '?';
+            return;
+        }
+
+        // User is logged in, fetch and display profile data
+        await loadUserProfile();
     }
-}
 
-window.Paginator = Paginator;
-window.syncVendorProfile = syncVendorProfile;
+    async function loadUserProfile() {
+        try {
+            // Fetch user profile from backend
+            const response = await ApiService.get('/profile');
 
-/**
- * Clean URL Actions for Vendor Dashboard
- */
-function openStore() {
-    if (window.vendorStoreURL) {
-        window.open(window.vendorStoreURL, '_blank');
-    } else {
-        alert('Store URL not available yet.');
+            const user = response.vendor || response.user || response.customer || response;
+            if (!user) return;
+
+            // Check for locally uploaded image override
+            const localImage = localStorage.getItem('userProfileImage');
+            if (localImage && user) {
+                user.profile_picture = localImage;
+            }
+
+            if (user) {
+                // Update profile icon
+                const profileAvatar = document.getElementById('profile-avatar');
+                const profileInitials = document.getElementById('profile-initials');
+
+                if (user.profile_picture && user.profile_picture !== 'default.png') {
+                    profileAvatar.src = user.profile_picture.startsWith('http')
+                        ? user.profile_picture
+                        : `${window.API_BASE_URL}/${user.profile_picture}`;
+                    profileAvatar.classList.remove('hidden');
+                    profileInitials.textContent = '';
+                } else {
+                    // Show initials
+                    const initials = getInitials(user.fullname || user.full_name || user.email);
+                    profileInitials.textContent = initials;
+                    profileAvatar.classList.add('hidden');
+                }
+
+                // Update dropdown header
+                const dropdownAvatar = document.getElementById('dropdown-avatar');
+                const profileName = document.getElementById('profile-name');
+                const profileGreeting = document.querySelector('.profile-greeting');
+
+                if (dropdownAvatar) {
+                    if (user.profile_picture && user.profile_picture !== 'default.png') {
+                        dropdownAvatar.src = user.profile_picture.startsWith('http')
+                            ? user.profile_picture
+                            : `${window.API_BASE_URL}/${user.profile_picture}`;
+                    } else {
+                        // Use a default avatar or initials
+                        dropdownAvatar.style.display = 'none';
+                    }
+                }
+
+                if (profileName) {
+                    profileName.textContent = user.fullname || user.full_name || 'User';
+                }
+
+                if (profileGreeting) {
+                    const hour = new Date().getHours();
+                    let greeting = 'Hello';
+                    if (hour < 12) greeting = 'Good Morning';
+                    else if (hour < 18) greeting = 'Good Afternoon';
+                    else greeting = 'Good Evening';
+
+                    profileGreeting.textContent = `${greeting}!`;
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load user profile:', error);
+            // If API fails, use localStorage data as fallback
+            const userName = localStorage.getItem('userName') || localStorage.getItem('vendorEmail');
+            if (userName) {
+                const initials = getInitials(userName);
+                document.getElementById('profile-initials').textContent = initials;
+                document.getElementById('profile-name').textContent = userName;
+            }
+        }
     }
-}
 
-function copyStoreLink() {
-    if (window.vendorStoreURL) {
-        navigator.clipboard.writeText(window.vendorStoreURL).then(() => {
-            alert('Store link copied to clipboard!');
-        }).catch(err => {
-            console.error('Copy failed', err);
-            const el = document.createElement('textarea');
-            el.value = window.vendorStoreURL;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-            alert('Store link copied to clipboard!');
-        });
-    } else {
-        alert('Store URL not available yet.');
+    function getInitials(name) {
+        if (!name) return '?';
+        const parts = name.split(' ');
+        if (parts.length >= 2) {
+            return (parts[0][0] + parts[1][0]).toUpperCase();
+        }
+        return name.substring(0, 2).toUpperCase();
     }
-}
 
-window.openStore = openStore;
-window.copyStoreLink = copyStoreLink;
+    function toggleProfilePanel() {
+        const isLoggedIn = localStorage.getItem('vendorLoggedIn') === 'true';
 
+        if (!isLoggedIn) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        profileDropdown.classList.toggle('hidden');
+    }
+
+    function closeProfilePanel() {
+        if (profileDropdown) {
+            profileDropdown.classList.add('hidden');
+        }
+    }
+
+    async function handleLogout() {
+        try {
+            // Call backend logout API
+            await ApiService.post('/auth/logout');
+        } catch (error) {
+            console.error('Logout API error:', error);
+        } finally {
+            // Clear local storage
+            localStorage.removeItem('vendorLoggedIn');
+            localStorage.removeItem('vendorEmail');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userProfileImage');
+
+            // Redirect to login page
+            window.location.href = 'login.html';
+        }
+    }
+
+});

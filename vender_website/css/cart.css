@@ -69,7 +69,7 @@ body {
 /* Header - Adapted for Cart Context but we will use nav in HTML */
 /* But keeping these styles for cart layout consistency */
 /* The HTML will use common nav, so these header styles might be redundant for nav but required for cart layout if cart relies on it?
-   Actually the marketplace cart has its own header.
+   Actually the marketonex cart has its own header.
    The vendor site has a common nav. 
    I will use the vendor nav, but ensure cart container styles work.
 */

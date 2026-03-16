@@ -1,6 +1,6 @@
 /**
  * VENDOR PROFILE DROPDOWN SYSTEM
- * Replicated from Marketplace profile dropdown functionality
+ * Replicated from Marketonex profile dropdown functionality
  * Handles profile icon display, dropdown panel, session management, and logout
  */
 

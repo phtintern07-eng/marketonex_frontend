@@ -1,10 +1,42 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Theme Handling ---
-    // Note: Theme toggle is handled by theme-switcher.js and index/common.js in vendor site.
-    // We just need to ensure cart styles respect data-theme.
-    // The marketonex cart.js has theme toggling logic, but in vendor-site we usually have a separate script/header for it.
-    // I will keep the base theme loading if needed, but rely on existing theme logic if present.
-    // Actually, to be safe and "same functionality", I'll include the basic setting but respect existing.
+    // --- Theme Toggle ---
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const themeDropdown = document.getElementById('theme-dropdown');
+    const body = document.body;
+
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+
+    function setTheme(theme) {
+        body.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+
+        const icon = themeToggleBtn.querySelector('i');
+        if (theme === 'dark') {
+            icon.className = 'fas fa-moon';
+        } else {
+            icon.className = 'fas fa-sun';
+        }
+    }
+
+    themeToggleBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        themeDropdown.classList.toggle('hidden');
+    });
+
+    themeDropdown.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', () => {
+            const theme = button.getAttribute('data-theme');
+            setTheme(theme);
+            themeDropdown.classList.add('hidden');
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!themeToggleBtn.contains(e.target) && !themeDropdown.contains(e.target)) {
+            themeDropdown.classList.add('hidden');
+        }
+    });
 
     // --- Cart Management ---
     const VAT_RATE = 0.05; // 5% VAT
@@ -20,33 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
         'FLAT50': { type: 'fixed', value: 50, description: '₹50 off' }
     };
 
-    // Helper to get vendor slug from URL
-    function getVendorSlug() {
-        const path = window.location.pathname;
-        const parts = path.split('/');
-        if (parts.length >= 3 && parts[1] === 'vendor') {
-            return parts[2];
-        }
-        return null;
-    }
-
-    const VENDOR_SLUG = getVendorSlug();
-    const CART_KEY = VENDOR_SLUG ? `vendor_cart_${VENDOR_SLUG}` : 'vendor_cart';
-
-    // Update Branding
-    if (VENDOR_SLUG) {
-        fetch(`/api/vendors/info/${VENDOR_SLUG}`).then(res => res.json()).then(vendor => {
-            const brands = document.querySelectorAll('.nav-brand');
-            brands.forEach(b => {
-                b.innerHTML = `<i class="fas fa-microchip"></i> ${vendor.business_name || vendor.fullname}`;
-            });
-            document.title = `Cart - ${vendor.business_name || vendor.fullname}`;
-        }).catch(err => console.error('Branding fetch error:', err));
-    }
-
     // Load cart from localStorage
     function loadCart() {
-        const savedCart = localStorage.getItem(CART_KEY);
+        const savedCart = localStorage.getItem('marketonex_cart');
         cart = savedCart ? JSON.parse(savedCart) : [];
         renderCart();
         updateSummary();
@@ -54,7 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Save cart to localStorage
     function saveCart() {
-        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+        localStorage.setItem('marketonex_cart', JSON.stringify(cart));
+        if (typeof window.updateCartBadge === 'function') {
+            window.updateCartBadge();
+        }
     }
 
     // Render cart items
@@ -62,15 +73,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('cart-items-container');
         const emptyMessage = document.getElementById('empty-cart-message');
 
-        if (!container) return;
-
         if (cart.length === 0) {
             container.innerHTML = '';
-            if (emptyMessage) emptyMessage.classList.remove('hidden');
+            emptyMessage.classList.remove('hidden');
             return;
         }
 
-        if (emptyMessage) emptyMessage.classList.add('hidden');
+        emptyMessage.classList.add('hidden');
         container.innerHTML = cart.map((item, index) => `
             <div class="cart-item" data-index="${index}">
                 <div class="item-image">
@@ -179,28 +188,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const total = subtotal + vat + shipping - discount;
 
-        const subtotalEl = document.getElementById('subtotal-amount');
-        if (subtotalEl) subtotalEl.textContent = `₹${subtotal.toFixed(2)}`;
-
-        const vatEl = document.getElementById('vat-amount');
-        if (vatEl) vatEl.textContent = `₹${vat.toFixed(2)}`;
-
-        const shippingEl = document.getElementById('shipping-amount');
-        if (shippingEl) shippingEl.textContent = shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`;
-
-        const totalEl = document.getElementById('total-amount');
-        if (totalEl) totalEl.textContent = `₹${Math.max(0, total).toFixed(2)}`;
+        document.getElementById('subtotal-amount').textContent = `₹${subtotal.toFixed(2)}`;
+        document.getElementById('vat-amount').textContent = `₹${vat.toFixed(2)}`;
+        document.getElementById('shipping-amount').textContent = shipping === 0 ? 'Free' : `₹${shipping.toFixed(2)}`;
+        document.getElementById('total-amount').textContent = `₹${Math.max(0, total).toFixed(2)}`;
 
         // Update discount display
         const discountRow = document.getElementById('applied-discount');
-        if (discountRow) {
-            if (appliedCoupon && discount > 0) {
-                discountRow.classList.remove('hidden');
-                document.getElementById('discount-code').textContent = appliedCoupon.code;
-                document.getElementById('discount-amount').textContent = `-₹${discount.toFixed(2)}`;
-            } else {
-                discountRow.classList.add('hidden');
-            }
+        if (appliedCoupon && discount > 0) {
+            discountRow.classList.remove('hidden');
+            document.getElementById('discount-code').textContent = appliedCoupon.code;
+            document.getElementById('discount-amount').textContent = `-₹${discount.toFixed(2)}`;
+        } else {
+            discountRow.classList.add('hidden');
         }
     }
 
@@ -208,51 +208,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const couponToggle = document.getElementById('coupon-toggle');
     const couponForm = document.getElementById('coupon-form');
 
-    if (couponToggle && couponForm) {
-        couponToggle.addEventListener('click', () => {
-            couponForm.classList.toggle('hidden');
-            couponToggle.classList.toggle('collapsed');
+    couponToggle.addEventListener('click', () => {
+        couponForm.classList.toggle('hidden');
+        couponToggle.classList.toggle('collapsed');
 
-            const icon = couponToggle.querySelector('i');
-            if (couponForm.classList.contains('hidden')) {
-                icon.className = 'fas fa-plus';
-            } else {
-                icon.className = 'fas fa-minus';
-            }
-        });
-    }
+        const icon = couponToggle.querySelector('i');
+        if (couponForm.classList.contains('hidden')) {
+            icon.className = 'fas fa-plus';
+        } else {
+            icon.className = 'fas fa-minus';
+        }
+    });
 
     // Apply coupon
     const applyCouponBtn = document.getElementById('apply-coupon-btn');
     const couponInput = document.getElementById('coupon-input');
     const couponMessage = document.getElementById('coupon-message');
 
-    if (applyCouponBtn && couponInput) {
-        applyCouponBtn.addEventListener('click', () => {
-            const code = couponInput.value.trim().toUpperCase();
+    applyCouponBtn.addEventListener('click', () => {
+        const code = couponInput.value.trim().toUpperCase();
 
-            if (!code) {
-                showCouponMessage('Please enter a coupon code', 'error');
-                return;
-            }
+        if (!code) {
+            showCouponMessage('Please enter a coupon code', 'error');
+            return;
+        }
 
-            if (coupons[code]) {
-                appliedCoupon = { ...coupons[code], code };
-                showCouponMessage(`Coupon applied! ${coupons[code].description}`, 'success');
-                updateSummary();
-                couponInput.value = '';
-            } else {
-                showCouponMessage('Invalid coupon code', 'error');
-                appliedCoupon = null;
-                updateSummary();
-            }
-        });
-    }
+        if (coupons[code]) {
+            appliedCoupon = { ...coupons[code], code };
+            showCouponMessage(`Coupon applied! ${coupons[code].description}`, 'success');
+            updateSummary();
+            couponInput.value = '';
+        } else {
+            showCouponMessage('Invalid coupon code', 'error');
+            appliedCoupon = null;
+            updateSummary();
+        }
+    });
 
     // Show coupon message
     function showCouponMessage(message, type) {
-        if (!couponMessage) return;
-
         couponMessage.textContent = message;
         couponMessage.className = `coupon-message ${type}`;
         couponMessage.classList.remove('hidden');
@@ -263,52 +257,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Back to shopping
-    const backBtn = document.getElementById('back-to-shopping');
-    if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            if (VENDOR_SLUG) {
-                window.location.href = `/vendor/${VENDOR_SLUG}/products.html`;
-            } else {
-                window.location.href = '/vendor-site/products.html';
-            }
-        });
-    }
+    document.getElementById('back-to-shopping').addEventListener('click', () => {
+        window.location.href = 'marketonex.html'; // Sibling file
+    });
 
     // Checkout
-    const checkoutBtn = document.getElementById('checkout-btn');
-    if (checkoutBtn) {
-        checkoutBtn.addEventListener('click', () => {
-            if (cart.length === 0) {
-                showToast('Your cart is empty!', 'error');
-                return;
-            }
+    document.getElementById('checkout-btn').addEventListener('click', () => {
+        if (cart.length === 0) {
+            showToast('Your cart is empty!', 'error');
+            return;
+        }
 
-            showToast('Proceeding to checkout...', 'success');
+        showToast('Proceeding to checkout...', 'success');
 
-            // Save Coupon State for Checkout
-            if (appliedCoupon) {
-                localStorage.setItem('appliedCoupon', JSON.stringify(appliedCoupon));
-            } else {
-                localStorage.removeItem('appliedCoupon');
-            }
+        // Save Coupon State for Checkout
+        if (appliedCoupon) {
+            localStorage.setItem('appliedCoupon', JSON.stringify(appliedCoupon));
+        } else {
+            localStorage.removeItem('appliedCoupon');
+        }
 
-            // Simulate checkout process
-            setTimeout(() => {
-                if (VENDOR_SLUG) {
-                    window.location.href = `/vendor/${VENDOR_SLUG}/checkout.html`;
-                } else {
-                    window.location.href = '/vendor-site/checkout.html';
-                }
-            }, 1000);
-        });
-    }
+        // Simulate checkout process
+        setTimeout(() => {
+            window.location.href = 'checkout.html'; // Redirect to checkout (sibling)
+        }, 1000);
+    });
 
     // Toast notification
     function showToast(message, type = 'success') {
         const toast = document.getElementById('toast-notification');
         const toastMessage = document.getElementById('toast-message');
-
-        if (!toast || !toastMessage) return;
 
         toastMessage.textContent = message;
         toast.className = `toast-notification ${type}`;

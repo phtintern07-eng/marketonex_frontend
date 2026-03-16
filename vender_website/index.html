@@ -54,8 +54,8 @@
                 </a>
             </div>
 
-            <a href="/vendor/vender_profile.html" class="btn-gaming-primary" id="vendor-profile-btn"
-                style="display: none;">
+            <a href="/vendor/vender_profile_products_add-product.html" class="btn-gaming-primary"
+                id="vendor-profile-btn" style="display: none;">
                 Vendor Profile
             </a>
 
@@ -212,8 +212,8 @@
                 <span class="mob-nav-label">Profile</span>
                 <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
             </a>
-            <a href="/vendor/vender_profile.html" class="mob-nav-item mob-nav-vendor" id="mob-vendor-profile-link"
-                style="display: none;">
+            <a href="/vendor/vender_profile_products_add-product.html" class="mob-nav-item mob-nav-vendor"
+                id="mob-vendor-profile-link" style="display: none;">
                 <span class="mob-nav-icon"><i class="fas fa-store"></i></span>
                 <span class="mob-nav-label">Vendor Profile</span>
                 <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
@@ -226,7 +226,7 @@
             <div class="mob-drawer-divider"></div>
             <a href="/" class="mob-nav-item mob-nav-back">
                 <span class="mob-nav-icon"><i class="fas fa-arrow-left"></i></span>
-                <span class="mob-nav-label">Back to Marketplace</span>
+                <span class="mob-nav-label">Back to Marketonex</span>
                 <span class="mob-nav-arrow"><i class="fas fa-chevron-right"></i></span>
             </a>
         </nav>
@@ -592,7 +592,7 @@
                     <div class="info-card-subtitle">Join the Best</div>
                     <p style="color: var(--text-secondary); line-height: 1.6; font-size: 0.9rem; margin-bottom: 1rem;">
                         Partner up with the best custom PC system builder in the world and earn extra cash! Become An
-                        Official MARKETPLACE Affiliate Today!
+                        Official MARKETONEX Affiliate Today!
                     </p>
                 </div>
 
@@ -604,7 +604,7 @@
                     <div class="info-card-title">SUPPORT</div>
                     <div class="info-card-subtitle">US Based Support</div>
                     <p style="color: var(--text-secondary); line-height: 1.6; font-size: 0.9rem; margin-bottom: 1rem;">
-                        Once you join us, we will have you covered. With every system, MARKETPLACE provides a free phone
+                        Once you join us, we will have you covered. With every system, MARKETONEX provides a free phone
                         and online lifetime service guarantee. Available from 6am - 8pm PST.
                     </p>
                 </div>
@@ -640,7 +640,7 @@
                     </ul>
                 </div>
                 <div class="footer-col">
-                    <h4 id="footer-logo">MARKETPLACE</h4>
+                    <h4 id="footer-logo">MARKETONEX</h4>
                     <ul class="footer-links">
                         <li><a href="#">About Us</a></li>
                         <li><a href="#">Contact</a></li>
@@ -670,7 +670,7 @@
 
             <div
                 style="border-top: 1px solid var(--border); padding-top: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.8rem;">
-                &copy; 2024 Marketplace. All rights reserved.
+                &copy; 2024 Marketonex. All rights reserved.
             </div>
         </div>
     </footer>
@@ -764,11 +764,13 @@
             const parts = window.location.pathname.split('/').filter(Boolean);
             // Support both URL patterns:
             //   /vendor/<slug>       → parts[0]='vendor', parts[1]='nikhil-1'
-            //   /<slug>              → parts[0]='nikhil-1'
+            //   /v/<slug>            → parts[0]='v', parts[1]='nikhil-1'
             let slug = null;
             if (parts[0] === 'vendor' && parts[1] && !parts[1].includes('.html')) {
                 slug = parts[1];
-            } else if (parts[0] && !parts[0].includes('.html') && !parts[0].includes('.') && parts[0] !== 'vendor-site') {
+            } else if (parts[0] === 'v' && parts[1] && !parts[1].includes('.html')) {
+                slug = parts[1];
+            } else if (parts[0] && !parts[0].includes('.html') && !parts[0].includes('.') && parts[0] !== 'vendor-site' && parts[0] !== 'v' && parts[0] !== 'vendor') {
                 slug = parts[0];
             }
             if (!slug) return;
@@ -776,88 +778,7 @@
             // Persist so products.html can fall back to localStorage
             localStorage.setItem('vendor_store_slug', slug);
 
-            // Fetch generic vendor elements from DB via the new endpoint
-            fetch(`/api/vendor-website/${slug}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.settings) {
-                        const s = data.settings;
-
-                        // Hero Section
-                        if (s.hero_title) document.getElementById('hero-title').textContent = s.hero_title;
-                        if (s.hero_description) document.getElementById('hero-description').textContent = s.hero_description;
-                        if (s.hero_image) {
-                            const heroImgContainer = document.querySelector('.hero-img-container');
-                            if (heroImgContainer) {
-                                heroImgContainer.style.backgroundImage = `url('${s.hero_image}')`;
-                                // ensure inner img is hidden or synced
-                                const innerImg = heroImgContainer.querySelector('img');
-                                if (innerImg) innerImg.style.display = 'none';
-                            }
-                        }
-
-                        // Feature Section
-                        const featureH2 = document.querySelector('.split-left h2');
-                        if (s.feature_title && featureH2) featureH2.textContent = s.feature_title;
-
-                        const featureSpan = document.querySelector('.split-left span[style*="background-color: var(--accent)"]');
-                        if (s.feature_badge && featureSpan) featureSpan.textContent = s.feature_badge;
-
-                        const featureListContainer = document.querySelector('.split-left .feature-list');
-                        if (s.feature_list && Array.isArray(s.feature_list) && featureListContainer) {
-                            featureListContainer.innerHTML = s.feature_list.map(f => `<li>${f}</li>`).join('');
-                        }
-
-                        // Testimonial
-                        const testTitle = document.querySelector('#testimonial-content h4');
-                        const testText = document.querySelector('#testimonial-content .testimonial-text');
-                        if (s.testimonial_title && testTitle) testTitle.textContent = s.testimonial_title;
-                        if (s.testimonial_text && testText) testText.textContent = `"${s.testimonial_text}"`;
-
-                        // Info Cards
-                        const cards = document.querySelectorAll('.info-card-white');
-                        if (cards.length >= 3) {
-                            // Financing
-                            if (s.financing_title) cards[0].querySelector('.info-card-title').textContent = s.financing_title;
-                            if (s.financing_subtitle) cards[0].querySelector('.info-card-subtitle').textContent = s.financing_subtitle;
-                            if (s.financing_items && Array.isArray(s.financing_items)) {
-                                const ul = cards[0].querySelector('.info-card-list');
-                                if (ul) ul.innerHTML = s.financing_items.map(i => `<li>${i}</li>`).join('');
-                            }
-
-                            // Affiliates
-                            if (s.affiliate_title) cards[1].querySelector('.info-card-title').textContent = s.affiliate_title;
-                            if (s.affiliate_subtitle) cards[1].querySelector('.info-card-subtitle').textContent = s.affiliate_subtitle;
-                            if (s.affiliate_description) {
-                                const p = cards[1].querySelector('p');
-                                if (p) p.textContent = s.affiliate_description;
-                            }
-
-                            // Support
-                            if (s.support_title) cards[2].querySelector('.info-card-title').textContent = s.support_title;
-                            if (s.support_subtitle) cards[2].querySelector('.info-card-subtitle').textContent = s.support_subtitle;
-                            if (s.support_description) {
-                                const p = cards[2].querySelector('p');
-                                if (p) p.textContent = s.support_description;
-                            }
-                        }
-
-                        // Social Links
-                        const socialIcons = document.querySelector('.footer-col .social-icons');
-                        if (socialIcons) {
-                            const facebookLink = socialIcons.querySelector('.fa-facebook-f')?.parentElement;
-                            const twitterLink = socialIcons.querySelector('.fa-twitter')?.parentElement;
-                            const instagramLink = socialIcons.querySelector('.fa-instagram')?.parentElement;
-                            const youtubeLink = socialIcons.querySelector('.fa-youtube')?.parentElement;
-
-                            if (facebookLink) facebookLink.href = s.facebook_link || '#';
-                            if (twitterLink) twitterLink.href = s.twitter_link || '#';
-                            if (instagramLink) instagramLink.href = s.instagram_link || '#';
-                            if (youtubeLink) youtubeLink.href = s.youtube_link || '#';
-                        }
-                    }
-                })
-                .catch(err => console.error("Error fetching vendor website config:", err));
+            // Note: Fetching and applying the website settings is now handled sequentially inside landingpage.js (loadVendorProfile) to prevent race conditions.
 
             // Rewrite all internal /vendor-site/... hrefs to /vendor/<slug>/...
             document.querySelectorAll('a[href^="/vendor-site/"]').forEach(el => {

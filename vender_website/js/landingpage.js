@@ -24,11 +24,17 @@ document.addEventListener('DOMContentLoaded', () => {
 function getVendorSlug() {// vender website link creating //  
     const path = window.location.pathname;
     const parts = path.split('/');
-    // Format: /vendor/<slug>
-    if (parts.length >= 3 && parts[1] === 'vendor') {
+    // Check for /vendor/<slug> or /v/<slug>
+    if (parts.length >= 3 && (parts[1] === 'vendor' || parts[1] === 'v')) {
         return parts[2];
     }
-    return null;
+    // Check for root-level slug like /nikhil: parts = ['', 'nikhil']
+    const rootParts = path.split('/').filter(Boolean);
+    if (rootParts.length === 1 && !rootParts[0].includes('.') && rootParts[0] !== 'vendor-site') {
+        return rootParts[0];
+    }
+    // Fall back to localStorage (set by index.html inline script for all URL formats)
+    return localStorage.getItem('vendor_store_slug') || null;
 }
 
 async function loadVendorProfile(slug) {
@@ -52,13 +58,107 @@ async function loadVendorProfile(slug) {
 
         // Hero Update
         const heroTitle = document.getElementById('hero-title');
-        if (heroTitle) heroTitle.innerHTML = `${vendor.business_name || vendor.fullname}<br>STOREFRONT`;
 
         document.title = `${vendor.business_name || vendor.fullname} - Storefront`;
 
         // Load targeted reviews once we have vendor ID
         if (vendor.id) {
-            loadReviews(vendor.id);
+            await loadReviews(vendor.id);
+        }
+
+        // --- NEW: Load Custom Website Settings ---
+        try {
+            const settingsRes = await fetch(`/api/vendor-website/${slug}`);
+            if (settingsRes.ok) {
+                const data = await settingsRes.json();
+                if (data.success && data.settings) {
+                    const s = data.settings;
+
+                    // Hero Section
+                    if (s.hero_title) {
+                        if (heroTitle) heroTitle.innerHTML = s.hero_title;
+                    } else {
+                        if (heroTitle) heroTitle.innerHTML = `${vendor.business_name || vendor.fullname}<br>STOREFRONT`;
+                    }
+
+                    if (s.hero_description) document.getElementById('hero-description').textContent = s.hero_description;
+                    if (s.hero_image) {
+                        const heroImgContainer = document.querySelector('.hero-img-container');
+                        if (heroImgContainer) {
+                            heroImgContainer.style.backgroundImage = `url('${s.hero_image}')`;
+                            const innerImg = heroImgContainer.querySelector('img');
+                            if (innerImg) innerImg.style.display = 'none';
+                        }
+                    }
+
+                    // Feature Section
+                    const featureH2 = document.querySelector('.split-left h2');
+                    if (s.feature_title && featureH2) featureH2.textContent = s.feature_title;
+
+                    const featureSpan = document.querySelector('.split-left span[style*="background-color: var(--accent)"]');
+                    if (s.feature_badge && featureSpan) featureSpan.textContent = s.feature_badge;
+
+                    const featureListContainer = document.querySelector('.split-left .feature-list');
+                    if (s.feature_list && Array.isArray(s.feature_list) && featureListContainer) {
+                        featureListContainer.innerHTML = s.feature_list.map(f => `<li>${f}</li>`).join('');
+                    }
+
+                    // Testimonial
+                    const testTitle = document.querySelector('#testimonial-content h4');
+                    const testText = document.querySelector('#testimonial-content .testimonial-text');
+                    if (s.testimonial_title && testTitle) testTitle.textContent = s.testimonial_title;
+                    if (s.testimonial_text && testText) testText.textContent = `"${s.testimonial_text}"`;
+
+                    // Info Cards
+                    const cards = document.querySelectorAll('.info-card-white');
+                    if (cards.length >= 3) {
+                        // Financing
+                        if (s.financing_title) cards[0].querySelector('.info-card-title').textContent = s.financing_title;
+                        if (s.financing_subtitle) cards[0].querySelector('.info-card-subtitle').textContent = s.financing_subtitle;
+                        if (s.financing_items && Array.isArray(s.financing_items)) {
+                            const ul = cards[0].querySelector('.info-card-list');
+                            if (ul) ul.innerHTML = s.financing_items.map(i => `<li>${i}</li>`).join('');
+                        }
+
+                        // Affiliates
+                        if (s.affiliate_title) cards[1].querySelector('.info-card-title').textContent = s.affiliate_title;
+                        if (s.affiliate_subtitle) cards[1].querySelector('.info-card-subtitle').textContent = s.affiliate_subtitle;
+                        if (s.affiliate_description) {
+                            const p = cards[1].querySelector('p');
+                            if (p) p.textContent = s.affiliate_description;
+                        }
+
+                        // Support
+                        if (s.support_title) cards[2].querySelector('.info-card-title').textContent = s.support_title;
+                        if (s.support_subtitle) cards[2].querySelector('.info-card-subtitle').textContent = s.support_subtitle;
+                        if (s.support_description) {
+                            const p = cards[2].querySelector('p');
+                            if (p) p.textContent = s.support_description;
+                        }
+                    }
+
+                    // Social Links
+                    const socialIcons = document.querySelector('.footer-col .social-icons');
+                    if (socialIcons) {
+                        const facebookLink = socialIcons.querySelector('.fa-facebook-f')?.parentElement;
+                        const twitterLink = socialIcons.querySelector('.fa-twitter')?.parentElement;
+                        const instagramLink = socialIcons.querySelector('.fa-instagram')?.parentElement;
+                        const youtubeLink = socialIcons.querySelector('.fa-youtube')?.parentElement;
+
+                        if (facebookLink) facebookLink.href = s.facebook_link || '#';
+                        if (twitterLink) twitterLink.href = s.twitter_link || '#';
+                        if (instagramLink) instagramLink.href = s.instagram_link || '#';
+                        if (youtubeLink) youtubeLink.href = s.youtube_link || '#';
+                    }
+                } else {
+                    if (heroTitle) heroTitle.innerHTML = `${vendor.business_name || vendor.fullname}<br>STOREFRONT`;
+                }
+            } else {
+                if (heroTitle) heroTitle.innerHTML = `${vendor.business_name || vendor.fullname}<br>STOREFRONT`;
+            }
+        } catch (setErr) {
+            console.error("Error fetching custom vendor website settings:", setErr);
+            if (heroTitle) heroTitle.innerHTML = `${vendor.business_name || vendor.fullname}<br>STOREFRONT`;
         }
     } catch (err) {
         console.error('Failed to load vendor profile:', err);
@@ -139,7 +239,7 @@ async function loadFeaturedProducts(vendorSlug = null) {
     if (!container) return;
 
     try {
-        let apiUrl = '/api/marketplace/products?limit=4';
+        let apiUrl = '/api/marketonex/products?limit=4';
         if (vendorSlug) {
             apiUrl += `&vendor_slug=${vendorSlug}`;
         }
