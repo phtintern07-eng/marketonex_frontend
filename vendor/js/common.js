@@ -107,11 +107,11 @@ async function checkAuth() {
 
                 // Stage 1: Admin approval check (existing logic)
                 if (!currentUser.verified || currentUser.verified === 'false' || currentUser.verified === 0) {
-                    const verificationPages = ['signup.html', 'verification.html', 'verification_biz_verification_website_editor.html', 'vender_profile_products_add-product.html', 'loginvender.html'];
+                    const verificationPages = ['signup.html', 'verification_biz_verification_website_editor.html', 'vender_profile_products_add-product.html', 'loginvender.html'];
                     const isAllowedPage = verificationPages.some(page => path.endsWith(page));
 
                     if (!isAllowedPage) {
-                        window.location.href = 'verification.html?msg=restricted';
+                        window.location.href = 'verification_biz_verification_website_editor.html?msg=restricted';
                         return;
                     }
 
@@ -129,7 +129,7 @@ async function checkAuth() {
                         const isRestricted = restrictedPages.some(page => path.endsWith(page));
 
                         if (isRestricted) {
-                            let redirectTarget = 'verification.html';
+                            let redirectTarget = 'verification_biz_verification_website_editor.html';
                             // KYC pending stays on verification page for status info
                             window.location.href = redirectTarget + '?msg=kyc_required';
                             return;
@@ -1026,9 +1026,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.warn('[DASHBOARD] API stats failed, using local data only:', apiErr);
             }
 
-            // Merge or prioritize local data for orders/sales
-            const totalOrdersCount = filteredLocal.length || apiStats.total_orders || 0;
-            const totalSales = filteredLocal.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0) || apiStats.total_sales || 0;
+            // Priority: Use API stats if available, otherwise fallback to local calculation
+            const totalOrdersCount = apiStats.total_orders !== undefined ? apiStats.total_orders : (filteredLocal.length || 0);
+            const totalSales = apiStats.total_sales !== undefined ? apiStats.total_sales : (filteredLocal.reduce((sum, o) => sum + (parseFloat(o.total) || 0), 0) || 0);
 
             // Products and Rating still come from API if available
             const totalProducts = apiStats.total_products || 0;
@@ -1550,6 +1550,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (imageUploadArea) {
                     imageUploadArea.querySelector('p').textContent = 'Upload product images (Multiple allowed)';
                     imageUploadArea.style.borderColor = '';
+                }
+
+                // Refresh dashboard metrics after save
+                if (typeof calculateDashboardMetrics === 'function') {
+                    calculateDashboardMetrics();
                 }
             };
 

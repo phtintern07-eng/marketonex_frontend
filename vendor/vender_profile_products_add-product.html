@@ -343,7 +343,7 @@
             transform: translateY(-50%);
             font-weight: 700;
             font-size: 0.95rem;
-            color: var(--accent-blue);
+            color: var(--primary-red);
             pointer-events: none;
             z-index: 1;
         }
@@ -381,12 +381,12 @@
         }
 
         .image-upload-box:hover {
-            border-color: var(--accent-blue);
+            border-color: var(--primary-red);
             transform: translateY(-2px);
             background: var(--bg-card);
             box-shadow:
-                0 0 0 4px rgba(6, 182, 212, 0.06),
-                0 10px 30px rgba(6, 182, 212, 0.13);
+                0 0 0 4px rgba(255, 45, 45, 0.06),
+                0 10px 30px rgba(255, 45, 45, 0.13);
         }
 
         .image-upload-box:hover::before {
@@ -415,9 +415,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, var(--accent-blue) 0%, rgba(6, 182, 212, 0.45) 100%);
+            background: linear-gradient(135deg, var(--primary-red) 0%, rgba(255, 45, 45, 0.45) 100%);
             box-shadow:
-                0 6px 18px rgba(6, 182, 212, 0.25),
+                0 6px 18px rgba(255, 45, 45, 0.25),
                 inset 0 1px 0 rgba(255, 255, 255, 0.25);
             transition: all 0.3s ease;
         }
@@ -588,11 +588,11 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--accent-blue) 0%, #0891b2 100%);
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-hover) 100%);
             color: #fff;
             border: none;
             box-shadow:
-                0 4px 14px rgba(6, 182, 212, 0.35),
+                0 4px 14px rgba(255, 45, 45, 0.35),
                 0 1px 3px rgba(0, 0, 0, 0.12),
                 inset 0 -3px 0 rgba(0, 0, 0, 0.18);
         }
@@ -763,11 +763,26 @@
             <span>VendorVerse</span>
         </div>
         <nav class="nav-menu">
-            <a href="vender_profile_products_add-product.html#profile-page" class="nav-item active" data-page="profile-page" id="nav-profile">
+            {% if not user or not user.verified or user.kyc_status != 'approved' %}
+            <a href="verification_biz_verification_website_editor.html#business-verification-page" class="nav-item"
+                id="nav-verification">
+                <i class="fas fa-shield-alt"></i>
+                <span>Verification</span>
+            </a>
+            {% elif user.biz_verification_status != 'approved' %}
+            <a href="verification_biz_verification_website_editor.html#store-verification-page" class="nav-item"
+                id="nav-store-verification">
+                <i class="fas fa-store"></i>
+                <span>Store Verification</span>
+            </a>
+            {% else %}
+            <a href="vender_profile_products_add-product.html#profile-page" class="nav-item active"
+                data-page="profile-page" id="nav-profile">
                 <i class="fas fa-user"></i>
                 <span>My Profile</span>
             </a>
-            <a href="vender_profile_products_add-product.html#products-page" class="nav-item" data-page="products-page" id="nav-products">
+            <a href="vender_profile_products_add-product.html#products-page" class="nav-item" data-page="products-page"
+                id="nav-products">
                 <i class="fas fa-box"></i>
                 <span>My Products</span>
             </a>
@@ -811,6 +826,7 @@
                 <i class="fas fa-laptop-code"></i>
                 <span>Website Editor</span>
             </a>
+            {% endif %}
         </nav>
     </div>
 
@@ -1489,7 +1505,10 @@
         .btn-primary:disabled {
             opacity: 0.6;
             cursor: not-allowed;
-            background: #95a5a6 !important;
+            background: var(--border-color) !important;
+            border-color: var(--border-color) !important;
+            box-shadow: none !important;
+            transform: none !important;
         }
     </style>
     <script>
@@ -1989,8 +2008,12 @@
             // Attach click handlers to nav items with data-page
             document.querySelectorAll('.nav-item[data-page]').forEach(function (a) {
                 a.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    navigateTo(this.getAttribute('data-page'));
+                    const pageId = this.getAttribute('data-page');
+                    // ONLY prevent default if the section exists in THIS file
+                    if (pageId && document.getElementById(pageId)) {
+                        e.preventDefault();
+                        navigateTo(pageId);
+                    }
                 });
             });
 
@@ -2024,20 +2047,6 @@
             window.navigateTo = navigateTo;
         })();
 
-        // Requested switching logic
-        document.querySelectorAll('[data-page]').forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                const page = this.getAttribute('data-page');
-                document.querySelectorAll('.vendor-page').forEach(p => {
-                    p.classList.remove('active');
-                });
-                const target = document.getElementById(page);
-                if (target) {
-                    target.classList.add('active');
-                }
-            });
-        });
     </script>
 
     <!-- Global Theme Handler — must be loaded after all page HTML is in DOM -->

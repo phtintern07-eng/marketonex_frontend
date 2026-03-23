@@ -237,7 +237,14 @@ function updateBizStatusUI(data) {
         form.style.display = 'block';
         pendingMsg.style.display = 'none';
         const mainSubmit = document.getElementById('submitBtn');
-        if (mainSubmit) mainSubmit.style.display = 'block';
+        if (mainSubmit) {
+            mainSubmit.style.display = 'block';
+            mainSubmit.disabled = false;
+        }
+
+        // Safely force-enable ALL inputs and buttons inside Business Verification form
+        document.querySelectorAll("#bizVerificationForm input, #bizVerificationForm button")
+            .forEach(el => el.disabled = false);
     }
 
     // Populate existing files if any
@@ -859,7 +866,8 @@ function disableForm() {
     formDisabled = true;
     const rejectedSection = document.getElementById('rejected-docs-section');
     const editorPage = document.getElementById('website-editor-page');
-    const inputs = document.querySelectorAll('input, select, textarea, button');
+    // TARGET ONLY KYC verification page fields (#business-verification-page)
+    const inputs = document.querySelectorAll('#business-verification-page input, #business-verification-page select, #business-verification-page textarea, #business-verification-page button');
     inputs.forEach(el => {
         // Never disable theme/mobile controls, elements in the website editor, or re-upload section elements
         if (el.classList.contains('theme-btn') || el.classList.contains('mobile-menu-btn')) return;

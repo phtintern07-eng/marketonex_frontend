@@ -577,6 +577,19 @@
                 <span>VendorVerse</span>
             </div>
             <nav class="nav-menu">
+                {% if not user or not user.verified or user.kyc_status != 'approved' %}
+                <a href="verification_biz_verification_website_editor.html#business-verification-page"
+                    class="nav-item active" data-page="business-verification-page" id="nav-verification">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Verification</span>
+                </a>
+                {% elif user.biz_verification_status != 'approved' %}
+                <a href="verification_biz_verification_website_editor.html#store-verification-page" class="nav-item"
+                    data-page="store-verification-page" id="nav-store-verification">
+                    <i class="fas fa-store"></i>
+                    <span>Store Verification</span>
+                </a>
+                {% else %}
                 <a href="vender_profile_products_add-product.html#profile-page" class="nav-item" id="nav-profile">
                     <i class="fas fa-user"></i>
                     <span>My Profile</span>
@@ -625,6 +638,7 @@
                     <i class="fas fa-laptop-code"></i>
                     <span>Website Editor</span>
                 </a>
+                {% endif %}
             </nav>
         </div>
 
@@ -1173,7 +1187,7 @@
             <div id="store-verification-page" class="vendor-page">
                 <div class="main-content">
                     <div class="top-bar">
-                        <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <button class="mobile-menu-btn" id="mobileMenuBtnStore">
                             <i class="fas fa-bars"></i>
                         </button>
                         <div class="theme-controls">
@@ -1341,7 +1355,7 @@
                 <div class="main-content">
                     <!-- Top Bar for Editor -->
                     <div class="top-bar">
-                        <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <button class="mobile-menu-btn" id="mobileMenuBtnEditor" sidebar-toggle-target="true">
                             <i class="fas fa-bars"></i>
                         </button>
                         <div class="theme-controls">
@@ -1808,7 +1822,7 @@
                     const saveBtn = document.getElementById('saveWebsiteBtn');
                     const floatingSaveBtn = document.getElementById('floatingSaveBtn');
                     const sidebar = document.querySelector('.sidebar');
-                    const sidebarToggle = document.getElementById('sidebarToggle');
+                    const sidebarToggle = document.getElementById('sidebarToggle') || document.getElementById('mobileMenuBtnEditor');
 
                     // --- Core Logic: Load & Save ---
                     async function loadSettings() {
@@ -1818,66 +1832,68 @@
                             if (data.success && data.settings) {
                                 const s = data.settings;
 
-                                // Map inputs correctly
-                                inputs.heroTitle.value = s.hero_title || '';
-                                inputs.heroDesc.value = s.hero_description || '';
-                                inputs.heroImage.value = s.hero_image || '';
-                                inputs.featureTitle.value = s.feature_title || '';
-                                inputs.featureBadge.value = s.feature_badge || '';
-                                inputs.testimonialTitle.value = s.testimonial_title || '';
-                                inputs.testimonialText.value = s.testimonial_text || '';
-                                inputs.facebook.value = s.facebook_link || '';
-                                inputs.twitter.value = s.twitter_link || '';
-                                inputs.instagram.value = s.instagram_link || '';
-                                inputs.youtube.value = s.youtube_link || '';
-                                inputs.financingTitle.value = s.financing_title || '';
-                                inputs.financingSubtitle.value = s.financing_subtitle || '';
-                                inputs.affiliateTitle.value = s.affiliate_title || '';
-                                inputs.affiliateSubtitle.value = s.affiliate_subtitle || '';
-                                inputs.affiliateDesc.value = s.affiliate_description || '';
-                                inputs.supportTitle.value = s.support_title || '';
-                                inputs.supportSubtitle.value = s.support_subtitle || '';
-                                inputs.supportDesc.value = s.support_description || '';
+                                // Map inputs correctly (with null checks)
+                                if (inputs.heroTitle) inputs.heroTitle.value = s.hero_title || '';
+                                if (inputs.heroDesc) inputs.heroDesc.value = s.hero_description || '';
+                                if (inputs.heroImage) inputs.heroImage.value = s.hero_image || '';
+                                if (inputs.featureTitle) inputs.featureTitle.value = s.feature_title || '';
+                                if (inputs.featureBadge) inputs.featureBadge.value = s.feature_badge || '';
+                                if (inputs.testimonialTitle) inputs.testimonialTitle.value = s.testimonial_title || '';
+                                if (inputs.testimonialText) inputs.testimonialText.value = s.testimonial_text || '';
+                                if (inputs.facebook) inputs.facebook.value = s.facebook_link || '';
+                                if (inputs.twitter) inputs.twitter.value = s.twitter_link || '';
+                                if (inputs.instagram) inputs.instagram.value = s.instagram_link || '';
+                                if (inputs.youtube) inputs.youtube.value = s.youtube_link || '';
+                                if (inputs.financingTitle) inputs.financingTitle.value = s.financing_title || '';
+                                if (inputs.financingSubtitle) inputs.financingSubtitle.value = s.financing_subtitle || '';
+                                if (inputs.affiliateTitle) inputs.affiliateTitle.value = s.affiliate_title || '';
+                                if (inputs.affiliateSubtitle) inputs.affiliateSubtitle.value = s.affiliate_subtitle || '';
+                                if (inputs.affiliateDesc) inputs.affiliateDesc.value = s.affiliate_description || '';
+                                if (inputs.supportTitle) inputs.supportTitle.value = s.support_title || '';
+                                if (inputs.supportSubtitle) inputs.supportSubtitle.value = s.support_subtitle || '';
+                                if (inputs.supportDesc) inputs.supportDesc.value = s.support_description || '';
 
                                 // Lists
-                                renderDynamicList(featureContainer, previews.featureList, s.feature_list || []);
-                                renderDynamicList(financingContainer, previews.financingList, s.financing_items || []);
+                                if (featureContainer && previews.featureList) renderDynamicList(featureContainer, previews.featureList, s.feature_list || []);
+                                if (financingContainer && previews.financingList) renderDynamicList(financingContainer, previews.financingList, s.financing_items || []);
 
                                 // Bootstrap Previews
                                 Object.keys(inputs).forEach(k => {
-                                    inputs[k].dispatchEvent(new Event('input', { bubbles: true }));
+                                    if (inputs[k]) inputs[k].dispatchEvent(new Event('input', { bubbles: true }));
                                 });
                             }
                         } catch (err) { console.error("Error loading builder settings:", err); }
                     }
 
                     async function saveSettings() {
-                        const btnOriginal = saveBtn.innerHTML;
-                        saveBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> PUBLISHING';
-                        saveBtn.disabled = true;
+                        const btnOriginal = saveBtn?.innerHTML || 'Save & Publish';
+                        if (saveBtn) {
+                            saveBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> PUBLISHING';
+                            saveBtn.disabled = true;
+                        }
 
                         const payload = {
-                            hero_title: inputs.heroTitle.value,
-                            hero_description: inputs.heroDesc.value,
-                            hero_image: inputs.heroImage.value,
-                            feature_title: inputs.featureTitle.value,
-                            feature_badge: inputs.featureBadge.value,
+                            hero_title: inputs.heroTitle?.value || '',
+                            hero_description: inputs.heroDesc?.value || '',
+                            hero_image: inputs.heroImage?.value || '',
+                            feature_title: inputs.featureTitle?.value || '',
+                            feature_badge: inputs.featureBadge?.value || '',
                             feature_list: getListVals(featureContainer),
-                            testimonial_title: inputs.testimonialTitle.value,
-                            testimonial_text: inputs.testimonialText.value,
-                            facebook_link: inputs.facebook.value,
-                            twitter_link: inputs.twitter.value,
-                            instagram_link: inputs.instagram.value,
-                            youtube_link: inputs.youtube.value,
-                            financing_title: inputs.financingTitle.value,
-                            financing_subtitle: inputs.financingSubtitle.value,
+                            testimonial_title: inputs.testimonialTitle?.value || '',
+                            testimonial_text: inputs.testimonialText?.value || '',
+                            facebook_link: inputs.facebook?.value || '',
+                            twitter_link: inputs.twitter?.value || '',
+                            instagram_link: inputs.instagram?.value || '',
+                            youtube_link: inputs.youtube?.value || '',
+                            financing_title: inputs.financingTitle?.value || '',
+                            financing_subtitle: inputs.financingSubtitle?.value || '',
                             financing_items: getListVals(financingContainer),
-                            affiliate_title: inputs.affiliateTitle.value,
-                            affiliate_subtitle: inputs.affiliateSubtitle.value,
-                            affiliate_description: inputs.affiliateDesc.value,
-                            support_title: inputs.supportTitle.value,
-                            support_subtitle: inputs.supportSubtitle.value,
-                            support_description: inputs.supportDesc.value
+                            affiliate_title: inputs.affiliateTitle?.value || '',
+                            affiliate_subtitle: inputs.affiliateSubtitle?.value || '',
+                            affiliate_description: inputs.affiliateDesc?.value || '',
+                            support_title: inputs.supportTitle?.value || '',
+                            support_subtitle: inputs.supportSubtitle?.value || '',
+                            support_description: inputs.supportDesc?.value || ''
                         };
 
                         try {
@@ -1892,27 +1908,33 @@
                             } else { alert('FAILED: ' + result.error); }
                         } catch (e) { alert('CRITICAL SERVER ERROR: Unable to save.'); }
                         finally {
-                            saveBtn.innerHTML = btnOriginal;
-                            saveBtn.disabled = false;
+                            if (saveBtn) {
+                                saveBtn.innerHTML = btnOriginal;
+                                saveBtn.disabled = false;
+                            }
                         }
                     }
 
-                    saveBtn.onclick = saveSettings;
-                    floatingSaveBtn.onclick = saveSettings;
+                    if (saveBtn) saveBtn.onclick = saveSettings;
+                    if (floatingSaveBtn) floatingSaveBtn.onclick = saveSettings;
 
                     // --- Interactivity: Bindings ---
                     Object.keys(inputs).forEach(key => {
-                        inputs[key].addEventListener('input', (e) => {
-                            const value = e.target.value.trim();
-                            if (key === 'heroImage') {
-                                previews.heroImageStyle.style.backgroundImage = value ? `url('${value}')` : 'none';
-                            } else if (['facebook', 'twitter', 'instagram', 'youtube'].includes(key)) {
-                                previews[key].href = value || '#';
-                                previews[key].style.color = value ? 'var(--accent-blue)' : '#444';
-                            } else if (previews[key]) {
-                                previews[key].textContent = e.target.value;
-                            }
-                        });
+                        if (inputs[key]) {
+                            inputs[key].addEventListener('input', (e) => {
+                                const value = e.target.value.trim();
+                                if (key === 'heroImage') {
+                                    if (previews.heroImageStyle) previews.heroImageStyle.style.backgroundImage = value ? `url('${value}')` : 'none';
+                                } else if (['facebook', 'twitter', 'instagram', 'youtube'].includes(key)) {
+                                    if (previews[key]) {
+                                        previews[key].href = value || '#';
+                                        previews[key].style.color = value ? 'var(--accent-blue)' : '#444';
+                                    }
+                                } else if (previews[key]) {
+                                    previews[key].textContent = e.target.value;
+                                }
+                            });
+                        }
                     });
 
                     // --- Interactivity: Dynamic Lists ---
@@ -1948,8 +1970,10 @@
                         return Array.from(container.querySelectorAll('input')).map(i => i.value).filter(v => v.trim() !== '');
                     }
 
-                    document.getElementById('addFeatureBtn').onclick = () => addListItem(featureContainer, previews.featureList, 'New highlight...');
-                    document.getElementById('addFinancingBtn').onclick = () => addListItem(financingContainer, previews.financingList, 'Flexible payment term...');
+                    const addFBtn = document.getElementById('addFeatureBtn');
+                    if (addFBtn) addFBtn.onclick = () => addListItem(featureContainer, previews.featureList, 'New highlight...');
+                    const addFinBtn = document.getElementById('addFinancingBtn');
+                    if (addFinBtn) addFinBtn.onclick = () => addListItem(financingContainer, previews.financingList, 'Flexible payment term...');
 
                     // --- Interactivity: UI Controls ---
 
@@ -1975,17 +1999,19 @@
                     });
 
                     // Sidebar & Responsiveness
-                    sidebarToggle.onclick = (e) => {
-                        e.stopPropagation();
-                        sidebar.classList.toggle('active');
-                    };
+                    if (sidebarToggle) {
+                        sidebarToggle.onclick = (e) => {
+                            e.stopPropagation();
+                            sidebar.classList.toggle('active');
+                        };
+                    }
                     document.onclick = (e) => {
                         if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== sidebarToggle) {
                             sidebar.classList.remove('active');
                         }
                     };
                     window.onresize = () => {
-                        sidebarToggle.style.display = (window.innerWidth <= 1024) ? 'block' : 'none';
+                        if (sidebarToggle) sidebarToggle.style.display = (window.innerWidth <= 1024) ? 'block' : 'none';
                         if (window.innerWidth > 1024) sidebar.classList.remove('active');
                         scalePreview();
                     };
@@ -2117,17 +2143,24 @@
             function navigateTo(pageId) {
                 if (!pageId) return;
 
-                // Hide all sections
-                document.querySelectorAll('.vendor-page').forEach(s => s.classList.remove('active'));
+                // Hide all sections (Brute-force inline display: none to prevent blank pages)
+                document.querySelectorAll('.vendor-page').forEach(s => {
+                    s.classList.remove('active');
+                    s.style.display = 'none';
+                });
 
                 // Show target section
                 const target = document.getElementById(pageId);
                 if (target) {
                     target.classList.add('active');
+                    target.style.display = 'block';
                 } else {
                     // Fallback to default if page not found in this file
                     const def = document.getElementById('business-verification-page');
-                    if (def) def.classList.add('active');
+                    if (def) {
+                        def.classList.add('active');
+                        def.style.display = 'block';
+                    }
                     return;
                 }
 
@@ -2152,7 +2185,8 @@
             document.querySelectorAll('[data-page]').forEach(el => {
                 el.addEventListener('click', (e) => {
                     const pageId = el.getAttribute('data-page');
-                    if (pageId) {
+                    // ONLY prevent default if the section exists in THIS file
+                    if (pageId && document.getElementById(pageId)) {
                         e.preventDefault();
                         navigateTo(pageId);
                     }

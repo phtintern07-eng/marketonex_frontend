@@ -10,27 +10,48 @@
    DARK THEME (default) — Sidebar: #06B6D4 | Content: #000000
    ============================================================ */
 :root {
-    --sidebar-bg: #06B6D4;
-    --sidebar-text: #000000;
-    --sidebar-hover: rgba(0, 0, 0, 0.15);
-    --sidebar-active: rgba(0, 0, 0, 0.20);
-    --sidebar-accent: #000000;
-    --sidebar-border: #0891b2;
+    /* New Palette Variables */
+    --bg-main: #000000;
+    --bg-secondary: #121212;
+    --bg-card: #1A1A1A;
 
-    --content-bg: #000000;
-    --bg-primary: #000000;
-    --bg-secondary: #0f0f0f;
-    --bg-card: #141414;
-    --text-primary: #ffffff;
-    --text-secondary: #a1a1aa;
-    --border-color: #262626;
-    --accent-blue: #06B6D4;
+    --primary-red: #FF2D2D;
+    --primary-red-hover: #E50914;
+
+    --text-main: #FFFFFF;
+    --text-secondary: #B0B0B0;
+    --text-muted: #808080;
+
+    --border-color: #444444;
+    --border-hover: #666666;
+
+    --gradient-start: #0F2027;
+    --gradient-mid: #203A43;
+    --gradient-end: #2C5364;
+
+    /* Existing Variable Mapping (Maintenance) */
+    --sidebar-bg: var(--bg-secondary);
+    --sidebar-text: var(--text-main);
+    --sidebar-hover: rgba(255, 255, 255, 0.05);
+    --sidebar-active: var(--bg-card);
+    --sidebar-accent: var(--primary-red);
+    --sidebar-border: var(--border-color);
+
+    --content-bg: var(--bg-main);
+    --bg-primary: var(--bg-main);
+    --bg-secondary: var(--bg-secondary);
+    --bg-card: var(--bg-card);
+    /* Using new --bg-card */
+    --text-primary: var(--text-main);
+    --text-secondary: var(--text-secondary);
+    --border-color: var(--border-color);
+    --accent-blue: var(--primary-red);
     --accent-green: #34d399;
     --accent-yellow: #fbbf24;
-    --accent-red: #f87171;
-    --bg-input: #0f0f0f;
-    --border-input: #262626;
-    --text-input: #ffffff;
+    --accent-red: var(--primary-red);
+    --bg-input: var(--bg-secondary);
+    --border-input: var(--border-color);
+    --text-input: var(--text-main);
 }
 
 /* ============================================================
@@ -54,6 +75,7 @@
     --bg-input: #ffffff;
     --border-input: #7ecff0;
     --text-input: #0d2d3d;
+    --text-main: #0d2d3d;
     --accent-blue: #0090cc;
     --accent-green: #059669;
     --accent-yellow: #d97706;
@@ -85,6 +107,7 @@
     --bg-input: #fdf3ed;
     --border-input: #e8c5b0;
     --text-input: #3b1f1f;
+    --text-main: #3b1f1f;
     --accent-blue: #8B4513;
     --accent-green: #5a8a4a;
     --accent-yellow: #c8871a;
@@ -116,30 +139,43 @@
     top: 100%;
     right: 0;
     margin-top: 8px;
-    background: var(--bg-card);
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-main) !important;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     width: 150px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
     display: none;
-    z-index: 100;
+    z-index: 9999;
     overflow: hidden;
+    opacity: 1;
+    visibility: visible;
 }
 
 .theme-menu.active {
     display: block;
 }
 
-.theme-option {
+.theme-option,
+.theme-menu a,
+.theme-menu button {
     padding: 10px 16px;
     cursor: pointer;
-    color: var(--text-primary);
+    color: var(--text-main) !important;
     transition: all 0.2s ease;
     font-size: 14px;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    display: block;
+    text-decoration: none;
 }
 
-.theme-option:hover {
-    background: rgba(59, 130, 246, 0.05);
+.theme-option:hover,
+.theme-menu a:hover,
+.theme-menu button:hover {
+    background-color: var(--bg-card) !important;
 }
 
 .theme-option.active {
@@ -162,8 +198,8 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    background: var(--content-bg);
-    color: var(--text-primary);
+    background: var(--bg-main);
+    color: var(--text-main);
     display: flex;
     min-height: 100vh;
 }
@@ -271,7 +307,7 @@ body {
 
 /* Top Bar */
 .top-bar {
-    background: rgba(0, 0, 0, 0.06);
+    background: linear-gradient(to right, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border-color);
     padding: 16px 32px;
@@ -842,8 +878,8 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: var(--accent-blue);
-    color: var(--text-primary);
+    background: var(--primary-red);
+    color: var(--text-main);
     border: none;
     padding: 12px 20px;
     border-radius: 8px;
@@ -854,7 +890,9 @@ body {
 }
 
 .add-product-btn:hover {
-    background: #2563eb;
+    background: var(--primary-red-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 45, 45, 0.3);
 }
 
 /* Products Controls */
@@ -1080,13 +1118,14 @@ body {
 }
 
 .action-btn.primary {
-    background: #8b5cf6;
-    /* Purple accent from image */
+    background: var(--primary-red);
     color: #ffffff;
 }
 
 .action-btn.primary:hover {
-    background: #7c3aed;
+    background: var(--primary-red-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 45, 45, 0.4);
 }
 
 /* Stats Grid */
@@ -1441,8 +1480,8 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: var(--text-primary);
-    color: var(--bg-primary);
+    background: var(--primary-red);
+    color: #ffffff;
     border: none;
     padding: 12px 20px;
     border-radius: 8px;
@@ -1453,7 +1492,9 @@ body {
 }
 
 .generate-btn:hover {
-    background: #e5e7eb;
+    background: var(--primary-red-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 45, 45, 0.3);
 }
 
 .recommendations-card {
@@ -1751,8 +1792,8 @@ body {
 }
 
 .save-btn {
-    background: var(--text-primary);
-    color: var(--bg-primary);
+    background: var(--primary-red);
+    color: #ffffff;
     border: none;
     padding: 12px 24px;
     border-radius: 8px;
@@ -1763,7 +1804,9 @@ body {
 }
 
 .save-btn:hover {
-    background: #e5e7eb;
+    background: var(--primary-red-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 45, 45, 0.3);
 }
 
 .change-password-btn {

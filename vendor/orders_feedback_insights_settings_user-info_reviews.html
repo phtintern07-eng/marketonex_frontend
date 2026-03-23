@@ -35,46 +35,68 @@
             <span>VendorVerse</span>
         </div>
         <nav class="nav-menu">
-            <a href="vender_profile_products_add-product.html#profile-page" class="nav-item">
-                <i class="fas fa-user"></i>
-                <span>My Profile</span>
-            </a>
-            <a href="vender_profile_products_add-product.html#products-page" class="nav-item">
-                <i class="fas fa-box"></i>
-                <span>My Products</span>
-            </a>
-            <a href="orders_feedback_insights_settings_user-info_reviews.html#orders-page" class="nav-item active">
-                <i class="fas fa-shopping-cart"></i>
-                <span>Orders</span>
-            </a>
-            <a href="orders_feedback_insights_settings_user-info_reviews.html#feedback-page" class="nav-item">
-                <i class="fas fa-comment-dots"></i>
-                <span>Feedback</span>
-            </a>
-            <a href="orders_feedback_insights_settings_user-info_reviews.html#insights-page" class="nav-item">
-                <i class="fas fa-chart-line"></i>
-                <span>Insights</span>
-            </a>
-            <a href="orders_feedback_insights_settings_user-info_reviews.html#settings-page" class="nav-item">
-                <i class="fas fa-cog"></i>
-                <span>Settings</span>
-            </a>
-            <a href="verification_biz_verification_website_editor.html#business-verification-page" class="nav-item">
+            {% if not user or not user.verified or user.kyc_status != 'approved' %}
+            <a href="verification_biz_verification_website_editor.html#business-verification-page"
+                class="nav-item active" data-page="business-verification-page" id="nav-verification">
                 <i class="fas fa-shield-alt"></i>
                 <span>Verification</span>
             </a>
-            <a href="verification_biz_verification_website_editor.html#store-verification-page" class="nav-item">
+            {% elif user.biz_verification_status != 'approved' %}
+            <a href="verification_biz_verification_website_editor.html#store-verification-page" class="nav-item active"
+                data-page="store-verification-page" id="nav-store-verification">
                 <i class="fas fa-store"></i>
                 <span>Store Verification</span>
             </a>
-            <a href="#" class="nav-item" data-page="reviews-page">
+            {% else %}
+            <a href="vender_profile_products_add-product.html#profile-page" class="nav-item" id="nav-profile">
+                <i class="fas fa-user"></i>
+                <span>My Profile</span>
+            </a>
+            <a href="vender_profile_products_add-product.html#products-page" class="nav-item" id="nav-products">
+                <i class="fas fa-box"></i>
+                <span>My Products</span>
+            </a>
+            <a href="orders_feedback_insights_settings_user-info_reviews.html#orders-page" class="nav-item active"
+                id="nav-orders">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Orders</span>
+            </a>
+            <a href="orders_feedback_insights_settings_user-info_reviews.html#feedback-page" class="nav-item"
+                id="nav-feedback">
+                <i class="fas fa-comment-dots"></i>
+                <span>Feedback</span>
+            </a>
+            <a href="orders_feedback_insights_settings_user-info_reviews.html#insights-page" class="nav-item"
+                id="nav-insights">
+                <i class="fas fa-chart-line"></i>
+                <span>Insights</span>
+            </a>
+            <a href="orders_feedback_insights_settings_user-info_reviews.html#settings-page" class="nav-item"
+                id="nav-settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="verification_biz_verification_website_editor.html#business-verification-page" class="nav-item"
+                data-page="business-verification-page" id="nav-verification">
+                <i class="fas fa-shield-alt"></i>
+                <span>Verification</span>
+            </a>
+            <a href="verification_biz_verification_website_editor.html#store-verification-page" class="nav-item"
+                data-page="store-verification-page" id="nav-store-verification">
+                <i class="fas fa-store"></i>
+                <span>Store Verification</span>
+            </a>
+            <a href="orders_feedback_insights_settings_user-info_reviews.html#reviews-page" class="nav-item"
+                data-page="reviews-page" id="nav-reviews">
                 <i class="fas fa-star"></i>
                 <span>Reviews</span>
             </a>
-            <a href="verification_biz_verification_website_editor.html#website-editor-page" class="nav-item">
+            <a href="verification_biz_verification_website_editor.html#website-editor-page" class="nav-item"
+                data-page="website-editor-page" id="nav-website-editor">
                 <i class="fas fa-laptop-code"></i>
                 <span>Website Editor</span>
             </a>
+            {% endif %}
         </nav>
     </div>
 
@@ -1823,7 +1845,8 @@
             document.querySelectorAll('[data-page]').forEach(el => {
                 el.addEventListener('click', (e) => {
                     const pageId = el.getAttribute('data-page');
-                    if (pageId) {
+                    // ONLY prevent default if the section exists in THIS file
+                    if (pageId && document.getElementById(pageId)) {
                         e.preventDefault();
                         navigateTo(pageId);
                     }
@@ -1845,20 +1868,6 @@
             window.navigateTo = navigateTo;
         })();
 
-        // Requested switching logic
-        document.querySelectorAll('[data-page]').forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                const page = this.getAttribute('data-page');
-                document.querySelectorAll('.vendor-page').forEach(p => {
-                    p.classList.remove('active');
-                });
-                const target = document.getElementById(page);
-                if (target) {
-                    target.classList.add('active');
-                }
-            });
-        });
     </script>
 
     <!-- Global Theme Handler — must be loaded after all page HTML is in DOM -->

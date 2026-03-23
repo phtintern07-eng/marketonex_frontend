@@ -415,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!authStatus.user.verified) {
                     console.log('[ADD PRODUCT] Vendor not verified');
                     alert('Your vendor account is pending admin approval. Please wait for verification or complete your KYC.');
-                    window.location.href = '../vendor/verification.html';
+                    window.location.href = '../vendor/verification_biz_verification_website_editor.html';
                     return;
                 }
 
