@@ -21,17 +21,19 @@ class ApiService {
             const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
             const response = await fetch(`${API_URL}/api${path}`, options);
 
-            // Read JSON safely
-            let result = {};
-            const textResponse = await response.text();
-
-            if (textResponse && textResponse.trim()) {
-                try {
-                    result = JSON.parse(textResponse);
-                } catch (e) {
-                    console.error(`Failed to parse JSON from ${endpoint}:`, textResponse.substring(0, 200));
-                    throw new Error(`Invalid JSON response. API returned HTML or unexpected format.`);
+            let result;
+            try {
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    result = await response.json();
+                } else {
+                    const text = await response.text();
+                    console.error("Server returned non-JSON:", text);
+                    throw new Error("Invalid server response");
                 }
+            } catch (err) {
+                console.error("JSON parse error:", err);
+                throw new Error("Invalid JSON response from server");
             }
 
 

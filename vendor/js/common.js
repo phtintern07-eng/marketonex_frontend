@@ -19,19 +19,22 @@ class ApiService {
             const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
             const response = await fetch(`${API_URL}/api${path}`, options);
 
-            // Check if response is actually JSON
-            const text = await response.text();
-            let result = {};
-
-            if (text && text.trim()) {
-                try {
-                    result = JSON.parse(text);
-                } catch (e) {
-                    console.error("Failed to parse JSON:", text);
+            let result;
+            try {
+                const contentType = response.headers.get("content-type");
+                if (contentType && contentType.includes("application/json")) {
+                    result = await response.json();
+                } else {
+                    const text = await response.text();
+                    console.error("Server returned non-JSON:", text);
                     const err = new Error(`Server returned a non-JSON response (${response.status}).`);
                     err.status = response.status;
                     throw err;
                 }
+            } catch (err) {
+                console.error("JSON parse error:", err);
+                if (!err.status) err.status = 500;
+                throw new Error("Invalid JSON response from server");
             }
 
             if (!response.ok) {
