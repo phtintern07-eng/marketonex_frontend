@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const text = await res.text();
                 let response = {};
 
-                if (text) {
+                if (text && text.trim()) {
                     try {
                         response = JSON.parse(text);
                     } catch (e) {

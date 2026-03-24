@@ -23,7 +23,7 @@ class ApiService {
             const text = await response.text();
             let result = {};
 
-            if (text) {
+            if (text && text.trim()) {
                 try {
                     result = JSON.parse(text);
                 } catch (e) {
