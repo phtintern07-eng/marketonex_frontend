@@ -20,17 +20,18 @@ class ApiService {
             const response = await fetch(`${API_URL}/api${path}`, options);
 
             // Check if response is actually JSON
-            const contentType = response.headers.get("content-type");
-            let result; // Renamed 'data' to 'result' to match original code's variable name for consistency
+            const text = await response.text();
+            let result = {};
 
-            if (contentType && contentType.includes("application/json")) {
-                result = await response.json();
-            } else {
-                // If the server returns HTML (e.g., 502 Bad Gateway), don't crash with JSON parse error
-                const text = await response.text();
-                const err = new Error(`Server returned a non-JSON response (${response.status}): ${text.substring(0, 100)}`);
-                err.status = response.status;
-                throw err;
+            if (text) {
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    console.error("Failed to parse JSON:", text);
+                    const err = new Error(`Server returned a non-JSON response (${response.status}).`);
+                    err.status = response.status;
+                    throw err;
+                }
             }
 
             if (!response.ok) {

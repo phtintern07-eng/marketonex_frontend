@@ -33,14 +33,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ email, password })
                 });
 
-                const contentType = res.headers.get("content-type");
-                let response;
+                const text = await res.text();
+                let response = {};
 
-                if (contentType && contentType.includes("application/json")) {
-                    response = await res.json();
-                } else {
-                    const errorText = await res.text();
-                    throw new Error(`Server returned a non-JSON response (${res.status}). Please try again later.`);
+                if (text) {
+                    try {
+                        response = JSON.parse(text);
+                    } catch (e) {
+                        console.error("Failed to parse JSON:", text);
+                        throw new Error("Server returned an invalid response. Please try again.");
+                    }
                 }
 
                 if (!res.ok) {
