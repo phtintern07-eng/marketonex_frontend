@@ -18,7 +18,17 @@ class ApiService {
             // Ensure endpoint starts with /
             const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
             const response = await fetch(`${API_URL}/api${path}`, options);
-            const result = await response.json();
+            // Read JSON only if content-type is application/json
+            let result;
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+                result = await response.json();
+            } else {
+                const textResponse = await response.text();
+                const err = new Error(`API returned non-JSON format: ${textResponse.substring(0, 100)}`);
+                err.status = response.status;
+                throw err;
+            }
 
             if (!response.ok) {
                 if (response.status === 401) {
