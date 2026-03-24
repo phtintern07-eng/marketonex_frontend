@@ -2029,32 +2029,49 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Global Helper Functions & Initialization ---
 
     function createProductCardHTML(product) {
+        if (!product) return '';
+
+        // Safety checks for all fields
+        const id = product.id || '';
+        const pid = product.product_id || product.id || 'N/A';
+        const name = product.name || product.product_name || 'Unnamed Product';
+        const desc = product.desc || product.product_description || '';
+        const price = product.price !== undefined && product.price !== null ? product.price : '0.00';
+        const category = product.category || product.product_category || 'Uncategorized';
+        const brand = product.brand || product.brand_name || product.company_name || 'My Store';
+        const stock = product.available_stock !== undefined ? product.available_stock : (product.quantity || 0);
+
         const isPublished = product.is_published === true;
         const statusBadge = isPublished
             ? '<span class="status-badge published" style="background:#d1fae5; color:#065f46; padding:2px 8px; border-radius:12px; font-size:0.75rem;">Published</span>'
             : '<span class="status-badge unpublished" style="background:#f3f4f6; color:#1f2937; padding:2px 8px; border-radius:12px; font-size:0.75rem;">Unpublished</span>';
 
         const publishAction = isPublished
-            ? `<button class="menu-item unpublish-btn" data-id="${product.product_id || product.id}"><i class="fas fa-eye-slash"></i> Unpublish</button>`
-            : `<button class="menu-item publish-btn" data-id="${product.product_id || product.id}"><i class="fas fa-globe"></i> Publish</button>`;
+            ? `<button class="menu-item unpublish-btn" data-id="${pid}"><i class="fas fa-eye-slash"></i> Unpublish</button>`
+            : `<button class="menu-item publish-btn" data-id="${pid}"><i class="fas fa-globe"></i> Publish</button>`;
+
+        // Normalize image
+        let displayImg = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdHJhdGlvPSJ4TWlkWU1pZCBzbGljZSIgZm9jdXNhYmxlPSJmYWxzZSIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJQbGFjZWhvbGRlciI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2VlZSI+PC9yZWN0Pjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmaWxsPSIjYWFhIiBkeT0iLjNlbSIgc3R5bGU9ImZvbnQtZmFtaWx5OkFyaWFsO2ZvbnQtc2l6ZToyMHB4O3RleHQtYW5jaG9yOm1pZGRsZSI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+';
+        if (product.image) displayImg = product.image;
+        else if (product.images && product.images.length > 0) displayImg = product.images[0];
 
         return `
-            <div class="product-card dynamic" data-id="${product.id}" data-pid="${product.product_id || product.id}" data-category="${product.category || 'Uncategorized'}" data-price="${product.price.toString().replace('$', '')}" data-vendor="${product.brand || 'Your Store'}">
+            <div class="product-card dynamic" data-id="${id}" data-pid="${pid}" data-category="${category}" data-price="${price.toString().replace('$', '')}" data-vendor="${brand}">
                 <div class="product-image">
-                    <img src="${product.image || (product.images && product.images[0]) || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBwcmVzZXJ2ZUFzcGVjdHJhdGlvPSJ4TWlkWU1pZCBzbGljZSIgZm9jdXNhYmxlPSJmYWxzZSIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJQbGFjZWhvbGRlciI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2VlZSI+PC9yZWN0Pjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmaWxsPSIjYWFhIiBkeT0iLjNlbSIgc3R5bGU9ImZvbnQtZmFtaWx5OkFyaWFsO2ZvbnQtc2l6ZToyMHB4O3RleHQtYW5jaG9yOm1pZGRsZSI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+'}" alt="${product.name}" class="p-img">
+                    <img src="${displayImg}" alt="${name}" class="p-img">
                     <div class="card-badges" style="position:absolute; top:8px; left:8px; z-index:2;">
                         ${statusBadge}
                     </div>
                 </div>
                 <div class="product-info">
-                    <h3>${product.name}</h3>
-                    <p class="product-desc">${product.desc || product.product_description || ''}</p>
+                    <h3>${name}</h3>
+                    <p class="product-desc">${desc}</p>
                     <div class="product-meta">
-                        <span class="vendor-name">${product.brand || 'Your Store'}</span>
-                        <span class="product-price">$${product.price}</span>
+                        <span class="vendor-name">${brand}</span>
+                        <span class="product-price">₹${price}</span>
                     </div>
                     <div class="product-footer">
-                        <span class="stock-pill">${product.available_stock || product.quantity} in stock</span>
+                        <span class="stock-pill">${stock} in stock</span>
                         <div class="card-menu-container">
                             <button class="card-menu-btn"><i class="fas fa-ellipsis-h"></i></button>
                             <div class="card-menu-dropdown">
@@ -2078,13 +2095,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Expose loadProducts globally for checkAuth
     async function loadProducts() {
-        const grid = document.querySelector('.products-grid');
+        const grid = document.getElementById('productsGrid') || document.querySelector('.products-grid');
         if (!grid) {
-            console.warn('[LOAD PRODUCTS] No element with class .products-grid found in the current view.');
+            console.warn('[LOAD PRODUCTS] No product grid found in the current view.');
             return;
         }
 
-        console.log('[LOAD PRODUCTS] Triggering product fetch...', new Date().toISOString());
+        console.log('[LOAD PRODUCTS] Fetching products from API...', new Date().toISOString());
 
         let apiProducts = [];
         let loadedFromApi = false;
@@ -2096,7 +2113,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             if (res.ok) {
                 const result = await res.json();
-                console.log('[LOAD PRODUCTS] API result:', result);
+                console.log('[LOAD PRODUCTS] API raw result:', result);
                 if (result.products) {
                     apiProducts = result.products.map(p => {
                         // Normalize API data to match frontend expectations
@@ -2120,43 +2137,47 @@ document.addEventListener('DOMContentLoaded', () => {
                             is_published: p.is_published
                         };
                     });
-                    console.log(`[LOAD PRODUCTS] Successfully fetched ${apiProducts.length} normalized products from API`);
+                    console.log(`[LOAD PRODUCTS] Successfully fetched ${apiProducts.length} products`);
                     loadedFromApi = true;
                 }
             } else if (res.status === 401 || res.status === 403) {
-                console.error('[LOAD PRODUCTS] Unauthorized (401/403). Session may have expired or account is limited.');
-                console.warn('[LOAD PRODUCTS] Clearing local cache to prevent stale data.');
+                console.error('[LOAD PRODUCTS] Auth error (401/403).');
                 localStorage.removeItem('products');
             } else {
-                console.error(`[LOAD PRODUCTS] API error: ${res.status} ${res.statusText}`);
+                console.error(`[LOAD PRODUCTS] API error: ${res.status}`);
             }
         } catch (e) {
-            console.error('[LOAD PRODUCTS] Network or Parse Error:', e);
+            console.error('[LOAD PRODUCTS] Network/Parse Error:', e);
         }
 
-        // If API data found, use it. Otherwise fallback to localStorage
+        // Final list
         const productsToRender = loadedFromApi ? apiProducts : JSON.parse(localStorage.getItem('products') || '[]');
-        console.log(`[LOAD PRODUCTS] Final count to render: ${productsToRender.length} (Source: ${loadedFromApi ? 'API' : 'LocalStorage'})`);
+        console.log(`[LOAD PRODUCTS] Rendering ${productsToRender.length} items...`);
 
         // Render
-        grid.innerHTML = ''; // Clear placeholders
+        grid.innerHTML = '';
         if (productsToRender.length === 0) {
             grid.innerHTML = '<div class="empty-state" style="text-align:center; padding:40px; color:#6b7280; grid-column: 1 / -1;">' +
                 '<i class="fas fa-box-open" style="font-size:3rem; margin-bottom:1rem; display:block; opacity:0.3;"></i>' +
                 'No products found. Start by adding one in the "Add Product" section!</div>';
         } else {
             productsToRender.forEach(product => {
-                // Prevent duplicates if something is weird
-                if (!grid.querySelector(`.product-card[data-pid="${product.product_id || product.id}"]`)) {
-                    if (typeof window.createProductCardHTML === 'function') {
-                        const cardHTML = window.createProductCardHTML(product);
-                        grid.insertAdjacentHTML('afterbegin', cardHTML);
-                    }
+                try {
+                    const cardHTML = window.createProductCardHTML(product);
+                    grid.insertAdjacentHTML('afterbegin', cardHTML);
+                } catch (renderErr) {
+                    console.error('[LOAD PRODUCTS] Failed to render product:', product, renderErr);
                 }
             });
+
+            // Re-apply filters to match current UI state
+            if (typeof filterProducts === 'function') {
+                console.log('[LOAD PRODUCTS] Applying UI filters...');
+                filterProducts();
+            }
         }
 
-        // Re-attach listeners to new elements
+        // Re-attach listeners
         document.querySelectorAll('.product-card').forEach(attachGlobalCardListener);
     }
     window.loadProducts = loadProducts;
