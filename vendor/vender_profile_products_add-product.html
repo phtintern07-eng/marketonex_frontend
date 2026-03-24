@@ -2003,6 +2003,14 @@
                     'add-product-page': 'VendorVerse - Add Product'
                 };
                 document.title = titles[pageId] || 'VendorVerse';
+
+                // Load products if entering products page
+                if (pageId === 'products-page') {
+                    if (typeof window.loadProducts === 'function') {
+                        console.log('[Navigate] Entering products page, triggering loadProducts...');
+                        window.loadProducts();
+                    }
+                }
             }
 
             // Attach click handlers to nav items with data-page

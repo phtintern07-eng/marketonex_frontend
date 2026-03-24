@@ -2079,12 +2079,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Expose loadProducts globally for checkAuth
     async function loadProducts() {
         const grid = document.querySelector('.products-grid');
-        if (!grid) return;
+        if (!grid) {
+            console.warn('[LOAD PRODUCTS] No element with class .products-grid found in the current view.');
+            return;
+        }
 
-        // Clear existing static/local content to avoid duplicates with API
-        // grid.innerHTML = ''; // Optional: decide if we want to wipe it first or append. 
-        // For distinct "vendor dashboard", we likely want to show what's real.
-        // Let's wipe static placeholders but keep structure if grid is empty container.
+        console.log('[LOAD PRODUCTS] Triggering product fetch...', new Date().toISOString());
 
         let apiProducts = [];
         let loadedFromApi = false;
@@ -2095,13 +2095,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 credentials: 'include'
             });
             if (res.ok) {
-                const data = await res.json();
-                if (data.products) {
-                    apiProducts = data.products.map(p => {
+                const result = await res.json();
+                console.log('[LOAD PRODUCTS] API result:', result);
+                if (result.products) {
+                    apiProducts = result.products.map(p => {
                         // Normalize API data to match frontend expectations
                         let images = [];
                         try {
-                            images = typeof p.product_images === 'string' ? JSON.parse(p.product_images) : p.product_images;
+                            images = typeof p.product_images === 'string' ? JSON.parse(p.product_images || '[]') : p.product_images;
                         } catch (e) { images = []; }
 
                         return {
@@ -2119,23 +2120,30 @@ document.addEventListener('DOMContentLoaded', () => {
                             is_published: p.is_published
                         };
                     });
+                    console.log(`[LOAD PRODUCTS] Successfully fetched ${apiProducts.length} normalized products from API`);
                     loadedFromApi = true;
                 }
             } else if (res.status === 401 || res.status === 403) {
-                console.warn('Unauthorized access to products. Clearing cache.');
+                console.error('[LOAD PRODUCTS] Unauthorized (401/403). Session may have expired or account is limited.');
+                console.warn('[LOAD PRODUCTS] Clearing local cache to prevent stale data.');
                 localStorage.removeItem('products');
+            } else {
+                console.error(`[LOAD PRODUCTS] API error: ${res.status} ${res.statusText}`);
             }
         } catch (e) {
-            console.error('Failed to load products from API:', e);
+            console.error('[LOAD PRODUCTS] Network or Parse Error:', e);
         }
 
-        // If API data found, use it. Otherwise fallback to localStorage (ONLY if no auth error occurred ideally, but clearing above helps)
+        // If API data found, use it. Otherwise fallback to localStorage
         const productsToRender = loadedFromApi ? apiProducts : JSON.parse(localStorage.getItem('products') || '[]');
+        console.log(`[LOAD PRODUCTS] Final count to render: ${productsToRender.length} (Source: ${loadedFromApi ? 'API' : 'LocalStorage'})`);
 
         // Render
         grid.innerHTML = ''; // Clear placeholders
         if (productsToRender.length === 0) {
-            grid.innerHTML = '<div class="empty-state">No products found. Start by adding one!</div>';
+            grid.innerHTML = '<div class="empty-state" style="text-align:center; padding:40px; color:#6b7280; grid-column: 1 / -1;">' +
+                '<i class="fas fa-box-open" style="font-size:3rem; margin-bottom:1rem; display:block; opacity:0.3;"></i>' +
+                'No products found. Start by adding one in the "Add Product" section!</div>';
         } else {
             productsToRender.forEach(product => {
                 // Prevent duplicates if something is weird
