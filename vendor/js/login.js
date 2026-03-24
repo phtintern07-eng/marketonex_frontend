@@ -33,7 +33,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ email, password })
                 });
 
-                const response = await res.json();
+                const contentType = res.headers.get("content-type");
+                let response;
+
+                if (contentType && contentType.includes("application/json")) {
+                    response = await res.json();
+                } else {
+                    const errorText = await res.text();
+                    throw new Error(`Server returned a non-JSON response (${res.status}). Please try again later.`);
+                }
 
                 if (!res.ok) {
                     // Handle vendor-only error

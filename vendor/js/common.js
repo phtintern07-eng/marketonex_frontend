@@ -18,14 +18,17 @@ class ApiService {
             // Ensure endpoint starts with /
             const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
             const response = await fetch(`${API_URL}/api${path}`, options);
-            // Read JSON only if content-type is application/json
-            let result;
+
+            // Check if response is actually JSON
             const contentType = response.headers.get("content-type");
+            let result; // Renamed 'data' to 'result' to match original code's variable name for consistency
+
             if (contentType && contentType.includes("application/json")) {
                 result = await response.json();
             } else {
-                const textResponse = await response.text();
-                const err = new Error(`API returned non-JSON format: ${textResponse.substring(0, 100)}`);
+                // If the server returns HTML (e.g., 502 Bad Gateway), don't crash with JSON parse error
+                const text = await response.text();
+                const err = new Error(`Server returned a non-JSON response (${response.status}): ${text.substring(0, 100)}`);
                 err.status = response.status;
                 throw err;
             }
@@ -261,6 +264,21 @@ function updateUIWithUser(user) {
             loadVendorReviews();
             loadBankDetails();
         }
+    }
+
+    // 5. Update Back to Landing Page Link
+    const backBtn = document.getElementById('backToLandingPage');
+    if (backBtn && user.vendor_slug) {
+        backBtn.href = `/${user.vendor_slug}`;
+
+        // Also update any sidebar items if they exist
+        const sidebarLinks = document.querySelectorAll('.nav-item span');
+        sidebarLinks.forEach(span => {
+            if (span.textContent.includes('Back to Landing Page')) {
+                const link = span.closest('a');
+                if (link) link.href = `/${user.vendor_slug}`;
+            }
+        });
     }
 }
 
