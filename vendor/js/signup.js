@@ -55,41 +55,25 @@ document.addEventListener('DOMContentLoaded', () => {
             showStatus('Sending verification email...', 'info');
 
             try {
-                const baseUrl = window.API_BASE_URL || '';
-                const res = await fetch(`${baseUrl}/api/auth/send-email-verification`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    // Handle special statuses (already verified / already exists)
-                    if (data.status === 'already_verified') {
-                        showStatus('✅ ' + data.message + ' Redirecting to login...', 'success');
-                        setTimeout(() => { window.location.href = 'loginvender.html'; }, 2500);
-                    } else if (data.status === 'already_exists') {
-                        showStatus('ℹ️ ' + data.message, 'info');
-                    } else {
-                        showStatus('✉️ Verification mail sent. Please check your inbox and click the verification link, then come back and click "Check Verification Status".', 'info');
-                    }
+                // Use ApiService for consistent error handling and JSON safety
+                const data = await ApiService.post('/auth/send-email-verification', { email });
+
+                // Handle special statuses (already verified / already exists)
+                if (data.status === 'already_verified') {
+                    showStatus('✅ ' + data.message + ' Redirecting to login...', 'success');
+                    setTimeout(() => { window.location.href = 'loginvender.html'; }, 2500);
+                } else if (data.status === 'already_exists') {
+                    showStatus('ℹ️ ' + data.message, 'info');
                 } else {
-                    let errorMsg = 'Failed to send verification email.';
-                    try {
-                        const contentType = res.headers.get('content-type');
-                        if (contentType && contentType.includes('application/json')) {
-                            const data = await res.json();
-                            errorMsg = data.error || errorMsg;
-                        } else {
-                            errorMsg = `Server error (${res.status}). Please check server logs.`;
-                        }
-                    } catch (e) {
-                        errorMsg = `Server error (${res.status}).`;
-                    }
-                    showStatus(errorMsg, 'error');
+                    showStatus('✉️ Verification mail sent. Please check your inbox and click the verification link, then come back and click "Check Verification Status".', 'info');
                 }
-            } catch (err) {
-                console.error(err);
-                showStatus('Network error. Please try again.', 'error');
+            } catch (error) {
+                console.error('Send verification failed:', error);
+                let errorMsg = 'Failed to send verification email.';
+                if (error.responseData) {
+                    errorMsg = error.responseData.error || error.responseData.message || errorMsg;
+                }
+                showStatus(errorMsg, 'error');
             } finally {
                 sendVerificationBtn.disabled = false;
                 sendVerificationBtn.textContent = 'Send Verification';
@@ -110,21 +94,13 @@ document.addEventListener('DOMContentLoaded', () => {
             checkVerificationBtn.textContent = 'Checking...';
 
             try {
-                const baseUrl = window.API_BASE_URL || '';
-                const res = await fetch(`${baseUrl}/api/auth/check-email-verification`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-                const data = await res.json();
+                const data = await ApiService.post('/auth/check-email-verification', { email });
 
                 if (data.verified) {
                     emailVerified = true;
                     setSignupEnabled(true);
                     if (data.existing_account) {
-                        // Existing vendor account — just verified, should log in
                         showStatus('✅ Email Verified Successfully! Your existing vendor account is now verified. Please log in.', 'success');
-                        // Hide sign up form and show login link instead
                         setTimeout(() => { window.location.href = 'loginvender.html'; }, 2500);
                     } else {
                         showStatus('✅ Email Verified Successfully — You can now Sign Up!', 'success');
@@ -134,9 +110,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     setSignupEnabled(false);
                     showStatus('⏳ Verification Pending — Please click the link in your email first.', 'info');
                 }
-            } catch (err) {
-                console.error(err);
-                showStatus('Network error. Please try again.', 'error');
+            } catch (error) {
+                console.error('Check verification failed:', error);
+                showStatus('Error checking verification. Please try again.', 'error');
             } finally {
                 checkVerificationBtn.disabled = false;
                 checkVerificationBtn.textContent = 'Check Verification Status';
@@ -179,20 +155,13 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
 
             try {
-                const baseUrl = window.API_BASE_URL || '';
-                const response = await fetch(`${baseUrl}/api/auth/signup`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ fullname, email, password, role: 'vendor', signup_source: 'vendor' })
-
+                const result = await ApiService.post('/auth/signup', {
+                    fullname,
+                    email,
+                    password,
+                    role: 'vendor',
+                    signup_source: 'vendor'
                 });
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.error || 'Signup failed');
-                }
 
                 showStatus('✅ Verification completed. Signup successful!', 'success');
                 alert(result.message || 'Account created successfully! Please log in.');
@@ -200,7 +169,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } catch (error) {
                 console.error('Signup error:', error);
-                showStatus(error.message || 'Signup failed. Please try again.', 'error');
+                let msg = 'Signup failed. Please try again.';
+                if (error.responseData) {
+                    msg = error.responseData.error || error.responseData.message || msg;
+                }
+                showStatus(msg, 'error');
                 submitBtn.textContent = origText;
                 submitBtn.disabled = false;
             }

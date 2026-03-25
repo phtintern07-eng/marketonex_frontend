@@ -64,25 +64,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const baseUrl = window.API_BASE_URL || '';
-                const response = await fetch(`${baseUrl}/api/auth/signup`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        fullname,
-                        email,
-                        password,
-                        role: 'user',          // Always 'user' for marketonex signup
-                        signup_source: 'customer' // Explicit source marker for backend
-                    })
+                // Use ApiService for consistent error handling and JSON safety
+                const result = await ApiService.post('/auth/signup', {
+                    fullname,
+                    email,
+                    password,
+                    role: 'user',          // Always 'user' for marketonex signup
+                    signup_source: 'customer' // Explicit source marker for backend
                 });
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.error || 'Signup failed');
-                }
 
                 showStatus('✅ Account created successfully! Redirecting...', 'success');
                 setTimeout(() => {
@@ -91,7 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } catch (error) {
                 console.error('Signup error:', error);
-                showStatus(error.message || 'Failed to create account. Please try again.', 'error');
+                let msg = 'Failed to create account. Please try again.';
+                if (error.responseData) {
+                    msg = error.responseData.error || error.responseData.message || msg;
+                }
+                showStatus(msg, 'error');
                 if (signupBtn) {
                     signupBtn.textContent = 'Sign Up';
                     signupBtn.disabled = false;
