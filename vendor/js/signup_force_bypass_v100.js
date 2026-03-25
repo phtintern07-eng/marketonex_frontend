@@ -72,20 +72,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ─── Send Verification ───────────────────────────────────────────────────
     if (sendVerificationBtn) {
+        console.log("[signup] Send Verification button attached successfully.");
         sendVerificationBtn.addEventListener('click', async () => {
+            console.log("[signup] Send Verification clicked.");
             const email = (document.getElementById('email')?.value || '').trim();
-            if (!email) { showStatus('Please enter your email address first.', 'error'); return; }
+            console.log("[signup] Target email:", email);
+
+            if (!email) {
+                console.warn("[signup] No email entered.");
+                showStatus('Please enter your email address first.', 'error');
+                return;
+            }
 
             sendVerificationBtn.disabled = true;
             sendVerificationBtn.textContent = 'Sending...';
             showStatus('Sending verification email...', 'info');
 
             try {
-                const data = await safeFetch(BASE + '/api/auth/send-email-verification', {
+                console.log("[signup] Fetching /api/auth/send-verification...");
+                const data = await safeFetch(BASE + '/api/auth/send-verification', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })
                 });
+                console.log("[signup] Send verification response:", data);
 
                 if (data.status === 'already_verified') {
                     showStatus('✅ ' + data.message + ' Redirecting to login...', 'success');
@@ -96,18 +106,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     showStatus('✉️ Verification mail sent! Check your inbox and click the link, then click "Check Verification Status".', 'info');
                 }
             } catch (error) {
-                console.error('Send verification failed:', error);
+                console.error('[signup] Send verification failed:', error);
                 showStatus(error.message || 'Failed to send verification email.', 'error');
             } finally {
                 sendVerificationBtn.disabled = false;
                 sendVerificationBtn.textContent = 'Send Verification';
             }
         });
+    } else {
+        console.error("[signup] CRITICAL: #sendVerificationBtn not found in HTML!");
     }
 
     // ─── Check Verification Status ───────────────────────────────────────────
     if (checkVerificationBtn) {
+        console.log("[signup] Check Verification button attached successfully.");
         checkVerificationBtn.addEventListener('click', async () => {
+            console.log("[signup] Check Status clicked.");
             const email = (document.getElementById('email')?.value || '').trim();
             if (!email) { showStatus('Please enter your email address first.', 'error'); return; }
 
@@ -115,11 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
             checkVerificationBtn.textContent = 'Checking...';
 
             try {
-                const data = await safeFetch(BASE + '/api/auth/check-email-verification', {
+                console.log("[signup] Fetching /api/auth/check-verification...");
+                const data = await safeFetch(BASE + '/api/auth/check-verification', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })
                 });
+                console.log("[signup] Check status response:", data);
 
                 if (data.verified) {
                     emailVerified = true;
@@ -136,13 +152,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     showStatus('⏳ Verification Pending — Please click the link in your email first.', 'info');
                 }
             } catch (error) {
-                console.error('Check verification failed:', error);
+                console.error('[signup] Check verification failed:', error);
                 showStatus(error.message || 'Error checking verification. Please try again.', 'error');
             } finally {
                 checkVerificationBtn.disabled = false;
                 checkVerificationBtn.textContent = 'Check Verification Status';
             }
         });
+    } else {
+        console.error("[signup] CRITICAL: #checkVerificationBtn not found in HTML!");
     }
 
     // ─── Sign Up Submission ──────────────────────────────────────────────────
