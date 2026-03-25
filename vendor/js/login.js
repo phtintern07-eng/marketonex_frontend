@@ -24,46 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
 
             try {
-                // Use vendor-only login endpoint to enforce role separation
-                const baseUrl = window.API_BASE_URL || '';
-                const res = await fetch(`${baseUrl}/api/auth/vendor-login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ email, password })
-                });
-
-                let response;
-                try {
-                    const contentType = res.headers.get("content-type");
-                    if (contentType && contentType.includes("application/json")) {
-                        response = await res.json();
-                    } else {
-                        const text = await res.text();
-                        console.error("Server returned non-JSON:", text);
-                        throw new Error("Invalid server response");
-                    }
-                } catch (err) {
-                    console.error("JSON parse error:", err);
-                    throw new Error("Invalid JSON response from server");
-                }
-
-                if (!res.ok) {
-                    // Handle vendor-only error
-                    const errCode = response.error || response.code || '';
-                    if (errCode === 'not_a_vendor') {
-                        alert('This login portal is for Vendors only. Please use the Marketonex login instead.');
-                    } else if (errCode === 'email_not_verified') {
-                        alert('Please verify your email address before logging in.\n\nGo to the Signup page, enter your email, and click "Send Verification" to get a new verification link.');
-                        window.location.href = 'signup.html';
-                        return;
-                    } else {
-                        alert(response.message || response.error || 'Login failed. Please check your credentials.');
-                    }
-                    submitBtn.textContent = originalBtnText;
-                    submitBtn.disabled = false;
-                    return;
-                }
+                // Use ApiService from common.js for consistent error handling and JSON safety
+                const response = await ApiService.post('/auth/vendor-login', { email, password });
 
                 const user = response.data ? response.data.user : response.user;
                 const redirect = response.data ? response.data.redirect : response.redirect;
@@ -98,7 +60,23 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error('Login failed:', error);
 
-                alert('A network error occurred. Please try again.');
+                // Handle specific business errors returned by the API
+                if (error.responseData) {
+                    const response = error.responseData;
+                    const errCode = response.error || response.code || '';
+
+                    if (errCode === 'not_a_vendor') {
+                        alert('This login portal is for Vendors only. Please use the Marketonex login instead.');
+                    } else if (errCode === 'email_not_verified') {
+                        alert('Please verify your email address before logging in.\n\nGo to the Signup page, enter your email, and click "Send Verification" to get a new verification link.');
+                        window.location.href = 'signup.html';
+                        return;
+                    } else {
+                        alert(response.message || response.error || 'Login failed. Please check your credentials.');
+                    }
+                } else {
+                    alert('A network error occurred. Please try again.');
+                }
 
                 // Reset UI
                 submitBtn.textContent = originalBtnText;

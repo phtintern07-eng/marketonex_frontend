@@ -19,22 +19,19 @@ class ApiService {
             const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
             const response = await fetch(`${API_URL}/api${path}`, options);
 
-            let result;
+            let result = {};
+            const text = await response.text();
+
             try {
                 const contentType = response.headers.get("content-type");
-                if (contentType && contentType.includes("application/json")) {
-                    result = await response.json();
-                } else {
-                    const text = await response.text();
-                    console.error("Server returned non-JSON:", text);
-                    const err = new Error(`Server returned a non-JSON response (${response.status}).`);
-                    err.status = response.status;
-                    throw err;
+                if (contentType && contentType.includes("application/json") && text) {
+                    result = JSON.parse(text);
+                } else if (text) {
+                    console.warn("Server returned non-JSON text:", text);
                 }
             } catch (err) {
-                console.error("JSON parse error:", err);
-                if (!err.status) err.status = 500;
-                throw new Error("Invalid JSON response from server");
+                console.error("JSON parse error:", err, "Raw text:", text);
+                throw new Error("Invalid response format from server");
             }
 
             if (!response.ok) {
@@ -69,15 +66,22 @@ class ApiService {
             body: formData,
             credentials: 'include'
         });
+        const text = await response.text();
         const contentType = response.headers.get("content-type");
-        let result;
-        if (contentType && contentType.includes("application/json")) {
-            result = await response.json();
-        } else {
-            const text = await response.text();
-            console.error("Upload: server returned non-JSON:", text);
-            throw new Error(`Upload failed: server returned unexpected response (${response.status}).`);
+        let result = {};
+
+        try {
+            if (contentType && contentType.includes("application/json") && text) {
+                result = JSON.parse(text);
+            } else if (text) {
+                console.error("Upload: server returned non-JSON:", text);
+                throw new Error(`Upload failed: server returned unexpected response (${response.status}).`);
+            }
+        } catch (err) {
+            console.error("Upload JSON parse error:", err, "Raw text:", text);
+            throw new Error("Invalid upload response format");
         }
+
         if (!response.ok) throw new Error(result.error || 'Upload failed');
         return result;
     }
