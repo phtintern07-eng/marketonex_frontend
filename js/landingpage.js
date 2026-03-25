@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const category = card.getAttribute('data-category');
             // Navigate to marketonex with category filter
             window.location.href = `marketonex/marketonex.html?category=${category}`;
-        });?
+        });
     });
 
     // Cart icon click handlers
