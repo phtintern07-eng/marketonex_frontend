@@ -64,7 +64,15 @@ class ApiService {
             body: formData,
             credentials: 'include'
         });
-        const result = await response.json();
+        const contentType = response.headers.get("content-type");
+        let result;
+        if (contentType && contentType.includes("application/json")) {
+            result = await response.json();
+        } else {
+            const text = await response.text();
+            console.error("Upload: server returned non-JSON:", text);
+            throw new Error(`Upload failed: server returned unexpected response (${response.status}).`);
+        }
         if (!response.ok) throw new Error(result.error || 'Upload failed');
         return result;
     }
