@@ -1,5 +1,5 @@
-// Marketonex Signup Page — Customer accounts ONLY.
 // Vendors must use /vendor/signup.html
+console.log("MARKETONEX SIGNUP V2_FIX LOADED");
 // This page always creates a customer (role: 'user') account.
 
 // Strong password regex: min 8 chars, uppercase, lowercase, digit, special char

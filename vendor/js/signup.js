@@ -1,5 +1,5 @@
-// Vendor Signup Page — with pre-signup email verification
 // Flow: Enter email → Send Verification → Check link in email → Check Status → Sign Up
+console.log("SIGNUP V2_FIX LOADED");
 
 document.addEventListener('DOMContentLoaded', () => {
     const signupForm = document.getElementById('signupForm');
