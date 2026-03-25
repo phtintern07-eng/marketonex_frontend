@@ -61,23 +61,30 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error('Login failed:', error);
 
-                // Handle specific business errors returned by the API
+                // Detailed error alert for user
+                let message = 'A network error occurred. Please try again.';
+
                 if (error.responseData) {
                     const response = error.responseData;
                     const errCode = response.error || response.code || '';
 
                     if (errCode === 'not_a_vendor') {
-                        alert('This login portal is for Vendors only. Please use the Marketonex login instead.');
+                        message = 'This login portal is for Vendors only.';
                     } else if (errCode === 'email_not_verified') {
-                        alert('Please verify your email address before logging in.\n\nGo to the Signup page, enter your email, and click "Send Verification" to get a new verification link.');
+                        message = 'Please verify your email address before logging in.';
+                        alert(message);
                         window.location.href = 'signup.html';
                         return;
+                    } else if (error.status === 403) {
+                        message = response.message || response.error || 'Your account is not verified. Please wait for Admin approval.';
                     } else {
-                        alert(response.message || response.error || 'Login failed. Please check your credentials.');
+                        message = response.message || response.error || 'Login failed. Please check your credentials.';
                     }
-                } else {
-                    alert('A network error occurred. Please try again.');
+                } else if (error.message) {
+                    message = error.message;
                 }
+
+                alert(message);
 
                 // Reset UI
                 submitBtn.textContent = originalBtnText;

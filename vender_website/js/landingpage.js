@@ -21,20 +21,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function getVendorSlug() {// vender website link creating //  
+function getVendorSlug() {
     const path = window.location.pathname;
-    const parts = path.split('/');
-    // Check for /vendor/<slug> or /v/<slug>
-    if (parts.length >= 3 && (parts[1] === 'vendor' || parts[1] === 'v')) {
-        return parts[2];
+    const parts = path.split('/').filter(Boolean);
+
+    console.log('Detecting slug from path parts:', parts);
+
+    // 1. Check for /vendor/<slug> or /v/<slug>
+    if (parts.length >= 2 && (parts[0] === 'vendor' || parts[0] === 'v')) {
+        return parts[1];
     }
-    // Check for root-level slug like /nikhil: parts = ['', 'nikhil']
-    const rootParts = path.split('/').filter(Boolean);
-    if (rootParts.length === 1 && !rootParts[0].includes('.') && rootParts[0] !== 'vendor-site') {
-        return rootParts[0];
+
+    // 2. Check for root-level slug like /nikhil or /nikhil/index.html
+    const systemPaths = ['vendor-site', 'marketonex', 'admin', 'vendor', 'v'];
+    if (parts.length > 0 && !systemPaths.includes(parts[0])) {
+        // If the first part doesn't look like a system file, it's likely a slug
+        if (!parts[0].includes('.') || parts[0].length > 20) {
+            return parts[0];
+        }
     }
-    // Fall back to localStorage (set by index.html inline script for all URL formats)
-    return localStorage.getItem('vendor_store_slug') || null;
+
+    // 3. Fall back to localStorage (set during login or previous visits)
+    const storedSlug = localStorage.getItem('vendor_store_slug');
+    if (storedSlug) {
+        console.log('Using stored vendor slug fallback:', storedSlug);
+        return storedSlug;
+    }
+
+    console.warn('No vendor slug detected in URL or storage.');
+    return null;
 }
 
 async function loadVendorProfile(slug) {
