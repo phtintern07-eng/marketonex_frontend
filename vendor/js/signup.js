@@ -1,5 +1,6 @@
 // Flow: Enter email → Send Verification → Check link in email → Check Status → Sign Up
 console.log("SIGNUP V2_FIX LOADED");
+alert("DEBUG: SIGNUP V2_FIX IS RUNNING");
 
 document.addEventListener('DOMContentLoaded', () => {
     const signupForm = document.getElementById('signupForm');
