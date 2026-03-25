@@ -1,4 +1,5 @@
 const API_URL = window.location.protocol === 'file:' ? 'http://127.0.0.1:5000' : '';
+console.log("COMMON FIX VERSION 1.0.2 LOADED");
 
 class ApiService {
     static async request(endpoint, method = 'GET', data = null) {

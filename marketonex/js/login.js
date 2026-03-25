@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("LOGIN FIX VERSION 1.0.2 LOADED (marketonex)");
     const loginForm = document.getElementById('loginForm');
 
     if (loginForm) {
