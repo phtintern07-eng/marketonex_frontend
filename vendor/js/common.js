@@ -2881,7 +2881,7 @@ async function syncVendorProfile() {
         if (backBtn || storeUrlEl) {
             const slug = user.vendor_slug || user.slug;
             if (slug) {
-                const cleanUrl = `${window.location.origin}/${slug}`;
+                const cleanUrl = `${window.location.origin}/vendor/${slug}`;
 
                 if (backBtn) backBtn.href = cleanUrl;
                 if (storeUrlEl) storeUrlEl.textContent = cleanUrl;
