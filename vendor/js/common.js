@@ -231,7 +231,7 @@ function updateUIWithUser(user) {
     // Update Initials (if elements exist)
     const initialsEls = document.querySelectorAll('.profile-initials, .user-initials');
     if (initialsEls.length > 0) {
-        const initials = getInitials(user.full_name || user.email);
+        const initials = getInitials(user.fullname || user.email);
         initialsEls.forEach(el => {
             el.textContent = initials;
             // Toggle visibility: Show initials if NO image, Hide if HAS image
@@ -246,20 +246,20 @@ function updateUIWithUser(user) {
 
     // 2. Update Text Fields
     if (document.getElementById('u-name')) {
-        document.getElementById('u-name').value = user.full_name || '';
+        document.getElementById('u-name').value = user.fullname || user.name || '';
         document.getElementById('u-email').value = user.email || '';
         document.getElementById('u-phone').value = user.phone || '';
         document.getElementById('u-address').value = user.address || '';
         document.getElementById('u-city').value = user.city || '';
         document.getElementById('u-state').value = user.state || '';
-        if (user.dob) document.getElementById('u-dob').value = user.dob;
+        if (user.date_of_birth) document.getElementById('u-dob').value = user.date_of_birth;
         if (user.gender) document.getElementById('u-gender').value = user.gender;
     }
 
     // 3. Update Dashboard/Profile Sidebar Text
     const profileName = document.querySelector('.profile-info h2');
     const profileEmail = document.querySelector('.profile-info p');
-    if (profileName) profileName.textContent = user.full_name || user.name || user.email;
+    if (profileName) profileName.textContent = user.fullname || user.name || user.email;
     if (profileEmail) profileEmail.textContent = user.email;
 
     // 4. Update Business Details (Vendor Profile Specific)
@@ -2705,54 +2705,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Authentication Handlers ---
-    const loginForm = document.getElementById('loginForm');
-    const signupForm = document.getElementById('signupForm');
-
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = loginForm.querySelector('button[type="submit"]');
-            const originalText = btn.textContent;
-
-            const email = loginForm.querySelector('#email').value.trim();
-            const password = loginForm.querySelector('#password').value.trim();
-
-            // Client-side Validation
-            if (!email || !email.includes('@')) {
-                alert('Please enter a valid email address.');
-                return;
-            }
-            if (!password) {
-                alert('Please enter your password.');
-                return;
-            }
-
-            btn.textContent = 'Signing in...';
-            btn.disabled = true;
-
-            try {
-                // Use vendor-only login endpoint to ensure correct role isolation
-                const res = await ApiService.request('/auth/vendor-login', 'POST', { email, password });
-                localStorage.setItem('vendorLoggedIn', 'true');
-                localStorage.setItem('vendorEmail', email);
-
-                const urlParams = new URLSearchParams(window.location.search);
-                const redirect = urlParams.get('redirect');
-
-                if (res.redirect) {
-                    window.location.href = res.redirect;
-                } else if (redirect === 'addProduct') {
-                    window.location.href = 'marketonex.html?openAddProduct=true';
-                } else {
-                    window.location.href = 'vender_profile_products_add-product.html';
-                }
-            } catch (err) {
-                alert('Login failed: ' + err.message);
-                btn.textContent = originalText;
-                btn.disabled = false;
-            }
-        });
-    }
+    // NOTE: loginForm is handled exclusively by login.js.
+    // Do NOT add a loginForm listener here to avoid dual API calls and JSON parse errors.
 
     // NOTE: Signup form is handled exclusively by signup.js.
     // Do NOT add a signupForm listener here to avoid dual API calls.

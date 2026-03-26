@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("LOGIN FIX VERSION 1.0.2 LOADED");
+    console.log("LOGIN FIX VERSION 1.1.0 LOADED");
     const loginForm = document.getElementById('loginForm');
 
     if (loginForm) {
@@ -25,18 +25,48 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
 
             try {
-                // Use ApiService from common.js for consistent error handling and JSON safety
-                const response = await ApiService.post('/auth/vendor-login', { email, password });
+                // Perform login request with safe text-first parsing to avoid "Unexpected end of JSON input"
+                const rawResponse = await fetch('/api/auth/vendor-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ email, password })
+                });
 
-                const user = response.data ? response.data.user : response.user;
-                const redirect = response.data ? response.data.redirect : response.redirect;
+                const text = await rawResponse.text();
+                let data = {};
+                try {
+                    if (text) data = JSON.parse(text);
+                } catch (parseErr) {
+                    console.error('[Login] JSON parse failed. Raw response:', text);
+                    throw new Error('Server returned an invalid response. Please try again.');
+                }
 
-                console.log('Vendor login successful:', user);
+                if (!rawResponse.ok) {
+                    const errCode = data.error || data.code || '';
+                    let message;
+                    if (errCode === 'not_a_vendor') {
+                        message = 'This login portal is for Vendors only.';
+                    } else if (errCode === 'email_not_verified') {
+                        alert('Please verify your email address before logging in.');
+                        window.location.href = 'signup.html';
+                        return;
+                    } else {
+                        message = data.message || data.error || 'Login failed. Please check your credentials.';
+                    }
+                    throw Object.assign(new Error(message), { responseData: data, status: rawResponse.status });
+                }
+
+                // Backend returns flat JSON: { success, message, user, redirect }
+                const user = data.user;
+                const redirect = data.redirect;
+
+                console.log('[Login] Vendor login successful:', user);
 
                 // Update Local Storage
                 if (user) {
                     localStorage.setItem('vendorLoggedIn', 'true');
-                    localStorage.setItem('vendorEmail', user.email);
+                    localStorage.setItem('vendorEmail', user.email || email);
                     sessionStorage.setItem('canAddProduct', 'true');
                 }
 
@@ -50,40 +80,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Use backend-provided redirect
                 if (redirect) {
-                    console.log('Redirecting to:', redirect);
+                    console.log('[Login] Redirecting to:', redirect);
                     window.location.href = redirect;
                     return;
                 }
 
                 // Fallback: vendor dashboard
-                window.location.href = '/vendor-site/index.html';
+                window.location.href = '/vendor/vender_profile_products_add-product.html';
 
             } catch (error) {
-                console.error('Login failed:', error);
+                console.error('[Login] Login failed:', error);
 
-                // Detailed error alert for user
-                let message = 'A network error occurred. Please try again.';
-
-                if (error.responseData) {
-                    const response = error.responseData;
-                    const errCode = response.error || response.code || '';
-
-                    if (errCode === 'not_a_vendor') {
-                        message = 'This login portal is for Vendors only.';
-                    } else if (errCode === 'email_not_verified') {
-                        message = 'Please verify your email address before logging in.';
-                        alert(message);
-                        window.location.href = 'signup.html';
-                        return;
-                    } else if (error.status === 403) {
-                        message = response.message || response.error || 'Your account is not verified. Please wait for Admin approval.';
-                    } else {
-                        message = response.message || response.error || 'Login failed. Please check your credentials.';
-                    }
-                } else if (error.message) {
-                    message = error.message;
-                }
-
+                let message = error.message || 'A network error occurred. Please try again.';
                 alert(message);
 
                 // Reset UI

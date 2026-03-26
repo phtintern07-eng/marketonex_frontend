@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const restrictedNavIds = [
                 'nav-profile', 'nav-products', 'nav-orders',
-                'nav-feedback', 'nav-insights', 'nav-settings',
+                'nav-insights', 'nav-settings',
                 'nav-reviews', 'nav-website-editor'
             ];
 
