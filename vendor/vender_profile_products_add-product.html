@@ -763,19 +763,16 @@
             <span>VendorVerse</span>
         </div>
         <nav class="nav-menu">
-            {% if not user or not user.verified or user.kyc_status != 'approved' %}
             <a href="verification_biz_verification_website_editor.html#business-verification-page" class="nav-item"
                 id="nav-verification">
                 <i class="fas fa-shield-alt"></i>
                 <span>Verification</span>
             </a>
-            {% elif user.biz_verification_status != 'approved' %}
             <a href="verification_biz_verification_website_editor.html#store-verification-page" class="nav-item"
                 id="nav-store-verification">
                 <i class="fas fa-store"></i>
                 <span>Store Verification</span>
             </a>
-            {% else %}
             <a href="vender_profile_products_add-product.html#profile-page" class="nav-item active"
                 data-page="profile-page" id="nav-profile">
                 <i class="fas fa-user"></i>
@@ -822,7 +819,6 @@
                 <i class="fas fa-laptop-code"></i>
                 <span>Website Editor</span>
             </a>
-            {% endif %}
         </nav>
     </div>
 

@@ -94,7 +94,7 @@
 
 /* Hard Disk (HDD) */
 .category-card[data-category="hdd"] .category-image {
-    background: url('../images/categories/Hard Disk.png') center/cover no-repeat,
+    background: url('../images/categories/hard_disk.png') center/cover no-repeat,
         linear-gradient(135deg, rgba(50, 26, 42, 0.7), rgba(66, 58, 58, 0.7));
 }
 
@@ -137,14 +137,14 @@
 
 /* RAM */
 .category-card[data-category="ram"] .category-image {
-    background: url('../images/categories/ram (2).png') center/cover no-repeat,
+    background: url('../images/categories/ram.png') center/cover no-repeat,
 
         linear-gradient(135deg, rgba(42, 26, 50, 0.7), rgba(58, 42, 58, 0.7));
 }
 
 /* Input Devices */
 .category-card[data-category="input-devices"] .category-image {
-    background: url('../images/categories/input dives.png') center/cover no-repeat,
+    background: url('../images/categories/input_devices.png') center/cover no-repeat,
 
         linear-gradient(135deg, rgba(26, 35, 50, 0.7), rgba(42, 51, 66, 0.7));
 }
@@ -157,7 +157,7 @@
 
 /* Output Devices */
 .category-card[data-category="output-devices"] .category-image {
-    background: url('../images/categories/output dives.png') center/cover no-repeat,
+    background: url('../images/categories/output_devices.png') center/cover no-repeat,
 
         linear-gradient(135deg, rgba(50, 26, 42, 0.7), rgba(66, 58, 58, 0.7));
 }
