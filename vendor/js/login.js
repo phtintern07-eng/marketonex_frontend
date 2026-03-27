@@ -85,8 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // Fallback: vendor dashboard
-                window.location.href = '/vendor/vender_profile_products_add-product.html';
+                // Fallback: vendor website (backend always provides redirect, this is a safety net)
+                window.location.href = '/vendor-site/';
 
             } catch (error) {
                 console.error('[Login] Login failed:', error);
