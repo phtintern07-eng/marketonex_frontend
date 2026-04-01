@@ -1,5 +1,6 @@
 const API_URL = window.location.protocol === 'file:' ? 'http://127.0.0.1:5000' : '';
-console.log("COMMON FIX VERSION 1.0.2 LOADED");
+window.API_BASE_URL = `${API_URL}/api`;
+console.log("COMMON FIX VERSION 1.1.0 LOADED");
 
 class ApiService {
     static async request(endpoint, method = 'GET', data = null) {
@@ -15,25 +16,22 @@ class ApiService {
             options.body = JSON.stringify(data);
         }
 
+        // ✅ 10-second fetch timeout via AbortController
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        options.signal = controller.signal;
+
         try {
             // Ensure endpoint starts with /
             const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-            const response = await fetch(`${API_URL}/api${path}`, options);
+            const response = await fetch(`${window.API_BASE_URL}${path}`, options);
+            clearTimeout(timeoutId);
 
-            let result = {};
+            // ✅ Safe JSON parsing — handle empty body
             const text = await response.text();
+            const result = text ? (() => { try { return JSON.parse(text); } catch { return {}; } })() : {};
 
-            try {
-                const contentType = response.headers.get("content-type");
-                if (contentType && contentType.includes("application/json") && text) {
-                    result = JSON.parse(text);
-                } else if (text) {
-                    console.warn("Server returned non-JSON text:", text);
-                }
-            } catch (err) {
-                console.error("JSON parse error:", err, "Raw text:", text);
-                throw new Error("Invalid response format from server");
-            }
+            // Note: result already parsed above
 
             if (!response.ok) {
                 if (response.status === 401) {
@@ -49,6 +47,10 @@ class ApiService {
             if (typeof hideLoading === 'function') hideLoading();
             return result;
         } catch (error) {
+            clearTimeout(timeoutId);
+            if (error.name === 'AbortError') {
+                throw new Error('Request timed out. Please check your connection.');
+            }
             if (typeof showError === 'function') showError(error.message);
             throw error;
         }
@@ -92,7 +94,8 @@ class ApiService {
 
     static async getBusinessInfo() { return this.get('/vendor/settings'); }
     static async updateBusinessInfo(data) { return this.put('/vendor/settings', data); }
-    static async uploadProfileImage(formData) { return this.upload('/upload/profile', formData); }
+    // ✅ Fixed: accepts a File object, not a pre-built FormData
+    static async uploadProfileImage(file) { return this.upload('/upload/profile', file); }
 }
 
 // Global User State
@@ -508,10 +511,14 @@ function restrictUnverifiedSidebar() {
     // Run immediately
     hideRestrictedElements();
 
-    // Run again after a short delay to catch dynamic renders (like sidebar includes)
-    setTimeout(hideRestrictedElements, 100);
-    setTimeout(hideRestrictedElements, 500);
-    setTimeout(hideRestrictedElements, 1000);
+    // ✅ Use MutationObserver instead of multiple setTimeout calls.
+    // This fires exactly when new DOM nodes are added (e.g. sidebar includes),
+    // rather than blindly waiting for arbitrary delays.
+    const restrictObserver = new MutationObserver(hideRestrictedElements);
+    restrictObserver.observe(document.body, { childList: true, subtree: true });
+
+    // Disconnect after 5 s to avoid watching forever
+    setTimeout(() => restrictObserver.disconnect(), 5000);
 }
 
 // Initialize Auth
@@ -533,12 +540,22 @@ document.addEventListener('DOMContentLoaded', () => {
             sidebar.classList.toggle('active');
         });
 
-        // Close sidebar when clicking outside
-        document.addEventListener('click', (e) => {
-            if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && !menuBtn.contains(e.target)) {
-                sidebar.classList.remove('active');
-            }
-        });
+        // ✅ Prevent duplicate click listeners if common.js is imported more than once
+        if (!window._sidebarClickListenerAttached) {
+            window._sidebarClickListenerAttached = true;
+            document.addEventListener('click', (e) => {
+                const activeSidebar = document.querySelector('.sidebar');
+                const activeMenuBtn = document.querySelector('.mobile-menu-btn');
+                if (
+                    activeSidebar &&
+                    activeSidebar.classList.contains('active') &&
+                    !activeSidebar.contains(e.target) &&
+                    !(activeMenuBtn && activeMenuBtn.contains(e.target))
+                ) {
+                    activeSidebar.classList.remove('active');
+                }
+            });
+        }
     }
 
     // Orders will be fetched from backend API - no seed data needed
@@ -861,10 +878,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch (err) { }
             }
 
+            // ✅ String() coercion prevents crash when o.id is a number
             const filtered = ordersToSearch.filter(o =>
-                o.id.toLowerCase().includes(term) ||
-                o.customer.toLowerCase().includes(term) ||
-                o.payment.toLowerCase().includes(term)
+                String(o.id).toLowerCase().includes(term) ||
+                String(o.customer || '').toLowerCase().includes(term) ||
+                String(o.payment || '').toLowerCase().includes(term)
             );
             renderOrdersTable(filtered);
         });
@@ -1755,6 +1773,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const detailBrand = document.getElementById('detailBrand');
             const detailVendor = document.getElementById('detailVendor');
             const detailDescShort = document.getElementById('detailDescShort');
+            const detailModel = document.getElementById('detailModel');
+            const detailColor = document.getElementById('detailColor');
+            const detailCategory = document.getElementById('detailCategory');
+            const detailWarranty = document.getElementById('detailWarranty');
+            const detailStock = document.getElementById('detailStock');
+            const detailTags = document.getElementById('detailTags');
 
             // Set all values
             if (detailTitle) detailTitle.textContent = productData.name || 'Product Name';
