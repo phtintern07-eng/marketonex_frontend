@@ -98,109 +98,130 @@ class ApiService {
 // Global User State
 let currentUser = null;
 
-// Auth check on load
+// ─── Auth Check Cache ────────────────────────────────────────────────────────
+// Prevents duplicate /api/auth/status calls when checkAuth() is invoked
+// multiple times in the same page lifecycle (e.g. from DOMContentLoaded +
+// a vendor-specific script both calling checkAuth).
+let _authCache = null;          // Stores the last resolved auth result
+let _authCheckPromise = null;   // Deduplicates concurrent in-flight requests
+
 async function checkAuth() {
+    const path = window.location.pathname;
+
+    // ✅ Skip entirely on login / signup pages — these have no session yet
+    // and calling /api/auth/status just adds an unnecessary DB round-trip.
+    if (path.includes('loginvender.html') || path.includes('signup.html') || path.includes('login.html')) {
+        return;
+    }
+
+    // ✅ Return cached result within the same page load
+    if (_authCache !== null) {
+        await _applyAuthResult(_authCache, path);
+        return;
+    }
+
+    // ✅ Deduplicate: if a request is already in-flight, wait for it
+    if (_authCheckPromise) {
+        await _authCheckPromise;
+        return;
+    }
+
     try {
-        const path = window.location.pathname;
-        const res = await ApiService.request('/auth/status');
+        _authCheckPromise = ApiService.request('/auth/status');
+        const res = await _authCheckPromise;
+        _authCache = res;
+        await _applyAuthResult(res, path);
+    } catch (e) {
+        // Silently fail — don't break the page if auth check errors
+    } finally {
+        _authCheckPromise = null;
+    }
+}
 
-        if (res.isAuthenticated) {
-            currentUser = res.user || res.vendor;
-            localStorage.setItem('vendorLoggedIn', 'true');
-            if (currentUser && currentUser.email) {
-                localStorage.setItem('vendorEmail', currentUser.email);
-            }
-            if (currentUser && (currentUser.id || currentUser.user_id)) {
-                localStorage.setItem('vendorId', currentUser.id || currentUser.user_id);
-            }
+async function _applyAuthResult(res, path) {
+    if (res.isAuthenticated) {
+        currentUser = res.user || res.vendor;
+        localStorage.setItem('vendorLoggedIn', 'true');
+        if (currentUser && currentUser.email) {
+            localStorage.setItem('vendorEmail', currentUser.email);
+        }
+        if (currentUser && (currentUser.id || currentUser.user_id)) {
+            localStorage.setItem('vendorId', currentUser.id || currentUser.user_id);
+        }
 
-            // Redirect unverified vendors to pending page if they are on protected pages
-            // STRICT ROLE CHECK: If logged in but NOT a vendor, redirect to vendor login
-            if (currentUser.role !== 'vendor') {
-                // Allow non-vendors to stay on the login or signup page if they want to switch roles/register
-                const isAuthPage = path.includes('loginvender.html') || path.includes('signup.html');
-                if (!isAuthPage) {
-                    window.location.href = '../marketonex/marketonex.html';
+        // STRICT ROLE CHECK: non-vendor on protected pages → redirect to marketplace
+        if (currentUser.role !== 'vendor') {
+            const isAuthPage = path.includes('loginvender.html') || path.includes('signup.html');
+            if (!isAuthPage) {
+                window.location.href = '../marketonex/marketonex.html';
+                return;
+            }
+        }
+
+        if (currentUser.role === 'vendor') {
+            // Stage 0: Email Verification
+            if (currentUser.email_verified !== true && currentUser.email_verified !== 1) {
+                if (!path.endsWith('signup.html')) {
+                    window.location.href = 'signup.html';
                     return;
                 }
             }
 
-            if (currentUser.role === 'vendor') {
-                // Stage 0: Email Verification Check
-                // Note: We check !== true because it might be 0 or false
-                if (currentUser.email_verified !== true && currentUser.email_verified !== 1) {
-                    if (!path.endsWith('signup.html')) {
-                        window.location.href = 'signup.html';
-                        return;
-                    }
+            // Stage 1: Admin approval
+            if (!currentUser.verified || currentUser.verified === 'false' || currentUser.verified === 0) {
+                const verificationPages = ['signup.html', 'verification_biz_verification_website_editor.html', 'vender_profile_products_add-product.html', 'loginvender.html'];
+                const isAllowedPage = verificationPages.some(page => path.endsWith(page));
+
+                if (!isAllowedPage) {
+                    window.location.href = 'verification_biz_verification_website_editor.html?msg=restricted';
+                    return;
                 }
+                restrictUnverifiedSidebar();
+            } else {
+                // Stage 2: KYC / account_status check
+                const accountStatus = currentUser.account_status;
 
-                // Stage 1: Admin approval check (existing logic)
-                if (!currentUser.verified || currentUser.verified === 'false' || currentUser.verified === 0) {
-                    const verificationPages = ['signup.html', 'verification_biz_verification_website_editor.html', 'vender_profile_products_add-product.html', 'loginvender.html'];
-                    const isAllowedPage = verificationPages.some(page => path.endsWith(page));
+                if (accountStatus && accountStatus !== 'active') {
+                    const restrictedPages = ['products.html', 'orders.html', 'insights.html'];
+                    const isRestricted = restrictedPages.some(page => path.endsWith(page));
 
-                    if (!isAllowedPage) {
-                        window.location.href = 'verification_biz_verification_website_editor.html?msg=restricted';
+                    if (isRestricted) {
+                        window.location.href = 'verification_biz_verification_website_editor.html?msg=kyc_required';
                         return;
                     }
-
-                    // Specific logic for unverified vendors on allowed pages (e.g. sidebar restrictions)
                     restrictUnverifiedSidebar();
-                } else {
-                    // Stage 2: KYC / account_status check
-                    // If email is verified but KYC not yet approved, restrict products/orders/insights
-                    const accountStatus = currentUser.account_status;
-                    const kycStatus = currentUser.kyc_status;
-
-                    if (accountStatus && accountStatus !== 'active') {
-                        // Pages that require full KYC approval
-                        const restrictedPages = ['products.html', 'orders.html', 'insights.html'];
-                        const isRestricted = restrictedPages.some(page => path.endsWith(page));
-
-                        if (isRestricted) {
-                            let redirectTarget = 'verification_biz_verification_website_editor.html';
-                            // KYC pending stays on verification page for status info
-                            window.location.href = redirectTarget + '?msg=kyc_required';
-                            return;
-                        }
-
-                        // Apply sidebar restrictions for limited-mode vendors
-                        restrictUnverifiedSidebar();
-                    }
                 }
-            }
-
-            updateUIWithUser(currentUser);
-
-            // Load products ONLY if verified and on products page
-            if (path.includes('products.html') || path.includes('vender_profile_products_add-product.html') || path.includes('orders_feedback_insights_settings_user-info_reviews.html')) {
-                if (currentUser.role === 'vendor' && currentUser.verified) {
-                    if (typeof window.loadProducts === 'function') {
-                        window.loadProducts();
-                    }
-                }
-            }
-        } else {
-            // Backend says not authenticated - clear local flags
-            localStorage.removeItem('vendorLoggedIn');
-            localStorage.removeItem('vendorEmail');
-            localStorage.removeItem('products'); // Clear cached products on logout/auth fail
-
-            // Skip redirect for public pages (login/signup/landing)
-            if (path.includes('login.html') || path.includes('loginvender.html') || path.includes('signup.html') || path.includes('landingpage.html')) return;
-
-            // Protected Routes
-            const protectedPages = ['vender_profile_products_add-product.html', 'profile.html', 'orders_feedback_insights_settings_user-info_reviews.html', 'settings.html', 'user-info.html', 'verification_biz_verification_website_editor.html'];
-            const isProtected = protectedPages.some(page => path.endsWith(page));
-
-            if (isProtected) {
-                window.location.href = 'loginvender.html';
             }
         }
-    } catch (e) {
+
+        updateUIWithUser(currentUser);
+
+        // Load products only on the relevant pages and only for verified vendors
+        if (path.includes('products.html') || path.includes('vender_profile_products_add-product.html') || path.includes('orders_feedback_insights_settings_user-info_reviews.html')) {
+            if (currentUser.role === 'vendor' && currentUser.verified) {
+                if (typeof window.loadProducts === 'function') {
+                    window.loadProducts();
+                }
+            }
+        }
+    } else {
+        // Not authenticated — clear local flags
+        localStorage.removeItem('vendorLoggedIn');
+        localStorage.removeItem('vendorEmail');
+        localStorage.removeItem('products');
+
+        // Skip redirect for public pages
+        if (path.includes('login.html') || path.includes('loginvender.html') || path.includes('signup.html') || path.includes('landingpage.html')) return;
+
+        // Redirect to login for protected pages
+        const protectedPages = ['vender_profile_products_add-product.html', 'profile.html', 'orders_feedback_insights_settings_user-info_reviews.html', 'settings.html', 'user-info.html', 'verification_biz_verification_website_editor.html'];
+        const isProtected = protectedPages.some(page => path.endsWith(page));
+        if (isProtected) {
+            window.location.href = 'loginvender.html';
+        }
     }
 }
+
 
 function updateUIWithUser(user) {
     if (!user) return;
