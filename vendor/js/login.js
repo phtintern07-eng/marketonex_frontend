@@ -1,15 +1,33 @@
+// 🛡️ DOUBLE-SUBMISSION GUARD
+// Prevents duplicate API calls when this script is accidentally loaded twice
+// (e.g., two <script> tags on the same page) or user clicks submit rapidly.
+let _vendorLoginInProgress = false;
+
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("LOGIN FINAL VERSION LOADED");
+    // Guard: if another DOMContentLoaded already set up the listener, skip.
+    if (window._vendorLoginListenerAttached) {
+        console.warn('[VENDOR LOGIN] Listener already attached, skipping duplicate.');
+        return;
+    }
+    window._vendorLoginListenerAttached = true;
+    console.log("[VENDOR LOGIN] Script loaded — v2026-04-01");
 
     const loginForm = document.getElementById('loginForm');
 
     if (!loginForm) {
-        console.error("Login form not found!");
+        console.error("[VENDOR LOGIN] Login form not found!");
         return;
     }
 
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        // 🔒 Block duplicate submissions
+        if (_vendorLoginInProgress) {
+            console.warn('[VENDOR LOGIN] Submission already in progress, ignoring duplicate.');
+            return;
+        }
+        _vendorLoginInProgress = true;
 
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
@@ -18,25 +36,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // ✅ Validation
         if (!emailInput.value.trim() || !passwordInput.value.trim()) {
             alert('Please enter both email and password');
+            _vendorLoginInProgress = false;
             return;
         }
 
         const email = emailInput.value.trim();
         const password = passwordInput.value;
 
-        // ✅ Button loading state
+        // ✅ Disable button IMMEDIATELY (before await) to block rapid clicks
         const originalBtnText = submitBtn.textContent;
         submitBtn.textContent = 'Signing In...';
         submitBtn.disabled = true;
 
         try {
-            // ✅ CORRECT LOGIN REQUEST
-            const response = await fetch('/login', {
+            // ✅ VENDOR-SPECIFIC LOGIN ENDPOINT (fixes session persistence bug)
+            // DO NOT use /login — that is the customer login and will not persist
+            // the vendor session correctly. Always use /api/auth/vendor-login.
+            const response = await fetch('/api/auth/vendor-login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                credentials: 'include',   // 🔥 IMPORTANT (session fix)
+                credentials: 'include',   // 🔥 CRITICAL: sends & receives session cookie
                 body: JSON.stringify({ email, password })
             });
 
@@ -45,48 +66,53 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 data = await response.json();
             } catch (err) {
-                throw new Error('Invalid server response');
+                throw new Error('Invalid server response — could not parse JSON.');
             }
 
-            console.log('[LOGIN RESPONSE]:', data);
+            console.log('[VENDOR LOGIN] Response status:', response.status);
+            console.log('[VENDOR LOGIN] Response data:', data);
 
             // ❌ If login failed
             if (!response.ok || !data.success) {
-                throw new Error(data.message || 'Login failed');
+                // Handle specific error codes from backend
+                if (data.error === 'not_a_vendor') {
+                    throw new Error(data.message || 'This portal is for Vendors only.');
+                }
+                if (data.error === 'email_not_verified') {
+                    throw new Error(data.message || 'Please verify your email first.');
+                }
+                throw new Error(data.message || data.error || 'Login failed. Please check your credentials.');
             }
 
-            // ✅ Save optional data
+            // ✅ Save session hints in localStorage (UI convenience only — NOT security)
             if (data.user) {
                 localStorage.setItem('vendorLoggedIn', 'true');
                 localStorage.setItem('vendorEmail', data.user.email || email);
                 sessionStorage.setItem('canAddProduct', 'true');
             }
 
-            // ✅ Check if redirected from another page
+            // ✅ Check if redirected from another page (e.g. user was bounced to login)
             const returnUrl = sessionStorage.getItem('returnAfterLogin');
             if (returnUrl) {
                 sessionStorage.removeItem('returnAfterLogin');
+                console.log('[VENDOR LOGIN] Redirecting to saved returnUrl:', returnUrl);
                 window.location.href = returnUrl;
                 return;
             }
 
-            // 🔥 MAIN REDIRECT (IMPORTANT)
-            if (data.redirect_url) {
-                console.log("Redirecting to:", data.redirect_url);
-                window.location.href = data.redirect_url;
-                return;
-            }
-
-            // fallback (just in case)
-            window.location.href = '/vendor';
+            // 🔥 MAIN REDIRECT — backend sends 'redirect' key (NOT 'redirect_url')
+            const redirectTarget = data.redirect || '/vendor/vender_profile_products_add-product.html';
+            console.log('[VENDOR LOGIN] Redirecting to:', redirectTarget);
+            window.location.href = redirectTarget;
 
         } catch (error) {
-            console.error('[LOGIN ERROR]:', error);
-            alert(error.message || 'Something went wrong');
+            console.error('[VENDOR LOGIN] Error:', error);
+            alert(error.message || 'Something went wrong. Please try again.');
 
-            // ❌ Reset button
+            // ❌ Reset button and allow retry
             submitBtn.textContent = originalBtnText;
             submitBtn.disabled = false;
+            _vendorLoginInProgress = false;
         }
     });
 });
