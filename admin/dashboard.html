@@ -62,6 +62,10 @@
                     <span>Customer Info</span>
                     <span class="badge" id="customers-badge"></span>
                 </a>
+                <a href="#" class="nav-item" data-tab="blogs">
+                    <i class="fas fa-blog"></i>
+                    <span>Blog Management</span>
+                </a>
                 <a href="#" class="nav-item" data-tab="logs">
                     <i class="fas fa-clipboard-list"></i>
                     <span>Logs</span>
@@ -323,6 +327,96 @@
                 </div>
             </div>
 
+            <!-- Blog Management Tab -->
+            <div id="blogs-view" class="view-section" style="padding: 2px;">
+                <div class="section-header">
+                    <h3><i class="fas fa-blog"></i> Blog Management</h3>
+                    <div class="action-buttons" style="display: flex; gap: 10px;">
+                        <button type="button" class="btn-action btn-view" id="blog-preview-btn"><i class="fas fa-eye"></i> Preview</button>
+                        <button type="button" class="btn-action btn-approve" id="blog-publish-btn"><i class="fas fa-upload"></i> Publish Post</button>
+                    </div>
+                </div>
+
+                <div class="blog-form-container" style="background: white; border-radius: 12px; padding: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-top: 15px;">
+                    <form id="blog-form" onsubmit="return false;" style="display: flex; flex-direction: column; gap: 20px;">
+                        
+                        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                            <!-- Left Column -->
+                            <div style="display: flex; flex-direction: column; gap: 15px;">
+                                <div>
+                                    <label style="font-weight: 600; display: block; margin-bottom: 5px;">Blog Title <span style="color: red;">*</span></label>
+                                    <input type="text" id="blog-title" placeholder="Enter an engaging title..." required 
+                                           style="width: 100%; padding: 10px 15px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 1rem; font-family: 'Outfit', sans-serif;">
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <div>
+                                        <label style="font-weight: 600; display: block; margin-bottom: 5px;">Writer Name <span style="color: red;">*</span></label>
+                                        <input type="text" id="blog-writer" placeholder="Author name..." required 
+                                               style="width: 100%; padding: 10px 15px; border: 1px solid #e5e7eb; border-radius: 8px; font-family: 'Outfit', sans-serif;">
+                                    </div>
+                                    <div>
+                                        <label style="font-weight: 600; display: block; margin-bottom: 5px;">Category <span style="color: red;">*</span></label>
+                                        <select id="blog-category" required style="width: 100%; padding: 10px 15px; border: 1px solid #e5e7eb; border-radius: 8px; font-family: 'Outfit', sans-serif; cursor: pointer;">
+                                            <option value="">Select Category...</option>
+                                            <option value="E-Commerce">E-Commerce</option>
+                                            <option value="Marketing">Marketing</option>
+                                            <option value="Tech & Tools">Tech & Tools</option>
+                                            <option value="Business Strategy">Business Strategy</option>
+                                            <option value="Success Stories">Success Stories</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Right Column -->
+                            <div style="display: flex; flex-direction: column; gap: 15px; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+                                <div>
+                                    <label style="font-weight: 600; display: block; margin-bottom: 5px;">Cover Images <span style="color: red;">*</span></label>
+                                    <input type="file" id="blog-images" multiple accept="image/*" required style="width: 100%; padding: 8px; border: 1px dashed #cbd5e1; border-radius: 6px; background: white; cursor: pointer;">
+                                    <small style="color: #6b7280; display: block; margin-top: 4px;">Hold Ctrl / Cmd to select multiple images.</small>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 10px; border-top: 1px solid #e5e7eb;">
+                                    <input type="checkbox" id="blog-expert" style="width: 18px; height: 18px; cursor: pointer;">
+                                    <label for="blog-expert" style="font-weight: 600; cursor: pointer; user-select: none;">Mark as <span style="color: #fbbf24; background: #fef3c7; padding: 2px 6px; border-radius: 4px; font-size: 0.9em;">⭐ Expert</span> Article</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tags System -->
+                        <div>
+                            <label style="font-weight: 600; display: block; margin-bottom: 5px;">Tags (Press Enter to add)</label>
+                            <div id="blog-tags-container" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 8px; min-height: 44px; align-items: center; background: #fff; cursor: text;">
+                                <input type="text" id="blog-tag-input" placeholder="Type a tag and press Enter..." style="border: none; outline: none; padding: 4px; flex-grow: 1; font-family: 'Outfit', sans-serif; min-width: 150px;">
+                            </div>
+                            <input type="hidden" id="blog-tags-hidden" value="[]">
+                        </div>
+
+                        <!-- Editor -->
+                        <div>
+                            <label style="font-weight: 600; display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                <span>Blog Content <span style="color: red;">*</span></span>
+                                <span style="color: #6b7280; font-size: 0.85rem;" id="blog-stats">0 words | 0 min read</span>
+                            </label>
+                            
+                            <div style="border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: white;">
+                                <div id="quill-toolbar-container"></div>
+                                <div id="quill-editor" style="height: 400px; font-family: 'Inter', sans-serif; font-size: 1rem;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Footer / Status Bar -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e5e7eb; padding-top: 15px;">
+                            <div style="color: #10b981; font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; opacity: 0; transition: opacity 0.3s;" id="blog-status-message">
+                                <i class="fas fa-check-circle"></i> <span id="blog-status-text">Draft saved successfully</span>
+                            </div>
+                            <button type="button" class="btn-action" id="blog-save-draft" style="background: #f3f4f6; color: #374151; border: 1px solid #d1d5db; display: flex; align-items: center; gap: 6px; padding: 8px 16px;">
+                                <i class="fas fa-save"></i> Save Draft
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- Logs Tab -->
             <div id="logs-view" class="view-section">
                 <div class="section-header">
@@ -378,8 +472,14 @@
         </div>
     </div>
 
+    <!-- Quill Rich Text Editor CSS & JS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
     <script src="js/admin.js"></script>
     <script src="js/admin_3d.js"></script>
+    <!-- Blog Management Extension -->
+    <script src="js/admin-blog.js"></script>
     <script>
         // ── Mobile sidebar toggle ──────────────────────────────────────────
         (function () {
