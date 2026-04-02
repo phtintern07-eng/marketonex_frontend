@@ -7,8 +7,10 @@ if (window._vendorLoginScriptLoaded) {
 
 let _vendorLoginInProgress = false;
 
-// ✅ FIXED: Direct API URL (NO CONFUSION)
-const API_URL = "https://marketonex.in/backend/passenger_wsgi.py";
+// ✅ FIXED API URL (REMOVED passenger_wsgi.py)
+if (!window.API_URL) {
+    window.API_URL = "https://marketonex.in";
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -56,8 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.disabled = true;
 
         try {
-            // 🌐 ✅ FIXED API CALL
-            const response = await fetch(`${API_URL}/auth/vendor-login`, {
+            // 🌐 API CALL
+            const response = await fetch(`${window.API_URL}/api/auth/vendor-login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -87,11 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // ✅ Save login state
             localStorage.setItem('vendorLoggedIn', 'true');
 
-            if (data.user?.email) {
+            if (data.user && data.user.email) {
                 localStorage.setItem('vendorEmail', data.user.email);
             }
 
-            if (data.user?.id || data.user?.user_id) {
+            if (data.user && (data.user.id || data.user.user_id)) {
                 localStorage.setItem('vendorId', data.user.id || data.user.user_id);
             }
 
