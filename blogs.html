@@ -1,428 +1,328 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Latest Blogs | Marketonex</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg-body: #f5f5f5;
-            --bg-card: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --primary: #4f46e5;
-            --expert-color: #fbbf24;
-            --border-radius: 16px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            min-height: 100vh;
-        }
-
-        /* Container & Header */
-        .blog-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 4rem 1.5rem;
-        }
-
-        .blog-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .blog-header h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--text-main);
-            margin-bottom: 1rem;
-            letter-spacing: -0.025em;
-        }
-
-        .blog-header p {
-            font-size: 1.1rem;
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* 3-Column Grid */
-        .blog-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            opacity: 0; /* For fade-in animation */
-        }
-
-        /* Card Design */
-        .blog-card {
-            background: var(--bg-card);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            cursor: pointer;
-            transition: transform var(--transition), box-shadow var(--transition);
-            display: flex;
-            flex-direction: column;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .blog-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        /* Image & Overlay */
-        .card-image-wrapper {
-            position: relative;
-            width: 100%;
-            height: 240px;
-            overflow: hidden;
-        }
-
-        .card-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform var(--transition);
-        }
-
-        .blog-card:hover .card-image {
-            transform: scale(1.05); /* Slight zoom-in */
-        }
-
-        .image-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 2rem 1.5rem 1rem;
-            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
-            display: flex;
-            align-items: flex-end;
-        }
-
-        .category-badge {
-            background: var(--primary);
-            color: white;
-            padding: 0.35rem 0.85rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        /* Card Content */
-        .card-content {
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-
-        .card-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            line-height: 1.4;
-            margin-bottom: 0.75rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .card-excerpt {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-            flex: 1;
-            /* Simple truncating */
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .card-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-top: 1.25rem;
-            border-top: 1px solid #f3f4f6;
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .writer-info {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-main);
-        }
-
-        .expert-badge {
-            color: #d97706; /* Darker amber for text contrast */
-            background-color: #fef3c7;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-        }
-
-        .tags-container {
-            display: flex;
-            gap: 0.4rem;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
-
-        .tagItem {
-            font-size: 0.75rem;
-            color: var(--primary);
-            background: #eef2ff;
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            font-weight: 500;
-        }
-
-        /* Utilities & Animations */
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease forwards;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .loading-state {
-            text-align: center;
-            padding: 4rem;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-        
-        .loader {
-            border: 3px solid rgba(79, 70, 229, 0.2);
-            border-top: 3px solid var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error-state {
-            text-align: center;
-            padding: 3rem;
-            background: #fef2f2;
-            color: #991b1b;
-            border-radius: var(--border-radius);
-            margin-top: 2rem;
-        }
-
-        /* Responsiveness */
-        @media (max-width: 1024px) {
-            .blog-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 640px) {
-            .blog-grid {
-                grid-template-columns: 1fr;
-            }
-            .blog-header h1 {
-                font-size: 2rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCHub Blog & Insights</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Oswald:wght@500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/blogs.css">
 </head>
+
 <body>
 
-    <div class="blog-container">
-        <header class="blog-header fade-in-up">
-            <h1>Our Insights & Articles</h1>
-            <p>Explore expert tips, market trends, and strategies designed for success.</p>
-        </header>
-
-        <!-- Loading Indicator -->
-        <div class="loading-state" id="loadingState">
-            <div class="loader"></div>
-            <p>Fetching latest blogs...</p>
-        </div>
-
-        <!-- Error Message -->
-        <div class="error-state" id="errorState" style="display: none;">
-            <h3>Oops, something went wrong.</h3>
-            <p id="errorText">Could not load the blogs.</p>
-        </div>
-
-        <!-- Blog Grid -->
-        <div class="blog-grid" id="blogGrid"></div>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">PC<span>Market</span>onex</a>
+      <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#" class="active">Blog</a></li>
+        <li><a href="#">Reviews</a></li>
+        <li><a href="#">Build Guides</a></li>
+        <li><a href="#">Components</a></li>
+        <li><button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme"><i
+              class="fa-solid fa-moon"></i></button></li>
+      </ul>
+      <div class="hamburger" id="hamburger">
+        <i class="fa-solid fa-bars"></i>
+      </div>
     </div>
+  </nav>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchBlogs();
-        });
+  <!-- Mobile Menu -->
+  <div class="mobile-nav" id="mobile-nav">
+    <a href="#">Home</a>
+    <a href="#" class="active">Blog</a>
+    <a href="#">Reviews</a>
+    <a href="#">Build Guides</a>
+    <a href="#">Components</a>
+    <a href="#" id="mobile-theme-toggle"><i class="fa-solid fa-moon"></i> Theme</a>
+  </div>
 
-        async function fetchBlogs() {
-            const grid = document.getElementById('blogGrid');
-            const loader = document.getElementById('loadingState');
-            const errorState = document.getElementById('errorState');
-            const errorText = document.getElementById('errorText');
+  <!-- Featured / Hero Section -->
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-content">
+        <span class="hero-tag">Featured Guide</span>
+        <h1>The Ultimate GPU Comparison: 2024 Edition</h1>
+        <p>We benchmarked the latest cutting-edge graphics cards under extreme 4K gaming loads, creative rendering, and
+          stress testing. Find out which card claims the throne.</p>
+        <div class="hero-meta">
+          <span><i class="fa-solid fa-calendar-day"></i> Sep 28, 2024</span>
+          <span><i class="fa-solid fa-user"></i> By Mark D.</span>
+        </div>
+        <button class="cta-btn">Read Full Article <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+  </section>
 
-            // Use exactly /get-blogs as requested
-            const API_BASE = window.location.protocol === 'file:' 
-                                ? 'http://127.0.0.1:5000' 
-                                : '';
-            const ENDPOINT = `${API_BASE}/get-blogs`;
+  <!-- Blog Main Section -->
+  <section class="blog-section">
+    <div class="blog-container">
 
-            try {
-                // Fetch dynamic data
-                const response = await fetch(ENDPOINT);
-                
-                // If endpoint missing, let's gracefully load dummy data for Visual Demonstration
-                if (!response.ok) {
-                    throw new Error(`Server returned ${response.status}`);
-                }
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-widget">
+          <h3>Search the Blog</h3>
+          <div class="search-box hover-glow">
+            <input type="text" name="search" id="blog-search" placeholder="Search GPUs, CPUs, builds...">
+            <button aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+          </div>
+        </div>
 
-                const data = await response.json();
-                
-                // Extract blogs array based on common JSON structures
-                const blogs = Array.isArray(data) ? data : (data.blogs || data.data || []);
-                
-                loader.style.display = 'none';
+        <div class="sidebar-widget">
+          <h3>Categories</h3>
+          <ul class="category-list" id="category-filters">
+            <li class="active hover-glow" data-filter="all">All Articles</li>
+            <li class="hover-glow" data-filter="reviews">Component Reviews</li>
+            <li class="hover-glow" data-filter="guides">Build Guides</li>
+            <li class="hover-glow" data-filter="news">Tech News</li>
+            <li class="hover-glow" data-filter="peripherals">Peripherals</li>
+          </ul>
+        </div>
 
-                if (blogs.length === 0) {
-                    errorText.textContent = "No blogs published yet. Check back later!";
-                    errorState.style.display = 'block';
-                    return;
-                }
+        <div class="sidebar-widget newsletter-widget">
+          <h3>Join the Hub</h3>
+          <p>Get the latest PC building news and exclusive component reviews straight to your inbox.</p>
+          <form id="newsletter-form">
+            <input type="email" name="email" id="newsletter-email" placeholder="Your email address" required class="hover-glow">
+            <button type="submit" class="hover-glow">Subscribe</button>
+          </form>
+        </div>
+      </aside>
 
-                renderBlogs(blogs, grid);
+      <!-- Blog Grid -->
+      <main class="blog-content">
+        <div class="top-bar">
+          <h2>Latest Postings</h2>
+          <select id="sort-filter" class="hover-glow">
+            <option value="newest">Newest First</option>
+            <option value="popular">Most Popular</option>
+            <option value="trending">Currently Trending</option>
+          </select>
+        </div>
 
-            } catch (error) {
-                console.error("Error fetching blogs:", error);
-                loader.style.display = 'none';
-                
-                // Show graceful error state
-                errorText.textContent = `Unable to connect to the server (${error.message}). Please try again later.`;
-                errorState.style.display = 'block';
-            }
-        }
+        <div class="article-grid" id="article-grid">
 
-        function renderBlogs(blogs, container) {
-            container.innerHTML = ''; // clear grid
+          <!-- Article 1 -->
+          <article class="article-card" data-category="reviews">
+            <div class="img-wrapper">
+              <span class="category-badge">Reviews</span>
+              <img src="https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=600&q=80"
+                alt="GPU circuit board">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> 8 min read</span>
+                <span>Sep 20, 2024</span>
+              </div>
+              <h3>RTX 4090 vs RX 7900 XTX: The 4K Showdown</h3>
+              <p>Two industry giants face off. We break down ray tracing performance, pure rasterization, and thermals
+                in our intensive PC testing bench.</p>
+              <div class="card-footer">
+                <div class="author">
+                  <div class="author-img">M</div>
+                  <span>Mark D.</span>
+                </div>
+                <a href="#" class="read-more">Read <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </article>
 
-            blogs.forEach((blog, index) => {
-                // 1. Strip HTML tags safely for the excerpt
-                const tmpDiv = document.createElement("div");
-                tmpDiv.innerHTML = blog.content || '';
-                const cleanText = tmpDiv.textContent || tmpDiv.innerText || "";
-                
-                // Truncate text (around 120-150 characters)
-                const excerpt = cleanText.length > 130 
-                                ? cleanText.substring(0, 130) + '...' 
-                                : cleanText;
+          <!-- Scrolling Ad Banner 1 -->
+          <div class="ad-banner">
+            <div class="ad-marquee">
+              <span id="ad-text-1"></span>
+            </div>
+          </div>
 
-                // 2. Parse Tags safely
-                let tagsHtml = '';
-                if (blog.tags) {
-                    let parsedTags = [];
-                    try {
-                        parsedTags = typeof blog.tags === 'string' ? JSON.parse(blog.tags) : blog.tags;
-                    } catch(e) {
-                        // Fallback if tags is just a comma-separated string
-                        parsedTags = typeof blog.tags === 'string' ? blog.tags.split(',').map(t => t.trim()) : [];
-                    }
+          <!-- Article 2 -->
+          <article class="article-card" data-category="guides">
+            <div class="img-wrapper">
+              <span class="category-badge">Guides</span>
+              <img src="https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=600&q=80"
+                alt="PC Case inner build">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> 15 min read</span>
+                <span>Sep 15, 2024</span>
+              </div>
+              <h3>Step-by-Step Custom Loop Water Cooling</h3>
+              <p>From bending PETG tubes to selecting the right radiator and fittings, here are the pro secrets to
+                building a leak-proof custom liquid cooling loop.</p>
+              <div class="card-footer">
+                <div class="author">
+                  <div class="author-img">S</div>
+                  <span>Sarah T.</span>
+                </div>
+                <a href="#" class="read-more">Read <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </article>
 
-                    if (Array.isArray(parsedTags) && parsedTags.length > 0) {
-                        // Show max 3 tags
-                        tagsHtml = `<div class="tags-container">` + 
-                            parsedTags.slice(0, 3).map(tag => `<span class="tagItem">#${tag}</span>`).join('') +
-                        `</div>`;
-                    }
-                }
+          <!-- Article 3 -->
+          <article class="article-card" data-category="guides">
+            <div class="img-wrapper">
+              <span class="category-badge">Guides</span>
+              <img src="https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=600&q=80"
+                alt="PC inside">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> 6 min read</span>
+                <span>Sep 10, 2024</span>
+              </div>
+              <h3>Cable Management Like a Pro: Tips & Tricks</h3>
+              <p>Airflow matters. Learn how to tightly route your PSU cables behind the motherboard tray for a cleaner,
+                cooler, and better-looking rig.</p>
+              <div class="card-footer">
+                <div class="author">
+                  <div class="author-img">J</div>
+                  <span>John R.</span>
+                </div>
+                <a href="#" class="read-more">Read <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </article>
 
-                // 3. Image Handling (Lazy loading + Fallback)
-                const fallbackImage = 'https://images.unsplash.com/photo-1542435503-956c469947f6?auto=format&fit=crop&q=80&w=800';
-                const imageUrl = blog.image 
-                                ? (blog.image.startsWith('http') ? blog.image : `/static/images/${blog.image}`) 
-                                : fallbackImage;
+          <!-- Article 4 -->
+          <article class="article-card" data-category="news">
+            <div class="img-wrapper">
+              <span class="category-badge">News</span>
+              <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"
+                alt="Processor">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> 3 min read</span>
+                <span>Sep 02, 2024</span>
+              </div>
+              <h3>Intel Core Ultra Desktop CPUs Announced</h3>
+              <p>The newest processor generation claims significant IPC gains, heavily optimized P-cores and E-cores
+                architecture, and stunning efficiency.</p>
+              <div class="card-footer">
+                <div class="author">
+                  <div class="author-img">E</div>
+                  <span>Emma L.</span>
+                </div>
+                <a href="#" class="read-more">Read <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </article>
 
-                // 4. Expert Badge
-                const isExpert = blog.expert === true || blog.expert === 'true' || blog.expert === 1;
-                const expertHtml = isExpert ? `<span class="expert-badge">⭐ Expert</span>` : '';
+          <!-- Scrolling Ad Banner 2 -->
+          <div class="ad-banner">
+            <div class="ad-marquee">
+              <span id="ad-text-2"></span>
+            </div>
+          </div>
 
-                // 5. Build Final Card Element
-                const card = document.createElement('a');
-                card.href = `/blog/${blog.id || index}`;
-                card.className = 'blog-card';
-                card.innerHTML = `
-                    <div class="card-image-wrapper">
-                        <img src="${imageUrl}" alt="${blog.title}" class="card-image" loading="lazy" onerror="this.src='${fallbackImage}'">
-                        <div class="image-overlay">
-                            ${blog.category ? `<span class="category-badge">${blog.category}</span>` : ''}
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        ${tagsHtml}
-                        <h2 class="card-title">${blog.title || 'Untitled Blog'}</h2>
-                        <p class="card-excerpt">${excerpt || 'No summary available.'}</p>
-                        
-                        <div class="card-footer">
-                            <span class="writer-info">
-                                <span style="font-weight: 600;">${blog.writer || 'Anonymous'}</span>
-                            </span>
-                            ${expertHtml}
-                        </div>
-                    </div>
-                `;
+          <!-- Article 5 -->
+          <article class="article-card" data-category="guides">
+            <div class="img-wrapper">
+              <span class="category-badge">Guides</span>
+              <img src="https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80"
+                alt="Setup workspace">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> 10 min read</span>
+                <span>Aug 28, 2024</span>
+              </div>
+              <h3>Top 5 High-Airflow Cases for Hot Builds</h3>
+              <p>Running a flagship CPU and GPU? You need a mesh front panel. We review the best cases for lowering your
+                system temperatures.</p>
+              <div class="card-footer">
+                <div class="author">
+                  <div class="author-img">M</div>
+                  <span>Mark D.</span>
+                </div>
+                <a href="#" class="read-more">Read <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </article>
 
-                container.appendChild(card);
-            });
+          <!-- Article 6 -->
+          <article class="article-card" data-category="reviews">
+            <div class="img-wrapper">
+              <span class="category-badge">Reviews</span>
+              <img src="https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=600&q=80"
+                alt="Motherboard details">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> 7 min read</span>
+                <span>Aug 20, 2024</span>
+              </div>
+              <h3>Gen5 NVMe SSDs Tested: Worth the Upgrade?</h3>
+              <p>Are sequential read speeds of 12,000 MB/s truly noticeably faster for gamers, or is Gen4 still the
+                price-to-performance king?</p>
+              <div class="card-footer">
+                <div class="author">
+                  <div class="author-img">S</div>
+                  <span>Sarah T.</span>
+                </div>
+                <a href="#" class="read-more">Read <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </article>
 
-            // Trigger grid fade-in animation
-            setTimeout(() => {
-                container.style.opacity = '1';
-                container.classList.add('fade-in-up');
-            }, 100);
-        }
-    </script>
+        </div>
+
+        <div class="pagination">
+          <button class="page-btn active">1</button>
+          <button class="page-btn hover-glow">2</button>
+          <button class="page-btn hover-glow">3</button>
+          <span>...</span>
+          <button class="page-btn hover-glow">Next <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+
+      </main>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-sections">
+      <div class="footer-col">
+        <h3>PCHub Blog</h3>
+        <p>Your trusted source for professional hardware reviews, PC building tutorials, and component news.</p>
+        <div class="social-links">
+          <a href="#" class="hover-glow"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="hover-glow"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" class="hover-glow"><i class="fa-brands fa-twitch"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3>Links</h3>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">PC Builder Tool</a></li>
+          <li><a href="#">Shop Components</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Policies</h3>
+        <ul>
+          <li><a href="#">Testing Methodology</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 PCHub. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/blogs.js"></script>
 </body>
+
 </html>
