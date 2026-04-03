@@ -7,6 +7,11 @@ if (window._vendorLoginScriptLoaded) {
 
 let _vendorLoginInProgress = false;
 
+// ✅ FIXED API URL (REMOVED passenger_wsgi.py)
+if (!window.API_URL) {
+    window.API_URL = "https://marketonex.in";
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // 🔁 Prevent duplicate event binding
@@ -38,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const passwordInput = document.getElementById('password');
         const submitBtn = loginForm.querySelector('button[type="submit"]');
 
-        // ✅ Basic validation
+        // ✅ Validation
         if (!emailInput.value.trim() || !passwordInput.value.trim()) {
             alert('Please enter both email and password');
             _vendorLoginInProgress = false;
@@ -53,8 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
         submitBtn.disabled = true;
 
         try {
-            // 🌐 API Call (FIXED)
-            const response = await fetch(`${window.API_BASE_URL}/auth/vendor-login`, {
+            // 🌐 API CALL
+            const response = await fetch(`${window.API_URL}/api/auth/vendor-login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -63,21 +68,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ email, password })
             });
 
-            // ✅ Safe JSON parsing
+            // 🔍 SAFE RESPONSE HANDLING
             const text = await response.text();
-            const data = text ? JSON.parse(text) : {};
+
+            let data;
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (err) {
+                console.error('[LOGIN ERROR] Invalid JSON:', text);
+                throw new Error("Server returned invalid response (not JSON)");
+            }
 
             console.log('[LOGIN RESPONSE]', data);
 
-            // ❌ Handle errors
+            // ❌ Handle backend errors
             if (!response.ok || !data.success) {
-                throw new Error(data.message || 'Login failed');
+                throw new Error(data.message || data.error || 'Login failed');
             }
 
-            // ✅ Store login state
+            // ✅ Save login state
             localStorage.setItem('vendorLoggedIn', 'true');
 
-            // Optional (helpful for other pages)
             if (data.user && data.user.email) {
                 localStorage.setItem('vendorEmail', data.user.email);
             }
@@ -86,10 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('vendorId', data.user.id || data.user.user_id);
             }
 
-            _vendorLoginInProgress = false;
-
-            // 🔁 Redirect (FIXED PATH)
-            const redirectTarget = data.redirect || 'vender_profile_products_add-product.html';
+            // 🔁 Redirect
+            const redirectTarget = data.redirect || '/vendor/vendor_profile_products_add-product.html';
 
             setTimeout(() => {
                 window.location.href = redirectTarget;
@@ -103,8 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // 🔄 Restore button
             submitBtn.textContent = originalBtnText;
             submitBtn.disabled = false;
-
-            _vendorLoginInProgress = false;
         }
+
+        _vendorLoginInProgress = false;
     });
 });
