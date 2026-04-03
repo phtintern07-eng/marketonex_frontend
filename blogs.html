@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MarketOnex</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Oswald:wght@500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/blogs.css">
+</head>
+
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">#<span>Market</span>Onex</a>
+      <ul class="nav-links">
+        <li><a href="#">Home</a></li>
+        <li><a href="#" class="active">Blog</a></li>
+        <li><a href="#">Reviews</a></li>
+        <li><a href="#">Build Guides</a></li>
+        <li><a href="#">Components</a></li>
+        <li><button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme"><i
+              class="fa-solid fa-moon"></i></button></li>
+      </ul>
+      <div class="hamburger" id="hamburger">
+        <i class="fa-solid fa-bars"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-nav" id="mobile-nav">
+    <a href="#">Home</a>
+    <a href="#" class="active">Blog</a>
+    <a href="#">Reviews</a>
+    <a href="#">Build Guides</a>
+    <a href="#">Components</a>
+    <a href="#" id="mobile-theme-toggle"><i class="fa-solid fa-moon"></i> Theme</a>
+  </div>
+
+  <!-- Featured / Hero Section -->
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-content">
+        <span class="hero-tag">Featured Guide</span>
+        <h1>The Ultimate GPU Comparison: 2024 Edition</h1>
+        <p>We benchmarked the latest cutting-edge graphics cards under extreme 4K gaming loads, creative rendering, and
+          stress testing. Find out which card claims the throne.</p>
+        <div class="hero-meta">
+          <span><i class="fa-solid fa-calendar-day"></i> Sep 28, 2024</span>
+          <span><i class="fa-solid fa-user"></i> By Mark D.</span>
+        </div>
+        <button class="cta-btn">Read Full Article <i class="fa-solid fa-arrow-right"></i></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Blog Main Section -->
+  <section class="blog-section">
+    <div class="blog-container">
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-widget">
+          <h3>Search the Blog</h3>
+          <div class="search-box hover-glow">
+            <input type="text" name="search" id="blog-search" placeholder="Search GPUs, CPUs, builds...">
+            <button aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+          </div>
+        </div>
+
+        <div class="sidebar-widget">
+          <h3>Categories</h3>
+          <ul class="category-list" id="category-filters">
+            <li class="active hover-glow" data-filter="all">All Articles</li>
+            <li class="hover-glow" data-filter="reviews">Component Reviews</li>
+            <li class="hover-glow" data-filter="guides">Build Guides</li>
+            <li class="hover-glow" data-filter="news">Tech News</li>
+            <li class="hover-glow" data-filter="peripherals">Peripherals</li>
+          </ul>
+        </div>
+
+        <div class="sidebar-widget newsletter-widget">
+          <h3>Join the Hub</h3>
+          <p>Get the latest MarketOnex building news and exclusive component reviews straight to your inbox.</p>
+          <form id="newsletter-form">
+            <input type="email" name="email" id="newsletter-email" placeholder="Your email address" required
+              class="hover-glow">
+            <button type="submit" class="hover-glow">Subscribe</button>
+          </form>
+        </div>
+      </aside>
+
+      <!-- Blog Grid -->
+      <main class="blog-content">
+        <div class="top-bar">
+          <h2>Latest Postings</h2>
+          <select id="sort-filter" class="hover-glow">
+            <option value="newest">Newest First</option>
+            <option value="popular">Most Popular</option>
+            <option value="trending">Currently Trending</option>
+          </select>
+        </div>
+
+        <div class="article-grid" id="article-grid">
+
+          <!-- Article 1 -->
+          <article class="article-card" data-category="reviews">
+            <div class="img-wrapper">
+              <span class="category-badge">Reviews</span>
+              <img src="https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=600&q=80"
+                alt="GPU circuit board">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> 8 min read</span>
+                <span>Sep 20, 2024</span>
+              </div>
+              <h3>RTX 4090 vs RX 7900 XTX: The 4K Showdown</h3>
+              <p>Two industry giants face off. We break down ray tracing performance, pure rasterization, and thermals
+                in our intensive PC testing bench.</p>
+              <div class="card-footer">
+                <div class="author">
+                  <div class="author-img">M</div>
+                  <span>Mark D.</span>
+                </div>
+                <a href="#" class="read-more">Read <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Scrolling Ad Banner 1 -->
+          <div class="ad-banner">
+            <div class="ad-marquee">
+              <span id="ad-text-1"></span>
+            </div>
+          </div>
+
+          <!-- Article 2 -->
+          <article class="article-card" data-category="guides">
+            <div class="img-wrapper">
+              <span class="category-badge">Guides</span>
+              <img src="https://images.unsplash.com/photo-1587202372634-32705e3bf49c?auto=format&fit=crop&w=600&q=80"
+                alt="PC Case inner build">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> 15 min read</span>
+                <span>Sep 15, 2024</span>
+              </div>
+              <h3>Step-by-Step Custom Loop Water Cooling</h3>
+              <p>From bending PETG tubes to selecting the right radiator and fittings, here are the pro secrets to
+                building a leak-proof custom liquid cooling loop.</p>
+              <div class="card-footer">
+                <div class="author">
+                  <div class="author-img">S</div>
+                  <span>Sarah T.</span>
+                </div>
+                <a href="#" class="read-more">Read <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Article 3 -->
+          <article class="article-card" data-category="guides">
+            <div class="img-wrapper">
+              <span class="category-badge">Guides</span>
+              <img src="https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=600&q=80"
+                alt="MarketOnex inside">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> 6 min read</span>
+                <span>Sep 10, 2024</span>
+              </div>
+              <h3>Cable Management Like a Pro: Tips & Tricks</h3>
+              <p>Airflow matters. Learn how to tightly route your PSU cables behind the motherboard tray for a cleaner,
+                cooler, and better-looking rig.</p>
+              <div class="card-footer">
+                <div class="author">
+                  <div class="author-img">J</div>
+                  <span>John R.</span>
+                </div>
+                <a href="#" class="read-more">Read <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Article 4 -->
+          <article class="article-card" data-category="news">
+            <div class="img-wrapper">
+              <span class="category-badge">News</span>
+              <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"
+                alt="Processor">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> 3 min read</span>
+                <span>Sep 02, 2024</span>
+              </div>
+              <h3>Intel Core Ultra Desktop CPUs Announced</h3>
+              <p>The newest processor generation claims significant IPC gains, heavily optimized P-cores and E-cores
+                architecture, and stunning efficiency.</p>
+              <div class="card-footer">
+                <div class="author">
+                  <div class="author-img">E</div>
+                  <span>Emma L.</span>
+                </div>
+                <a href="#" class="read-more">Read <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Scrolling Ad Banner 2 -->
+          <div class="ad-banner">
+            <div class="ad-marquee">
+              <span id="ad-text-2"></span>
+            </div>
+          </div>
+
+          <!-- Article 5 -->
+          <article class="article-card" data-category="guides">
+            <div class="img-wrapper">
+              <span class="category-badge">Guides</span>
+              <img src="https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80"
+                alt="Setup workspace">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> 10 min read</span>
+                <span>Aug 28, 2024</span>
+              </div>
+              <h3>Top 5 High-Airflow Cases for Hot Builds</h3>
+              <p>Running a flagship CPU and GPU? You need a mesh front panel. We review the best cases for lowering your
+                system temperatures.</p>
+              <div class="card-footer">
+                <div class="author">
+                  <div class="author-img">M</div>
+                  <span>Mark D.</span>
+                </div>
+                <a href="#" class="read-more">Read <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </article>
+
+          <!-- Article 6 -->
+          <article class="article-card" data-category="reviews">
+            <div class="img-wrapper">
+              <span class="category-badge">Reviews</span>
+              <img src="https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=600&q=80"
+                alt="Motherboard details">
+            </div>
+            <div class="card-content">
+              <div class="card-meta">
+                <span><i class="fa-regular fa-clock"></i> 7 min read</span>
+                <span>Aug 20, 2024</span>
+              </div>
+              <h3>Gen5 NVMe SSDs Tested: Worth the Upgrade?</h3>
+              <p>Are sequential read speeds of 12,000 MB/s truly noticeably faster for gamers, or is Gen4 still the
+                price-to-performance king?</p>
+              <div class="card-footer">
+                <div class="author">
+                  <div class="author-img">S</div>
+                  <span>Sarah T.</span>
+                </div>
+                <a href="#" class="read-more">Read <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="pagination">
+          <button class="page-btn active">1</button>
+          <button class="page-btn hover-glow">2</button>
+          <button class="page-btn hover-glow">3</button>
+          <span>...</span>
+          <button class="page-btn hover-glow">Next <i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+
+      </main>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-sections">
+      <div class="footer-col">
+        <h3>MarketOnex</h3>
+        <p>Your trusted source for professional hardware reviews, PC building tutorials, and component news.</p>
+        <div class="social-links">
+          <a href="#" class="hover-glow"><i class="fa-brands fa-youtube"></i></a>
+          <a href="#" class="hover-glow"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" class="hover-glow"><i class="fa-brands fa-twitch"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3>Links</h3>
+        <ul>
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">PC Builder Tool</a></li>
+          <li><a href="#">Shop Components</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h3>Policies</h3>
+        <ul>
+          <li><a href="#">Testing Methodology</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2024 MarketOnex. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <!-- Blog Reader Modal -->
+  <div id="blog-reader-modal" class="modal">
+    <div class="modal-content blog-reader-content">
+      <span class="close-modal" id="close-reader">&times;</span>
+      <div id="reader-render-area">
+        <!-- Content injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script src="js/blogs.js"></script>
+</body>
+
+</html>

@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showStatus('Sending verification email...', 'info');
 
             try {
-                const data = await safeFetch(BASE + '/api/auth/send-email-verification', {
+                const data = await safeFetch(BASE + '/auth/send-email-verification', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
             checkVerificationBtn.textContent = 'Checking...';
 
             try {
-                const data = await safeFetch(BASE + '/api/auth/check-email-verification', {
+                const data = await safeFetch(BASE + '/auth/check-email-verification', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
 
             try {
-                const result = await safeFetch(BASE + '/api/auth/signup', {
+                const result = await safeFetch(BASE + '/auth/signup', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',

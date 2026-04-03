@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="css/admin.css">
     <link rel="stylesheet" href="css/admin_3d.css">
     <link rel="stylesheet" href="css/admin_responsive.css">
+    <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.6/quill.snow.css">
+    <link rel="stylesheet" href="css/blog_management.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -61,6 +63,10 @@
                     <i class="fas fa-users"></i>
                     <span>Customer Info</span>
                     <span class="badge" id="customers-badge"></span>
+                </a>
+                <a href="#" class="nav-item" data-tab="blogs">
+                    <i class="fas fa-blog"></i>
+                    <span>Blog Management</span>
                 </a>
                 <a href="#" class="nav-item" data-tab="logs">
                     <i class="fas fa-clipboard-list"></i>
@@ -290,6 +296,7 @@
 
             <!-- Customer Information Tab -->
             <div id="customers-view" class="view-section">
+                <!-- ... existing customer tab content ... -->
                 <div class="section-header">
                     <h3><i class="fas fa-users"></i> Customer Information</h3>
                     <div class="search-box">
@@ -319,6 +326,126 @@
                     <div id="customers-empty" class="empty-state" style="display: none;">
                         <i class="fas fa-users"></i>
                         <p>No customers registered yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blog Management Tab -->
+            <div id="blogs-view" class="view-section">
+                <div class="section-header">
+                    <h3><i class="fas fa-blog"></i> Blog Management</h3>
+                    <div class="blog-actions">
+                        <span id="auto-save-status" class="auto-save-status"></span>
+                        <button class="btn-refresh" id="btn-preview-blog"><i class="fas fa-eye"></i> Preview</button>
+                        <button class="btn-action btn-view" id="btn-save-draft"><i class="fas fa-save"></i> Save Draft</button>
+                        <button class="btn-action btn-approve" id="btn-publish-blog"><i class="fas fa-paper-plane"></i> Publish Blog</button>
+                    </div>
+                </div>
+
+                <div class="blog-editor-container">
+                    <div class="blog-form-grid">
+                        <div class="blog-form-main">
+                            <div class="glass-panel">
+                                <div class="form-group-custom">
+                                    <label for="blog-title">Blog Title</label>
+                                    <input type="text" id="blog-title" class="blog-input" placeholder="Enter a catchy title...">
+                                </div>
+                                
+                                <div class="form-row-custom">
+                                    <div class="form-group-custom">
+                                        <label for="blog-category">Category</label>
+                                        <select id="blog-category" class="blog-input">
+                                            <option value="Technology">Technology</option>
+                                            <option value="Gadgets">Gadgets</option>
+                                            <option value="Software">Software</option>
+                                            <option value="Business">Business</option>
+                                            <option value="Lifestyle">Lifestyle</option>
+                                            <option value="AI & Robotics">AI & Robotics</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group-custom">
+                                        <label for="blog-writer">Writer Name</label>
+                                        <input type="text" id="blog-writer" class="blog-input" placeholder="Writer name...">
+                                    </div>
+                                </div>
+
+                                <div class="expert-toggle-group">
+                                    <label class="switch-custom">
+                                        <input type="checkbox" id="blog-expert-toggle">
+                                        <span class="slider-custom round"></span>
+                                    </label>
+                                    <span>Expert Article (Special Badge)</span>
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label>Content</label>
+                                    <div id="blog-editor-wrapper">
+                                        <div id="blog-editor-toolbar"></div>
+                                        <div id="blog-editor-content"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="blog-form-sidebar">
+                            <div class="glass-panel">
+                                <h3>Media & Tags</h3>
+                                
+                                <div class="form-group-custom">
+                                    <label>Cover Images (Multiple)</label>
+                                    <div class="image-upload-wrapper" id="blog-image-dropzone">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        <p>Drag & drop or Click</p>
+                                        <input type="file" id="blog-images" multiple accept="image/*" hidden>
+                                    </div>
+                                    <div id="blog-image-preview" class="image-preview-grid"></div>
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label>Tags</label>
+                                    <div class="tag-input-container">
+                                        <div id="blog-tags-list" class="tags-list"></div>
+                                        <input type="text" id="blog-tag-input" class="blog-input" placeholder="Add tag and Enter...">
+                                    </div>
+                                </div>
+
+                                <div class="blog-stats-panel">
+                                    <div class="stat-item-mini">
+                                        <i class="fas fa-file-word"></i>
+                                        <span id="word-count">0 words</span>
+                                    </div>
+                                    <div class="stat-item-mini">
+                                        <i class="fas fa-clock"></i>
+                                        <span id="reading-time">0 min read</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manage Existing Blogs Section -->
+                    <div class="blog-management-list glass-panel" style="margin-top: 2rem;">
+                        <div class="section-header-mini">
+                            <h3><i class="fas fa-list"></i> Manage Existing Blogs</h3>
+                            <button class="btn-refresh-mini" onclick="loadAdminBlogs()"><i class="fas fa-sync-alt"></i> Refresh List</button>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-blogs-table-body">
+                                    <!-- Populated by JS -->
+                                    <tr><td colspan="5" style="text-align:center;">Loading blogs...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -378,9 +505,64 @@
         </div>
     </div>
 
+    <!-- Blog Preview Modal -->
+    <div id="blog-preview-modal" class="modal">
+        <div class="modal-content blog-preview-content">
+            <span class="close-modal" id="close-preview">&times;</span>
+            <div id="preview-render-area">
+                <!-- Rendered content goes here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="js/blog_management.js"></script>
     <script src="js/admin.js"></script>
     <script src="js/admin_3d.js"></script>
     <script>
+        // ── Admin RBAC Sidebar Control ──────────────────────────────────────
+        (function () {
+            const role = localStorage.getItem('admin_role') || 'admin';
+            const navItems = document.querySelectorAll('.nav-item');
+            const userRoleEl = document.querySelector('.user-role');
+
+            console.log("[RBAC] Current Role:", role);
+
+            // Update UI role display
+            if (userRoleEl) {
+                userRoleEl.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+            }
+
+            // Visibility Logic
+            navItems.forEach(item => {
+                const tab = item.getAttribute('data-tab');
+                if (!tab) return; // Keep "Back to Home"
+
+                let isVisible = false;
+                if (role === 'admin') {
+                    isVisible = true;
+                } else if (role === 'blog') {
+                    isVisible = (tab === 'blogs');
+                } else if (role === 'verifier') {
+                    isVisible = ['pending', 'pending-biz'].includes(tab);
+                }
+
+                if (!isVisible) {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Auto-switch to first allowed tab if current is hidden
+            const activeItem = document.querySelector('.nav-item.active');
+            if (activeItem && activeItem.style.display === 'none') {
+                const firstAllowed = document.querySelector('.nav-item[data-tab]:not([style*="display: none"])');
+                if (firstAllowed) {
+                    // Small delay to ensure other UI scripts are ready
+                    setTimeout(() => firstAllowed.click(), 100);
+                }
+            }
+        })();
+
         // ── Mobile sidebar toggle ──────────────────────────────────────────
         (function () {
             var toggle = document.getElementById('sidebar-toggle');

@@ -195,9 +195,11 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    window.location.href = '/admin/dashboard.html';
+                    // Store role in localStorage for RBAC sidebar visibility
+                    localStorage.setItem('admin_role', data.role || 'admin');
+                    window.location.href = data.redirect || '/admin/dashboard.html';
                 } else {
-                    errorDiv.textContent = data.message || 'Login failed';
+                    errorDiv.textContent = data.message || (data.data && data.data.message) || 'Login failed';
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
